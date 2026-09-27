@@ -7,8 +7,17 @@ import os
 import sys
 import subprocess
 
+# Ensure UTF-8 output on Windows consoles
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 GIT_EXE = r"C:\Users\LOQ\.gemini\antigravity-ide\scratch\mingit\cmd\git.exe"
 REPO_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 def run_git(args):
     cmd = [GIT_EXE] + args
