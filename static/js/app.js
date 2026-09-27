@@ -276,6 +276,9 @@ document.addEventListener("DOMContentLoaded", () => {
 function switchPerspective(role) {
   appState.currentRole = role;
 
+  // Smoothly scroll window to top
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
   // Update Perspective Switcher Buttons
   document.querySelectorAll(".role-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.role === role);
@@ -309,6 +312,11 @@ function switchPerspective(role) {
 // Household Tabs
 function switchHouseholdTab(tab) {
   appState.householdTab = tab;
+
+  // Scroll household container to top
+  const hhContainer = document.querySelector(".household-container");
+  if (hhContainer) hhContainer.scrollTop = 0;
+
   document.querySelectorAll(".household-tab-pane").forEach(pane => {
     pane.classList.toggle("active", pane.id === `hh-tab-${tab}`);
   });
@@ -322,6 +330,85 @@ function switchHouseholdTab(tab) {
       selectScannerPreset("COPPER_SCRAP");
     }
   }
+}
+
+// Field Coordinator Tabs
+function switchCoordinatorTab(tab) {
+  document.querySelectorAll("#view-coordinator .portal-subpane").forEach(pane => {
+    pane.classList.toggle("active", pane.id === `coord-pane-${tab}`);
+  });
+  document.querySelectorAll("#view-coordinator [data-coordtab]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.coordtab === tab);
+  });
+}
+
+// Collector Mode Tabs (Mode 1 / Mode 2 / Mode 3)
+function switchCollectorMode(mode) {
+  document.querySelectorAll("#view-collector .portal-subpane").forEach(pane => {
+    pane.classList.toggle("active", pane.id === `collector-pane-${mode}`);
+  });
+  document.querySelectorAll("#view-collector [data-mode]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.mode === mode);
+  });
+}
+
+// Storage Hub Tabs (Scale / Incoming / Inventory)
+function switchHubTab(tab) {
+  document.querySelectorAll("#view-hub .portal-subpane").forEach(pane => {
+    pane.classList.toggle("active", pane.id === `hub-pane-${tab}`);
+  });
+  document.querySelectorAll("#view-hub [data-hubtab]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.hubtab === tab);
+  });
+}
+
+// Recycler Tabs (Offers / Directory / Gatepass)
+function switchRecyclerTab(tab) {
+  document.querySelectorAll("#view-recycler .portal-subpane").forEach(pane => {
+    pane.classList.toggle("active", pane.id === `recycler-pane-${tab}`);
+  });
+  document.querySelectorAll("#view-recycler [data-rectab]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.rectab === tab);
+  });
+}
+
+// SMS Simulator Interactive Messaging
+function sendCollectorSMS(customText) {
+  const inputEl = document.getElementById("collector-sms-input");
+  const text = customText || (inputEl ? inputEl.value.trim() : "");
+  if (!text) return;
+  if (inputEl) inputEl.value = "";
+
+  const box = document.getElementById("collector-sms-messages");
+  if (!box) return;
+
+  // Add outgoing message bubble
+  const outBubble = document.createElement("div");
+  outBubble.className = "sms-bubble sms-bubble-out";
+  outBubble.innerHTML = `<strong>COL:</strong> ${escapeHtml(text)}`;
+  box.appendChild(outBubble);
+  box.scrollTop = box.scrollHeight;
+
+  // Generate automated gateway response
+  setTimeout(() => {
+    let reply = "EcoFlow AI Gateway: Command received and logged in audit log.";
+    const upper = text.toUpperCase();
+    if (upper.includes("ACCEPT")) {
+      reply = "✅ EcoFlow SMS: Pickup PR-2026-000844 accepted! Navigate to House 8, Zoo Road. Customer: Meenakshi Devi.";
+    } else if (upper.includes("SEAL")) {
+      reply = "📦 EcoFlow SMS: Lot sealed! Digital ID LOT-2026-000186 generated. Proceed to HUB-001 (Central Sorting Hub).";
+    } else if (upper.includes("STATUS")) {
+      reply = "📊 EcoFlow SMS: Collector COL-00156 (Abdul Karim) | Status: ONLINE | Active Pickups: 1 | Assigned Hub: HUB-001.";
+    } else if (upper.includes("HELP")) {
+      reply = "💡 Commands: 'ACCEPT [ID]', 'SEAL [WEIGHT]', 'STATUS', 'SOS'. Contact coordinator: +91 98765 00012.";
+    }
+
+    const inBubble = document.createElement("div");
+    inBubble.className = "sms-bubble sms-bubble-in";
+    inBubble.innerHTML = `<strong>+91 80000 32635:</strong> ${escapeHtml(reply)}`;
+    box.appendChild(inBubble);
+    box.scrollTop = box.scrollHeight;
+  }, 400);
 }
 
 // Admin Tabs
@@ -339,16 +426,6 @@ function switchAdminTab(tab) {
   }
 }
 
-// Storage Hub Tabs
-function switchHubTab(tab) {
-  appState.hubTab = tab;
-  document.querySelectorAll(".hub-tab-pane").forEach(pane => {
-    pane.classList.toggle("active", pane.id === `hub-tab-${tab}`);
-  });
-  document.querySelectorAll(".hub-nav-item").forEach(item => {
-    item.classList.toggle("active", item.dataset.tab === tab);
-  });
-}
 
 // Initialize GIS Canvas Maps
 function initMaps() {

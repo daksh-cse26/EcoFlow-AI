@@ -49,21 +49,10 @@ body {
 }
 
 /* ----------------------------------------------------
-   TOP DEMO TOUR CONTROLLER (Section 53)
+   TOP DEMO TOUR CONTROLLER (Hidden per user request)
 ---------------------------------------------------- */
 .tour-controller-bar {
-  background: linear-gradient(90deg, #064E3B, #0D5C3A, #064E3B);
-  border-bottom: 1px solid rgba(52, 211, 153, 0.3);
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  z-index: 1000;
-  position: sticky;
-  top: 0;
-  box-shadow: var(--shadow-md);
+  display: none !important;
 }
 
 .tour-left {
@@ -248,8 +237,19 @@ body {
 }
 
 /* ----------------------------------------------------
-   PERSPECTIVE VIEWS
+   PERSPECTIVE VIEWS & INTERFACE TRANSITIONS
 ---------------------------------------------------- */
+@keyframes interface-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .perspective-view {
   display: none;
   padding: 20px;
@@ -259,7 +259,171 @@ body {
 
 .perspective-view.active {
   display: block;
+  animation: interface-enter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Sub-interface Header & Back Navigation */
+.sub-interface-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 14px;
+  border-radius: var(--radius-sm);
+}
+
+.sub-interface-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-glass);
+  color: var(--primary-mint);
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: var(--primary-leaf);
+  color: #064E3B;
+}
+
+/* Sub-interface Tabs in Coordinator, Hub, Collector, Recycler */
+.portal-subnav-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-glass);
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.portal-subnav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.portal-subnav-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.portal-subnav-btn.active {
+  background: var(--primary-leaf);
+  color: #064E3B;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+.portal-subpane {
+  display: none;
+}
+
+.portal-subpane.active {
+  display: block;
+  animation: interface-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* SMS Mobile Terminal Simulator (Mode 2) */
+.sms-terminal-container {
+  max-width: 480px;
+  margin: 0 auto;
+  background: #0B1410;
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.sms-messages-box {
+  height: 280px;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sms-bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.sms-bubble-in {
+  background: rgba(255, 255, 255, 0.08);
+  color: #E2E8F0;
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sms-bubble-out {
+  background: #064E3B;
+  color: #A7F3D0;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.sms-quick-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid var(--border-glass);
+}
+
+.sms-quick-btn {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--border-glass);
+  color: var(--primary-mint);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sms-quick-btn:hover {
+  background: var(--primary-leaf);
+  color: #064E3B;
+}
+
+.sms-input-row {
+  display: flex;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  gap: 8px;
+}
+
 
 /* ----------------------------------------------------
    HOUSEHOLD APPLICATION PERSPECTIVE (Mobile-First)
