@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoFlow AI — AI-Assisted. Human-Verified. Digitally Traceable.</title>
+  <meta name="description" content="AI-assisted, digitally managed recycling platform organizing the complete recyclable-waste journey from household to verified storage hub to authorized recycler." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+  <!-- ==================================================
+       SECTION 53: 26-STEP COMPLETE JUDGE TOUR BAR
+       ================================================== -->
+  <aside class="tour-controller-bar" id="tour-bar" aria-label="Demo Tour Controller">
+    <div class="tour-left">
+      <span class="tour-badge" id="tour-step-badge">Step 1 of 26</span>
+      <div class="tour-info">
+        <span class="tour-title" id="tour-step-title">Register / View Household Impact</span>
+        <span class="tour-desc" id="tour-step-desc">View Household Dashboard with verified recycling impact counters.</span>
+      </div>
+    </div>
+    <div class="tour-controls">
+      <select class="tour-select" id="tour-step-select" onchange="judgeTour.goToStep(parseInt(this.value))">
+        <!-- Injected via tour.js -->
+      </select>
+      <button class="btn btn-sm btn-outline" onclick="judgeTour.prevStep()">◀ Prev</button>
+      <button class="btn btn-sm btn-primary" onclick="judgeTour.nextStep()">Next Step ▶</button>
+    </div>
+  </aside>
+
+  <!-- ==================================================
+       APP HEADER & ROLE PERSPECTIVE SWITCHER
+       ================================================== -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo-icon">🌱</div>
+      <div class="brand-text">
+        <h1 data-i18n="app.name">ECOFLOW AI</h1>
+        <p class="brand-tagline" data-i18n="app.tagline">AI-Assisted. Human-Verified. Digitally Traceable.</p>
+      </div>
+    </div>
+
+    <!-- Perspective / Stakeholder Switcher -->
+    <nav class="role-switcher-bar" aria-label="Perspective Switcher">
+      <button class="role-btn active" data-role="household" onclick="switchPerspective('household')">
+        🏠 Household App
+      </button>
+      <button class="role-btn" data-role="coordinator" onclick="switchPerspective('coordinator')">
+        📋 Field Coordinator
+      </button>
+      <button class="role-btn" data-role="collector" onclick="switchPerspective('collector')">
+        🚚 Field Collector
+      </button>
+      <button class="role-btn" data-role="hub" onclick="switchPerspective('hub')">
+        ⚖️ Storage Hub (Authority)
+      </button>
+      <button class="role-btn" data-role="recycler" onclick="switchPerspective('recycler')">
+        🏭 Recycler Portal
+      </button>
+      <button class="role-btn" data-role="admin" onclick="switchPerspective('admin')">
+        🗺️ Command Center
+      </button>
+    </nav>
+
+    <!-- Language Selector & AI Voice Assistant Trigger -->
+    <div class="header-right">
+      <div class="lang-selector-group" title="Select Indian Regional Language">
+        <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिन्दी</button>
+        <button class="lang-btn" data-lang="as" onclick="setLanguage('as')">অসমীয়া</button>
+        <button class="lang-btn" data-lang="bn" onclick="setLanguage('bn')">বাংলা</button>
+      </div>
+      <button class="voice-btn-top" onclick="voiceAssistant.openVoiceModal('pickup-notes', 'pickup')" title="Multilingual Speech Recognition">
+        🎙️ <span data-i18n="voice.tap_to_speak">Voice Assistant</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================================================
+       VIEW 1: HOUSEHOLD APPLICATION PERSPECTIVE
+       Section 6: Mobile-first Household interface
+       ================================================== -->
+  <main class="perspective-view active" id="view-household">
+    <div class="household-container">
+      
+      <!-- Top Household Bar -->
+      <div class="household-app-bar">
+        <div class="user-greeting">
+          <h2 data-i18n="greeting.title">Good Morning, Rahul Sharma 🌱</h2>
+          <p data-i18n="greeting.subtitle">Your Household Recycling Impact Overview</p>
+        </div>
+      </div>
+
+      <!-- TAB 1: HOME -->
+      <section class="household-tab-pane active" id="hh-tab-home">
+        <div class="impact-grid">
+          <div class="impact-card">
+            <span class="impact-icon">⚖️</span>
+            <div>
+              <div class="impact-val" id="hh-stat-verified-kg">12.5 kg</div>
+              <div class="impact-lbl" data-i18n="impact.verified_weight">Verified Recycling</div>
+            </div>
+          </div>
+          <div class="impact-card">
+            <span class="impact-icon">📦</span>
+            <div>
+              <div class="impact-val" id="hh-stat-pickups">4</div>
+              <div class="impact-lbl" data-i18n="impact.pickups_count">Completed Pickups</div>
+            </div>
+          </div>
+          <div class="impact-card">
+            <span class="impact-icon">🎯</span>
+            <div>
+              <div class="impact-val" id="hh-stat-segregation">88/100</div>
+              <div class="impact-lbl" data-i18n="impact.segregation_score">Segregation Score</div>
+            </div>
+          </div>
+          <div class="impact-card">
+            <span class="impact-icon">🎉</span>
+            <div>
+              <div class="impact-val" id="hh-stat-matches">3</div>
+              <div class="impact-lbl" data-i18n="impact.weight_matches">Weight Matches</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Action Cards -->
+        <div class="home-actions-list">
+          <button class="action-card-btn" onclick="switchHouseholdTab('scan')">
+            <div class="action-btn-left">
+              <span class="action-btn-icon">📸</span>
+              <div>
+                <div class="action-btn-title" data-i18n="action.scan_waste">Scan Waste with Local AI</div>
+                <div class="action-btn-sub">On-device regional Indian waste classifier</div>
+              </div>
+            </div>
+            <span>➔</span>
+          </button>
+
+          <button class="action-card-btn" onclick="openPickupModal()">
+            <div class="action-btn-left">
+              <span class="action-btn-icon">📅</span>
+              <div>
+                <div class="action-btn-title" data-i18n="action.request_pickup">Request Scrap Pickup</div>
+                <div class="action-btn-sub">Map-confirmed location & time slot</div>
+              </div>
+            </div>
+            <span>➔</span>
+          </button>
+
+          <button class="action-card-btn" onclick="switchHouseholdTab('settlement')">
+            <div class="action-btn-left">
+              <span class="action-btn-icon">🧾</span>
+              <div>
+                <div class="action-btn-title" data-i18n="action.view_settlements">Transparent Settlements</div>
+                <div class="action-btn-sub">Verified weight × Buying rate formula</div>
+              </div>
+            </div>
+            <span>➔</span>
+          </button>
+
+          <button class="action-card-btn" onclick="switchHouseholdTab('rewards')">
+            <div class="action-btn-left">
+              <span class="action-btn-icon">🎁</span>
+              <div>
+                <div class="action-btn-title">Eco Rewards</div>
+                <div class="action-btn-sub"><span class="coming-soon-pill">COMING SOON</span> Green badges</div>
+              </div>
+            </div>
+            <span>➔</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 2: PICKUPS -->
+      <section class="household-tab-pane" id="hh-tab-pickups">
+        <h3 class="mb-2">Your Scrap Pickups</h3>
+        <div id="household-pickups-list">
+          <div class="queue-item-card">
+            <div class="queue-item-header">
+              <span class="queue-id">PR-2026-000842</span>
+              <span class="status-pill status-verified">VERIFIED</span>
+            </div>
+            <p class="small text-muted mt-2">10 kg Copper & PCB • Paltan Bazaar, Guwahati</p>
+            <div class="mt-2">
+              <button class="btn btn-sm btn-outline" onclick="switchHouseholdTab('settlement'); loadSettlementDetails('LOT-2026-000184');">
+                View Receipt (₹5,044)
+              </button>
+            </div>
+          </div>
+          <div class="queue-item-card mt-2">
+            <div class="queue-item-header">
+              <span class="queue-id">PR-2026-000844</span>
+              <span class="status-pill status-pending">PENDING</span>
+            </div>
+            <p class="small text-muted mt-2">25 kg Newspaper & Cardboard • Scheduled tomorrow</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: SCAN WASTE (Section 9, 10, 11) -->
+      <section class="household-tab-pane" id="hh-tab-scan">
+        <div class="scanner-viewport">
+          <div class="laser-line"></div>
+          <div class="scanner-preview-img" id="scanner-preview-img">
+            <!-- Sample preview visual injected -->
+          </div>
+          <div class="scanner-loading-overlay" id="scanner-loading">
+            <span class="pulse-dot"></span>
+            <span>Local AI Analyzing Material Signatures...</span>
+          </div>
+        </div>
+
+        <!-- Presets Bar for Instant Evaluation -->
+        <div class="presets-selector-bar">
+          <span class="presets-lbl" data-i18n="scanner.sample_presets">Select Sample Regional Scrap:</span>
+          <div class="preset-buttons-row">
+            <button type="button" class="scrap-preset-btn active" data-preset="COPPER_SCRAP" onclick="selectScannerPreset('COPPER_SCRAP')">
+              🔌 Copper Wires
+            </button>
+            <button type="button" class="scrap-preset-btn" data-preset="EWASTE_PCB" onclick="selectScannerPreset('EWASTE_PCB')">
+              💻 Circuit Boards
+            </button>
+            <button type="button" class="scrap-preset-btn" data-preset="NEWSPAPER" onclick="selectScannerPreset('NEWSPAPER')">
+              📰 Newspapers
+            </button>
+            <button type="button" class="scrap-preset-btn" data-preset="PET_BOTTLE" onclick="selectScannerPreset('PET_BOTTLE')">
+              🧴 PET Bottles
+            </button>
+            <button type="button" class="scrap-preset-btn" data-preset="ALUMINIUM_SCRAP" onclick="selectScannerPreset('ALUMINIUM_SCRAP')">
+              🥫 Aluminium
+            </button>
+          </div>
+        </div>
+
+        <div class="scanner-upload-actions">
+          <label class="btn btn-sm btn-outline btn-block" style="cursor: pointer;">
+            📁 Upload Custom Photo
+            <input type="file" accept="image/*" style="display: none;" onchange="handleCustomWasteUpload(event)" />
+          </label>
+        </div>
+
+        <!-- Local AI Structured Assessment Card -->
+        <div class="assessment-card" id="scanner-assessment-card">
+          <!-- Injected via app.js -->
+        </div>
+      </section>
+
+      <!-- TAB 4: SETTLEMENTS & DIGITAL RECEIPT (Section 28, 29, 32) -->
+      <section class="household-tab-pane" id="hh-tab-settlement">
+        <div id="settlement-receipt-view">
+          <!-- Injected via settlement.js -->
+        </div>
+      </section>
+
+      <!-- TAB 5: REWARDS (Section 38: COMING SOON) -->
+      <section class="household-tab-pane" id="hh-tab-rewards">
+        <div class="rewards-header-banner">
+          <span class="coming-soon-pill" data-i18n="rewards.coming_soon">COMING SOON</span>
+          <h3>EcoFlow Citizen Rewards</h3>
+          <p class="small text-muted" data-i18n="rewards.locked_msg">Rewards program launching soon across municipal zones.</p>
+        </div>
+
+        <div class="locked-reward-card">
+          <div class="reward-lock-badge">🔒 Locked</div>
+          <span class="reward-icon">🌱</span>
+          <div>
+            <div class="reward-title">GREEN STARTER</div>
+            <div class="reward-desc">Recycle your first 5 kg of verified waste</div>
+          </div>
+        </div>
+
+        <div class="locked-reward-card">
+          <div class="reward-lock-badge">🔒 Locked</div>
+          <span class="reward-icon">♻️</span>
+          <div>
+            <div class="reward-title">ECO REGULAR</div>
+            <div class="reward-desc">Complete 10 verified household pickups</div>
+          </div>
+        </div>
+
+        <div class="locked-reward-card">
+          <div class="reward-lock-badge">🔒 Locked</div>
+          <span class="reward-icon">🏆</span>
+          <div>
+            <div class="reward-title">WASTE WARRIOR</div>
+            <div class="reward-desc">Reach 50 kg verified recycling milestone</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mobile Bottom Navigation -->
+      <nav class="household-bottom-nav" aria-label="Household Bottom Navigation">
+        <button class="bottom-nav-item active" data-tab="home" onclick="switchHouseholdTab('home')">
+          <span class="nav-icon">🏠</span>
+          <span data-i18n="nav.home">Home</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="pickups" onclick="switchHouseholdTab('pickups')">
+          <span class="nav-icon">📦</span>
+          <span data-i18n="nav.pickups">Pickups</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="scan" onclick="switchHouseholdTab('scan')">
+          <span class="nav-icon">📸</span>
+          <span data-i18n="nav.scan">Scan</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="settlement" onclick="switchHouseholdTab('settlement')">
+          <span class="nav-icon">🧾</span>
+          <span>Settlements</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="rewards" onclick="switchHouseholdTab('rewards')">
+          <span class="nav-icon">🎁</span>
+          <span data-i18n="nav.rewards">Rewards</span>
+        </button>
+      </nav>
+
+    </div>
+  </main>
+
+  <!-- ==================================================
+       VIEW 2: FIELD OPERATIONS / COORDINATOR DASHBOARD
+       Sections 17, 18, 19, 20
+       ================================================== -->
+  <main class="perspective-view" id="view-coordinator">
+    <div class="page-header mb-2">
+      <h2>📋 Field Operations & Coordinator Dashboard</h2>
+      <p class="text-muted">Manage collector assignments across Zone A, B, C, D with 3 collector communication modes.</p>
+    </div>
+
+    <div class="coordinator-metrics-row mb-2">
+      <div class="impact-grid" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="impact-card">
+          <span class="impact-icon">⏳</span>
+          <div>
+            <div class="impact-val">1</div>
+            <div class="impact-lbl">Pending Requests</div>
+          </div>
+        </div>
+        <div class="impact-card">
+          <span class="impact-icon">🚚</span>
+          <div>
+            <div class="impact-val">3</div>
+            <div class="impact-lbl">Collectors Available</div>
+          </div>
+        </div>
+        <div class="impact-card">
+          <span class="impact-icon">📱</span>
+          <div>
+            <div class="impact-val">Mode 1/2/3</div>
+            <div class="impact-lbl">Smart / SMS / Physical</div>
+          </div>
+        </div>
+        <div class="impact-card">
+          <span class="impact-icon">⏱️</span>
+          <div>
+            <div class="impact-val">15 min</div>
+            <div class="impact-lbl">Reassignment Timeout</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hub-card">
+      <h3 class="mb-2">Operational Pickup Queue</h3>
+      <div id="coordinator-pending-list">
+        <!-- Injected via app.js -->
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================================================
+       VIEW 3: FIELD COLLECTOR APPLICATION (Section 21, 22)
+       ================================================== -->
+  <main class="perspective-view" id="view-collector">
+    <div class="household-container">
+      <div class="household-app-bar">
+        <div class="user-greeting">
+          <h2>Rameshwar Boro (COL-00142)</h2>
+          <p>Assigned Storage Hub: HUB-001 • Zone B</p>
+        </div>
+        <div class="mt-2">
+          <button id="collector-connectivity-pill" class="connectivity-pill connectivity-online" onclick="toggleCollectorConnectivity()">
+            ONLINE
+          </button>
+        </div>
+      </div>
+
+      <div style="padding: 16px;">
+        <div class="hub-authority-banner">
+          <strong>Active Collection Assignment</strong>
+          <p class="small mt-1">Pickup ID: PR-2026-000844 • 25 kg Newspaper & Cardboard</p>
+        </div>
+
+        <div class="assessment-card mb-2 text-center">
+          <h4>Digital Waste Lot QR</h4>
+          <p class="small text-muted mb-2">Lot: <strong id="collector-lot-id-badge">LOT-2026-000184</strong></p>
+          <div style="display: flex; justify-content: center; margin: 10px 0;">
+            <canvas id="collector-active-qr" width="150" height="150" style="border: 1px solid var(--border-glass); border-radius: 8px;"></canvas>
+          </div>
+          <p class="small text-muted">Bound to Household, Collector ID, and Pickup ID.</p>
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="createDigitalLotFromCollector()">
+          📦 Seal & Generate Waste Lot QR
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================================================
+       VIEW 4: STORAGE HUB VERIFICATION STATION
+       Section 23, 24, 25, 26, 27 (THE FINAL AUTHORITY!)
+       ================================================== -->
+  <main class="perspective-view" id="view-hub">
+    <div class="page-header mb-2">
+      <h2>⚖️ Storage Hub Verification Station</h2>
+      <p class="text-muted">The Storage Hub is the <strong>FINAL AUTHORITY</strong> for material classification, physical weight, and quality grading.</p>
+    </div>
+
+    <div class="hub-verification-grid">
+      
+      <!-- Left: Lot Physical Inspection Station -->
+      <div class="hub-card">
+        <div class="hub-authority-banner">
+          <strong>CORE PRINCIPLE:</strong> AI assists. Employees collect. Storage hubs verify. EcoFlow AI records, calculates and traces. <em>AI never independently determines final settlement.</em>
+        </div>
+
+        <div class="form-group">
+          <label>Select Incoming Lot to Inspect & Weigh:</label>
+          <select id="hub-lot-selector" class="form-input" onchange="onHubLotSelected(this.value)">
+            <!-- Injected via app.js -->
+          </select>
+        </div>
+
+        <div class="receipt-details-grid mb-2">
+          <div><span class="lbl">AI Preliminary Assessment:</span> <strong id="hub-ai-assessment-display">Copper Scrap (91% conf)</strong></div>
+          <div><span class="lbl">User Estimated Weight:</span> <strong id="hub-user-est-weight-display">10.0 kg</strong></div>
+        </div>
+
+        <h4 class="mb-2">Physical Segregation & Scale Breakdown</h4>
+        <table class="data-table mb-2">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Quality Grade</th>
+              <th>Verified Weight (kg)</th>
+              <th>Buying Rate (₹/kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Copper Scrap</td>
+              <td><span class="badge-grade">GRADE B</span></td>
+              <td><strong>7.9 kg</strong></td>
+              <td>₹580.00</td>
+            </tr>
+            <tr>
+              <td>Circuit Boards (PCB)</td>
+              <td><span class="badge-grade">GRADE B</span></td>
+              <td><strong>2.1 kg</strong></td>
+              <td>₹220.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Quick Demo Scenarios (Prompt Section 52) -->
+        <div style="background: rgba(0, 0, 0, 0.3); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 14px;">
+          <span class="small text-muted display-block mb-1"><strong>Demo Scenarios (Prompt Section 52):</strong></span>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-sm btn-primary" onclick="submitHubVerification('MATCH')">
+              Demo 1: 10kg Verified (Trigger MATCH Popup)
+            </button>
+            <button class="btn btn-sm btn-secondary" onclick="submitHubVerification('DIFFERENCE')">
+              Demo 2: 7.8kg Verified (DIFFERENCE Notice)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Lot Digital Passport & QR Preview -->
+      <div class="hub-card text-center">
+        <h4>Digital Lot Scanned Passport</h4>
+        <p class="small text-muted mb-2">Immutable digital chain verification token</p>
+        <div style="display: flex; justify-content: center; margin: 16px 0;">
+          <canvas id="hub-lot-qr-preview" width="120" height="120" style="border: 1px solid var(--border-glass); border-radius: 8px;"></canvas>
+        </div>
+        <div class="inspector-card text-left mt-2">
+          <div class="inspector-grid">
+            <div><span class="lbl">Assigned Hub:</span> <strong>HUB-001 (Central Sorting Hub)</strong></div>
+            <div><span class="lbl">Weighing Scale Calibrated:</span> <span class="badge-green">ISO-9001 Certified Digital Scale</span></div>
+            <div><span class="lbl">Tolerance Configured:</span> <strong>±5.0% Acceptable Variance</strong></div>
+            <div><span class="lbl">Chief Inspector:</span> <strong>Manoj Kalita</strong></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==================================================
+       VIEW 5: RECYCLER PORTAL & INVENTORY AGGREGATION
+       Sections 33, 34, 35, 36, 37
+       ================================================== -->
+  <main class="perspective-view" id="view-recycler">
+    <div class="page-header mb-2">
+      <h2>🏭 Authorized Recycler Marketplace & Dispatch</h2>
+      <p class="text-muted">Industrial recyclers bid on aggregated lots. <strong>Household settlements remain strictly decoupled from downstream recycler pricing.</strong></p>
+    </div>
+
+    <div class="hub-authority-banner mb-2">
+      <strong>CRITICAL BUSINESS PRINCIPLE (Section 37):</strong> Household → Organization uses <em>Verified Weight × Company Buying Rate</em>. Organization → Recycler uses <em>Aggregated Inventory × Recycler Offer</em>. Recycler prices NEVER retroactively modify completed household settlements.
+    </div>
+
+    <div class="hub-verification-grid">
+      <div class="hub-card">
+        <h3 class="mb-2">Active Recycler Purchase Offers</h3>
+        <div id="recycler-offers-list">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+
+      <div class="hub-card">
+        <h3 class="mb-2">Authorized Industrial Recyclers</h3>
+        <div class="inspector-card mb-2">
+          <h4>GreenPlast Circular Solutions</h4>
+          <p class="small text-muted">Amingaon Logistics Park • Auth: PCB-AS-AUTH-2025-4102</p>
+          <div class="inspector-grid">
+            <div><span class="lbl">Monthly Capacity:</span> <strong>400 Tonnes</strong></div>
+            <div><span class="lbl">Accepted:</span> <strong>PET, HDPE, LDPE</strong></div>
+          </div>
+        </div>
+        <div class="inspector-card">
+          <h4>Pragati Metal Refiners Ltd.</h4>
+          <p class="small text-muted">Narangi Industrial Estate • Auth: PCB-AS-AUTH-2024-8891</p>
+          <div class="inspector-grid">
+            <div><span class="lbl">Monthly Capacity:</span> <strong>250 Tonnes</strong></div>
+            <div><span class="lbl">Accepted:</span> <strong>Copper, Brass, Aluminium</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================================================
+       VIEW 6: ADMIN COMMAND CENTER & GIS MAP
+       Sections 16, 40, 41, 46, 48, 50
+       ================================================== -->
+  <main class="perspective-view" id="view-admin">
+    <div class="page-header mb-2">
+      <h2>🗺️ EcoFlow Command Center & AI Management</h2>
+      <p class="text-muted">Real-time geospatial operations, AI model versioning, feedback dataset, and end-to-end digital traceability.</p>
+    </div>
+
+    <!-- Admin Nav Tabs -->
+    <nav class="role-switcher-bar mb-2" style="background: rgba(15, 23, 42, 0.6);" aria-label="Admin Navigation">
+      <button class="admin-nav-item role-btn active" onclick="switchAdminTab('map')">🗺️ Command Map (GIS)</button>
+      <button class="admin-nav-item role-btn" onclick="switchAdminTab('ai_models')">🤖 AI Models & Testing</button>
+      <button class="admin-nav-item role-btn" onclick="switchAdminTab('feedback')">📊 AI Feedback Dataset</button>
+      <button class="admin-nav-item role-btn" onclick="switchAdminTab('traceability')">🔗 Traceability Explorer</button>
+      <button class="admin-nav-item role-btn" onclick="switchAdminTab('taxonomy')">📋 Material Taxonomy</button>
+      <button class="admin-nav-item role-btn" onclick="switchAdminTab('audit')">📜 Audit Logs</button>
+    </nav>
+
+    <!-- ADMIN TAB 1: GIS COMMAND MAP (Section 41) -->
+    <div class="admin-tab-pane active" id="admin-tab-map">
+      <div class="command-center-layout">
+        
+        <!-- Left: Operational Statistics -->
+        <aside class="map-sidebar-left">
+          <h4>Operational Statistics</h4>
+          <div class="impact-grid" style="grid-template-columns: 1fr; margin-top: 10px;">
+            <div class="impact-card">
+              <span class="impact-icon">📦</span>
+              <div>
+                <div class="impact-val" id="adm-stat-pickups">3</div>
+                <div class="impact-lbl">Total Pickups Tracked</div>
+              </div>
+            </div>
+            <div class="impact-card">
+              <span class="impact-icon">⏳</span>
+              <div>
+                <div class="impact-val" id="adm-stat-pending">1</div>
+                <div class="impact-lbl">Pending Pickups</div>
+              </div>
+            </div>
+            <div class="impact-card">
+              <span class="impact-icon">⚖️</span>
+              <div>
+                <div class="impact-val" id="adm-stat-weight">17.8 kg</div>
+                <div class="impact-lbl">Verified Scrap Weight</div>
+              </div>
+            </div>
+            <div class="impact-card">
+              <span class="impact-icon">🏢</span>
+              <div>
+                <div class="impact-val" id="adm-stat-inventory">17.8 kg</div>
+                <div class="impact-lbl">Hub Inventory Weight</div>
+              </div>
+            </div>
+            <div class="impact-card">
+              <span class="impact-icon">💵</span>
+              <div>
+                <div class="impact-val" id="adm-stat-revenue">₹9,568.00</div>
+                <div class="impact-lbl">Disbursed to Households</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Center: Interactive Canvas GIS Map -->
+        <section class="map-viewport-container">
+          <div class="map-toolbar">
+            <button class="map-tool-btn" onclick="appState.commandMap.zoomIn()">➕ Zoom In</button>
+            <button class="map-tool-btn" onclick="appState.commandMap.zoomOut()">➖ Zoom Out</button>
+            <button class="map-tool-btn" onclick="appState.commandMap.resetView()">🎯 Reset Center</button>
+          </div>
+
+          <div class="map-layer-toggles">
+            <label><input type="checkbox" checked onchange="appState.commandMap.toggleLayer('zones', this.checked)"> Zones</label>
+            <label><input type="checkbox" checked onchange="appState.commandMap.toggleLayer('routes', this.checked)"> Routes</label>
+            <label><input type="checkbox" checked onchange="appState.commandMap.toggleLayer('collectors', this.checked)"> Collectors</label>
+            <label><input type="checkbox" checked onchange="appState.commandMap.toggleLayer('pickups', this.checked)"> Pickups</label>
+            <label><input type="checkbox" checked onchange="appState.commandMap.toggleLayer('hubs', this.checked)"> Hubs</label>
+            <label><input type="checkbox" onchange="appState.commandMap.toggleLayer('heatmap', this.checked)"> Heatmap</label>
+          </div>
+
+          <canvas id="command-map-canvas"></canvas>
+        </section>
+
+        <!-- Right: Click Inspector -->
+        <aside class="map-sidebar-right">
+          <h4>Inspector</h4>
+          <p class="small text-muted mb-2">Click any marker on the map to inspect details.</p>
+          <div id="map-inspector-content">
+            <div class="inspector-card">
+              <p class="small text-muted">Select a collector, pickup request, storage hub, or recycler marker to view full live operational properties.</p>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 2: AI MODEL MANAGEMENT (Section 5) -->
+    <div class="admin-tab-pane" id="admin-tab-ai_models">
+      <div class="hub-card">
+        <h3 class="mb-2">AI Model Versioning & Deployment</h3>
+        <p class="text-muted small mb-2">Deploy, test, roll back, or activate regional Indian waste inference models.</p>
+        <div id="ai-models-list">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 3: AI FEEDBACK DATASET (Section 4, 46) -->
+    <div class="admin-tab-pane" id="admin-tab-feedback">
+      <div class="hub-card">
+        <h3 class="mb-2">AI + Human Verification Feedback Dataset</h3>
+        <p class="text-muted small mb-2">Storage hub physical verifications matched against AI predictions for validation and retraining datasets.</p>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Lot ID</th>
+              <th>AI Prediction</th>
+              <th>Hub Verified Material</th>
+              <th>Grade</th>
+              <th>Status</th>
+              <th>Model Version</th>
+            </tr>
+          </thead>
+          <tbody id="ai-feedback-tbody">
+            <!-- Injected via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 4: TRACEABILITY EXPLORER (Section 50) -->
+    <div class="admin-tab-pane" id="admin-tab-traceability">
+      <div class="hub-card">
+        <div class="form-group mb-2">
+          <label>Query Digital Traceability Token (Lot ID / Pickup ID):</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="trace-input-id" class="form-input" value="LOT-2026-000184" />
+            <button class="btn btn-primary" onclick="loadTraceabilityChain(document.getElementById('trace-input-id').value)">
+              Trace Provenance
+            </button>
+          </div>
+        </div>
+        <div id="traceability-chain-view">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 5: MATERIAL TAXONOMY -->
+    <div class="admin-tab-pane" id="admin-tab-taxonomy">
+      <div class="hub-card">
+        <h3 class="mb-2">Configurable Material Taxonomy & Official Buying Rates</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Subcategory</th>
+              <th>Code</th>
+              <th>Official Rate</th>
+              <th>Segregation Guideline</th>
+            </tr>
+          </thead>
+          <tbody id="taxonomy-tbody">
+            <!-- Injected via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 6: AUDIT LOGS (Section 48) -->
+    <div class="admin-tab-pane" id="admin-tab-audit">
+      <div class="hub-card">
+        <h3 class="mb-2">Immutable Chronological Audit Trail</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Previous Value</th>
+              <th>New Value</th>
+              <th>Actor & Role</th>
+              <th>Reason</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="audit-logs-tbody">
+            <!-- Injected via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================================================
+       MODAL 1: PICKUP REQUEST & HOUSEHOLD MAP (Section 12, 14)
+       ================================================== -->
+  <div class="modal-backdrop" id="pickup-modal">
+    <div class="modal-dialog">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 data-i18n="pickup.title">Confirm Pickup & Schedule</h3>
+        <button class="btn btn-sm btn-outline" onclick="closePickupModal()">✕</button>
+      </div>
+
+      <form onsubmit="submitPickupRequest(event)">
+        <!-- Household Private Interactive Map (Section 14) -->
+        <div class="form-group">
+          <label><strong>Confirm Location on Interactive Map:</strong> (Click map to move pin)</label>
+          <div style="height: 180px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-glass); margin-bottom: 8px;">
+            <canvas id="household-map-canvas" style="width: 100%; height: 100%; cursor: pointer;"></canvas>
+          </div>
+          <p class="disclaimer-note" style="margin-top: 2px;">
+            🔒 <em>Privacy Rule: Your household location is confidential and never exposed publicly.</em>
+          </p>
+        </div>
+
+        <input type="hidden" id="pickup-lat" value="26.1792" />
+        <input type="hidden" id="pickup-lng" value="91.7695" />
+        <input type="hidden" id="pickup-material-input" value="Copper Scrap" />
+        <input type="hidden" id="pickup-weight-input" value="10" />
+        <input type="hidden" id="pickup-rate-input" value="580" />
+
+        <div class="form-group">
+          <label data-i18n="pickup.address">Address:</label>
+          <input type="text" id="pickup-address" class="form-input" value="House 14, Peace Enclave, Paltan Bazaar, Guwahati" />
+        </div>
+
+        <div class="form-group">
+          <label data-i18n="pickup.landmark">Landmark:</label>
+          <input type="text" id="pickup-landmark" class="form-input" value="Opposite State Library" />
+        </div>
+
+        <div class="form-group">
+          <label data-i18n="pickup.zone">Service Zone:</label>
+          <select id="pickup-zone" class="form-input">
+            <option value="ZONE B">ZONE B - Central Paltan & Panbazar</option>
+            <option value="ZONE A">ZONE A - North Kamrup</option>
+            <option value="ZONE C">ZONE C - Dispur Capital</option>
+            <option value="ZONE D">ZONE D - East Narangi Industrial</option>
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label data-i18n="pickup.date">Date:</label>
+            <input type="date" id="pickup-date" class="form-input" value="2026-09-28" />
+          </div>
+          <div class="form-group">
+            <label data-i18n="pickup.slot">Time Slot:</label>
+            <select id="pickup-slot" class="form-input">
+              <option>10:00 AM - 12:00 PM</option>
+              <option>02:00 PM - 04:00 PM</option>
+              <option>04:00 PM - 06:00 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label data-i18n="pickup.notes">Instructions for Collector:</label>
+          <input type="text" id="pickup-notes" class="form-input" value="Scrap copper cable bundles bundled in study carton." />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" data-i18n="pickup.submit">
+          📅 Submit Pickup Request
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       MODAL 2: WEIGHT MATCH CELEBRATION (Section 25, 26)
+       ================================================== -->
+  <div class="modal-backdrop" id="weight-match-modal">
+    <div class="modal-dialog celebration-dialog">
+      <canvas id="celebration-canvas"></canvas>
+      <div class="celebration-icon float-leaf">🌱</div>
+      <h3 class="celebration-title" data-i18n="settlement.weight_match_celebration">
+        Congratulations! You are making a Leaner and Greener Environment.
+      </h3>
+      <p class="celebration-subtext" data-i18n="settlement.weight_match_subtext">
+        Your estimated weight matched the verified weight within acceptable tolerance.
+      </p>
+
+      <div class="celebration-weights-comparison">
+        <div>
+          <span class="lbl small text-muted">User Estimated Weight:</span>
+          <div class="weight-val" id="match-est-weight">10.0 kg</div>
+        </div>
+        <div>
+          <span class="lbl small text-muted">Hub Verified Weight:</span>
+          <div class="weight-val text-success" id="match-ver-weight">10.0 kg</div>
+        </div>
+      </div>
+
+      <div class="disclaimer-note mb-2">
+        <small id="match-tolerance-used">±5% tolerance</small><br />
+        <small style="color: #94A3B8;"><em>(Important Rule: This indicates the estimated weight falls within configured tolerance of the verified weight.)</em></small>
+      </div>
+
+      <button class="btn btn-primary btn-block" onclick="settlementEngine.closeCelebrationModal()">
+        View Final Verified Settlement Receipt ➔
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       MODAL 3: MULTILINGUAL AI SPEECH RECOGNITION (Section 8)
+       ================================================== -->
+  <div class="modal-backdrop" id="voice-modal">
+    <div class="modal-dialog text-center">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3>🎙️ Multilingual Speech Assistant</h3>
+        <button class="btn btn-sm btn-outline" onclick="voiceAssistant.closeVoiceModal()">✕</button>
+      </div>
+
+      <p class="small text-muted mb-2">Speak in English, Hindi, Assamese or Bengali to describe your waste or request a pickup.</p>
+
+      <div class="voice-waves" id="voice-waves">
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+      </div>
+
+      <div style="margin: 14px 0;">
+        <button id="voice-mic-btn" class="btn btn-primary" style="border-radius: 50%; width: 56px; height: 56px; font-size: 22px;" onclick="voiceAssistant.startListening()">
+          🎙️
+        </button>
+      </div>
+
+      <p id="voice-status-text" class="small mb-2" data-i18n="voice.tap_to_speak">Tap to Speak</p>
+
+      <div class="form-group text-left">
+        <label>Recognized Speech Text:</label>
+        <textarea id="voice-recognized-text" class="form-input" rows="3" placeholder="Recognized speech will appear here..."></textarea>
+      </div>
+
+      <!-- Quick sample chips -->
+      <div class="mb-2 text-left">
+        <span class="small text-muted">Or pick a quick phrase:</span>
+        <div id="voice-sample-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;"></div>
+      </div>
+
+      <p class="disclaimer-note mb-2" style="font-size: 10px;">
+        ⚠️ <strong>Security Rule:</strong> Important financial or operational actions are never executed purely from speech without explicit confirmation.
+      </p>
+
+      <div id="voice-confirm-actions" style="display: flex; gap: 8px; justify-content: center;">
+        <button class="btn btn-primary" onclick="voiceAssistant.confirmSpeech()" data-i18n="voice.confirm">
+          Confirm
+        </button>
+        <button class="btn btn-secondary" onclick="voiceAssistant.closeVoiceModal()" data-i18n="voice.cancel">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/i18n.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/gis_map.js"></script>
+  <script src="js/qr_engine.js"></script>
+  <script src="js/settlement.js"></script>
+  <script src="js/tour.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

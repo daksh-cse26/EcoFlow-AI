@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+install_git.py
+test.db
+test.txt
+*.log
