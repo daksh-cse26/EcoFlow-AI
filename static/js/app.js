@@ -300,6 +300,7 @@ function switchPerspective(role) {
     loadCollectorTasks();
   } else if (role === "hub") {
     loadHubPendingLots();
+    renderHubMaterialRows();
   } else if (role === "recycler") {
     loadRecyclerPortalData();
   }
@@ -800,34 +801,152 @@ function onHubLotSelected(lotId) {
     });
 }
 
-function submitHubVerification(scenarioType = "MATCH") {
-  // Scenario 1: MATCH (10 kg vs 10 kg)
-  // Scenario 2: DIFFERENCE (10 kg vs 7.8 kg)
-  let materialsBreakdown = [];
-  let discrepancyReason = "None";
-  let discrepancyNotes = "Clean segregation, scale calibrated.";
+// Active Interactive Storage Hub Material Breakdown State
+let activeHubMaterialRows = [
+  { material_name: "Copper Scrap", grade: "GRADE B", verified_weight: 7.9, rate_per_kg: 580.0 },
+  { material_name: "Circuit Boards (PCB)", grade: "GRADE B", verified_weight: 2.1, rate_per_kg: 220.0 }
+];
 
-  if (scenarioType === "MATCH") {
-    materialsBreakdown = [
-      { material_name: "Copper Scrap", grade: "GRADE B", verified_weight: 7.9, rate_per_kg: 580.0 },
-      { material_name: "Circuit Boards (PCB)", grade: "GRADE B", verified_weight: 2.1, rate_per_kg: 220.0 }
-    ];
-  } else {
-    // Scenario 2: DIFFERENCE
-    materialsBreakdown = [
-      { material_name: "Copper Scrap", grade: "GRADE B", verified_weight: 7.8, rate_per_kg: 580.0 }
-    ];
-    discrepancyReason = "Insulation and packaging tare deduction";
-    discrepancyNotes = "Household weighed thick rubber outer insulation jacket.";
+const HUB_CATALOG_RATES = {
+  "Copper Scrap": { "GRADE A": 610.0, "GRADE B": 580.0, "GRADE C": 495.0 },
+  "Circuit Boards (PCB)": { "GRADE A": 255.0, "GRADE B": 220.0, "GRADE C": 165.0 },
+  "PET Plastic Bottles": { "GRADE A": 24.0, "GRADE B": 21.0, "GRADE C": 18.0 },
+  "Old Newspaper (Raddi)": { "GRADE A": 14.0, "GRADE B": 12.0, "GRADE C": 10.0 },
+  "Aluminium Cans & Frames": { "GRADE A": 145.0, "GRADE B": 123.0, "GRADE C": 105.0 },
+  "Brass Fixtures & Fittings": { "GRADE A": 410.0, "GRADE B": 390.0, "GRADE C": 330.0 },
+  "HDPE Hard Plastic": { "GRADE A": 28.0, "GRADE B": 24.0, "GRADE C": 20.0 }
+};
+
+function renderHubMaterialRows() {
+  const tbody = document.getElementById("hub-materials-tbody");
+  if (!tbody) return;
+
+  tbody.innerHTML = activeHubMaterialRows.map((row, idx) => `
+    <tr>
+      <td>
+        <select class="form-input" style="padding: 4px 6px; font-size: 11px;" onchange="updateHubRow(${idx}, 'material_name', this.value)">
+          ${Object.keys(HUB_CATALOG_RATES).map(m => `
+            <option value="${m}" ${m === row.material_name ? 'selected' : ''}>${m}</option>
+          `).join("")}
+        </select>
+      </td>
+      <td>
+        <select class="form-input" style="padding: 4px 6px; font-size: 11px;" onchange="updateHubRow(${idx}, 'grade', this.value)">
+          <option value="GRADE A" ${row.grade === 'GRADE A' ? 'selected' : ''}>GRADE A (Premium)</option>
+          <option value="GRADE B" ${row.grade === 'GRADE B' ? 'selected' : ''}>GRADE B (Standard)</option>
+          <option value="GRADE C" ${row.grade === 'GRADE C' ? 'selected' : ''}>GRADE C (Commercial)</option>
+        </select>
+      </td>
+      <td>
+        <input type="number" step="0.1" min="0.1" class="form-input" style="padding: 4px 6px; font-size: 12px; font-weight: 700; width: 85px;" value="${row.verified_weight}" oninput="updateHubRow(${idx}, 'verified_weight', parseFloat(this.value) || 0)"/>
+      </td>
+      <td>₹${row.rate_per_kg.toFixed(2)}</td>
+      <td class="text-right"><strong>₹${(row.verified_weight * row.rate_per_kg).toFixed(2)}</strong></td>
+      <td class="text-center">
+        ${activeHubMaterialRows.length > 1 ? `
+          <button type="button" class="btn btn-sm btn-outline" style="color: #EF4444; padding: 2px 6px;" onclick="removeHubMaterialRow(${idx})">✕</button>
+        ` : ''}
+      </td>
+    </tr>
+  `).join("");
+
+  recalculateHubScaleTotals();
+}
+
+function addHubMaterialRow() {
+  activeHubMaterialRows.push({
+    material_name: "Aluminium Cans & Frames",
+    grade: "GRADE B",
+    verified_weight: 1.0,
+    rate_per_kg: 123.0
+  });
+  renderHubMaterialRows();
+}
+
+function removeHubMaterialRow(index) {
+  if (activeHubMaterialRows.length > 1) {
+    activeHubMaterialRows.splice(index, 1);
+    renderHubMaterialRows();
+  }
+}
+
+function updateHubRow(index, field, value) {
+  const row = activeHubMaterialRows[index];
+  if (!row) return;
+
+  if (field === 'material_name') {
+    row.material_name = value;
+    const rates = HUB_CATALOG_RATES[value] || { "GRADE B": 50.0 };
+    row.rate_per_kg = rates[row.grade] || rates["GRADE B"];
+  } else if (field === 'grade') {
+    row.grade = value;
+    const rates = HUB_CATALOG_RATES[row.material_name] || { "GRADE B": 50.0 };
+    row.rate_per_kg = rates[value] || rates["GRADE B"];
+  } else if (field === 'verified_weight') {
+    row.verified_weight = Math.max(0, value);
   }
 
+  renderHubMaterialRows();
+}
+
+function recalculateHubScaleTotals() {
+  let totalW = 0;
+  let totalA = 0;
+
+  activeHubMaterialRows.forEach(r => {
+    totalW += r.verified_weight;
+    totalA += r.verified_weight * r.rate_per_kg;
+  });
+
+  totalW = Math.round(totalW * 10) / 10;
+  totalA = Math.round(totalA * 100) / 100;
+
+  const wEl = document.getElementById("hub-total-verified-weight");
+  const aEl = document.getElementById("hub-total-verified-amount");
+  const meterVer = document.getElementById("hub-meter-ver");
+  const meterDiff = document.getElementById("hub-meter-diff");
+  const badge = document.getElementById("hub-live-match-badge");
+  const pBar = document.getElementById("hub-tolerance-progress-bar");
+
+  if (wEl) wEl.textContent = `${totalW.toFixed(1)} kg`;
+  if (aEl) aEl.textContent = `₹${totalA.toFixed(2)}`;
+  if (meterVer) meterVer.textContent = `${totalW.toFixed(1)} kg`;
+
+  // Compare with user estimated weight (default 10.0 kg)
+  const estWeight = 10.0;
+  const diff = totalW - estWeight;
+  const diffPct = ((diff / estWeight) * 100);
+
+  if (meterDiff) {
+    const sign = diff >= 0 ? "+" : "";
+    meterDiff.textContent = `${sign}${diff.toFixed(1)} kg (${sign}${diffPct.toFixed(1)}%)`;
+  }
+
+  // Tolerance evaluation: ±5.0%
+  const isMatch = Math.abs(diffPct) <= 5.0;
+
+  if (badge) {
+    badge.textContent = isMatch ? "MATCH STATUS READY (±5% Tolerance)" : "DIFFERENCE DETECTED";
+    badge.className = `status-pill ${isMatch ? 'status-verified' : 'status-pending'}`;
+  }
+
+  if (pBar) {
+    pBar.style.background = isMatch ? "#10B981" : "#F59E0B";
+  }
+}
+
+function executeLiveHubVerification() {
+  const lotSelector = document.getElementById("hub-lot-selector");
+  const lotId = lotSelector ? lotSelector.value : "LOT-2026-000184";
+  const notes = document.getElementById("hub-verification-notes").value || "Scale calibrated.";
+
   const payload = {
-    lot_id: document.getElementById("hub-lot-selector").value || "LOT-2026-000184",
+    lot_id: lotId,
     hub_id: "HUB-001",
     operator_name: "Manoj Kalita (Chief Inspector)",
-    materials_breakdown: materialsBreakdown,
-    discrepancy_reason: discrepancyReason,
-    discrepancy_notes: discrepancyNotes
+    materials_breakdown: activeHubMaterialRows,
+    discrepancy_reason: "None",
+    discrepancy_notes: notes
   };
 
   apiFetch("/api/hub/verify", {
@@ -840,14 +959,14 @@ function submitHubVerification(scenarioType = "MATCH") {
     refreshDashboardStats();
 
     if (res.weight_match_status === "MATCH") {
-      // SECTION 25: CELEBRATION POPUP!
+      // SECTION 25: INTERACTIVE CELEBRATION POPUP!
       settlementEngine.showCelebrationModal(res);
     } else {
-      alert(`Physical Verification Recorded.\n\nStatus: DIFFERENCE\nUser Estimated: ${res.user_estimated_weight} kg\nVerified Weight: ${res.verified_weight} kg\n\nNotice: Your estimated and verified weights are different. The verified weight will be used for the final settlement.`);
+      alert(`Physical Verification Finalized.\n\nStatus: DIFFERENCE\nDeclared: ${res.user_estimated_weight} kg\nVerified Scale: ${res.verified_weight} kg\n\nNotice: Your estimated and verified weights are different. The verified weight will be used for the final settlement.`);
     }
 
-    // Refresh settlement view
-    loadSettlementDetails(payload.lot_id);
+    // Refresh settlement receipt view
+    loadSettlementDetails(lotId);
   });
 }
 

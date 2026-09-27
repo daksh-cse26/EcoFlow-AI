@@ -25,7 +25,7 @@ class JudgeTourController {
       { id: 15, title: "Verify Material (Hub is Final Authority)", view: "hub", desc: "Operator inspects and segregates Copper Scrap (7.9kg) and PCB (2.1kg)." },
       { id: 16, title: "Enter Verified Weight (Physical Scale)", view: "hub", desc: "Enter physical scale weighment (10.0 kg). Source of truth recorded." },
       { id: 17, title: "Compare Estimated vs Verified Weight", view: "hub", desc: "Engine evaluates weight difference against configurable ±5% tolerance." },
-      { id: 18, title: "Trigger Congratulations Popup (MATCH)", view: "hub", desc: "Trigger 'Leaner & Greener' celebration popup for matching weights!" },
+      { id: 18, title: "Trigger Congratulations Popup (MATCH)", view: "hub", desc: "Trigger 'Cleaner & Greener' interactive celebration popup for matching weights!" },
       { id: 19, title: "Calculate Household Settlement", view: "settlement", desc: "Calculated strictly using Verified Weight × Buying Rate (₹5,044)." },
       { id: 20, title: "Generate Transparent Digital Receipt", view: "settlement", desc: "Generate audit-backed receipt with formula, grade, and lot reference." },
       { id: 21, title: "Add Verified Material to Inventory", view: "inventory", desc: "Verified materials enter hub inventory with AVAILABLE status." },

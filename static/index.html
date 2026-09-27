@@ -438,44 +438,62 @@
           <div><span class="lbl">User Estimated Weight:</span> <strong id="hub-user-est-weight-display">10.0 kg</strong></div>
         </div>
 
-        <h4 class="mb-2">Physical Segregation & Scale Breakdown</h4>
-        <table class="data-table mb-2">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h4>Physical Segregation & Digital Scale Station</h4>
+          <button type="button" class="btn btn-sm btn-outline" onclick="addHubMaterialRow()">
+            ➕ Add Material Row
+          </button>
+        </div>
+
+        <table class="data-table mb-2" id="hub-materials-table">
           <thead>
             <tr>
               <th>Material</th>
               <th>Quality Grade</th>
-              <th>Verified Weight (kg)</th>
-              <th>Buying Rate (₹/kg)</th>
+              <th>Scale Weight (kg)</th>
+              <th>Rate (₹/kg)</th>
+              <th class="text-right">Subtotal</th>
+              <th></th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Copper Scrap</td>
-              <td><span class="badge-grade">GRADE B</span></td>
-              <td><strong>7.9 kg</strong></td>
-              <td>₹580.00</td>
-            </tr>
-            <tr>
-              <td>Circuit Boards (PCB)</td>
-              <td><span class="badge-grade">GRADE B</span></td>
-              <td><strong>2.1 kg</strong></td>
-              <td>₹220.00</td>
-            </tr>
+          <tbody id="hub-materials-tbody">
+            <!-- Dynamically populated and interactive -->
           </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="2">Total Physical Verified Weight:</th>
+              <th id="hub-total-verified-weight" style="color: var(--primary-mint); font-size: 15px;">10.0 kg</th>
+              <th>Total Amount:</th>
+              <th class="text-right" id="hub-total-verified-amount" style="color: var(--primary-mint); font-size: 15px;">₹5,044.00</th>
+              <th></th>
+            </tr>
+          </tfoot>
         </table>
 
-        <!-- Quick Demo Scenarios (Prompt Section 52) -->
-        <div style="background: rgba(0, 0, 0, 0.3); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 14px;">
-          <span class="small text-muted display-block mb-1"><strong>Demo Scenarios (Prompt Section 52):</strong></span>
-          <div style="display: flex; gap: 8px;">
-            <button class="btn btn-sm btn-primary" onclick="submitHubVerification('MATCH')">
-              Demo 1: 10kg Verified (Trigger MATCH Popup)
-            </button>
-            <button class="btn btn-sm btn-secondary" onclick="submitHubVerification('DIFFERENCE')">
-              Demo 2: 7.8kg Verified (DIFFERENCE Notice)
-            </button>
+        <!-- Live Weight Match Tolerance Meter -->
+        <div class="tolerance-meter-box mb-2" style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span class="small text-muted"><strong>Weight Match Tolerance Evaluation (±5%):</strong></span>
+            <span id="hub-live-match-badge" class="status-pill status-verified">MATCH STATUS READY</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span>Household Declared: <strong id="hub-meter-est">10.0 kg</strong></span>
+            <span>Current Scale: <strong id="hub-meter-ver">10.0 kg</strong></span>
+            <span>Variance: <strong id="hub-meter-diff">0.0 kg (0.0%)</strong></span>
+          </div>
+          <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin-top: 6px;">
+            <div id="hub-tolerance-progress-bar" style="width: 100%; height: 100%; background: #10B981; transition: all 0.3s ease;"></div>
           </div>
         </div>
+
+        <div class="form-group mb-2">
+          <label>Inspector Verification Notes / Discrepancy Reason (if any):</label>
+          <input type="text" id="hub-verification-notes" class="form-input" placeholder="e.g. Clean segregation, digital scale tare checked, insulation deducted..." value="Clean segregation, scale calibrated." />
+        </div>
+
+        <button class="btn btn-primary btn-block" style="padding: 12px; font-size: 14px;" onclick="executeLiveHubVerification()">
+          ⚖️ Confirm Physical Verification & Weighment
+        </button>
       </div>
 
       <!-- Right: Lot Digital Passport & QR Preview -->
@@ -822,7 +840,7 @@
       <canvas id="celebration-canvas"></canvas>
       <div class="celebration-icon float-leaf">🌱</div>
       <h3 class="celebration-title" data-i18n="settlement.weight_match_celebration">
-        Congratulations! You are making a Leaner and Greener Environment.
+        Congratulations! You are making a Cleaner and Greener Environment.
       </h3>
       <p class="celebration-subtext" data-i18n="settlement.weight_match_subtext">
         Your estimated weight matched the verified weight within acceptable tolerance.
@@ -830,18 +848,39 @@
 
       <div class="celebration-weights-comparison">
         <div>
-          <span class="lbl small text-muted">User Estimated Weight:</span>
+          <span class="lbl small text-muted">Household Declared:</span>
           <div class="weight-val" id="match-est-weight">10.0 kg</div>
         </div>
         <div>
-          <span class="lbl small text-muted">Hub Verified Weight:</span>
+          <span class="lbl small text-muted">Hub Scale Verified:</span>
           <div class="weight-val text-success" id="match-ver-weight">10.0 kg</div>
         </div>
       </div>
 
+      <!-- Live Environmental Impact Achievements -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 8px; border-radius: var(--radius-sm);">
+          <span class="small" style="color: #A7F3D0;">🌍 Net CO₂ Offset:</span>
+          <div style="font-weight: 800; font-size: 15px; color: #FFFFFF;" id="match-co2-saved">24.5 kg CO₂</div>
+        </div>
+        <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 8px; border-radius: var(--radius-sm);">
+          <span class="small" style="color: #FDE68A;">⭐ Citizen Rewards:</span>
+          <div style="font-weight: 800; font-size: 15px; color: #FFFFFF;" id="match-eco-points">+100 pts</div>
+        </div>
+      </div>
+
       <div class="disclaimer-note mb-2">
-        <small id="match-tolerance-used">±5% tolerance</small><br />
-        <small style="color: #94A3B8;"><em>(Important Rule: This indicates the estimated weight falls within configured tolerance of the verified weight.)</em></small>
+        <small id="match-tolerance-used">±5.0% tolerance match</small><br />
+        <small style="color: #94A3B8;"><em>💡 Click or tap anywhere to burst fresh leaves & sparkles!</em></small>
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <button type="button" class="btn btn-outline btn-block" onclick="settlementEngine.burstLeavesAt(200, 150); settlementEngine.playEcoChime();">
+          🌿 Burst Leaves
+        </button>
+        <button type="button" class="btn btn-secondary btn-block" onclick="settlementEngine.downloadEcoCertificate()">
+          📜 Download Certificate
+        </button>
       </div>
 
       <button class="btn btn-primary btn-block" onclick="settlementEngine.closeCelebrationModal()">
