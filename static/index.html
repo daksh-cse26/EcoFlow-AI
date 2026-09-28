@@ -83,9 +83,9 @@
         <span class="lang-select-arrow" aria-hidden="true">▼</span>
       </div>
 
-      <!-- Illiterate / Voice Language Auto-Detection Button -->
-      <button type="button" class="btn-lang-voice-detect" id="btn-lang-voice-detect" onclick="openLanguageVoiceModal()" title="Tap to speak your language (बोलकर भाषा चुनें)">
-        🎙️ <span data-i18n="voice.tap_to_speak_lang">Tap to Speak</span>
+      <!-- Language Selection Button -->
+      <button type="button" class="btn-lang-voice-detect" id="btn-lang-voice-detect" onclick="openLanguageVoiceModal()" title="Select Language">
+        🌐 <span id="btn-lang-text">Language</span>
       </button>
 
       <button class="voice-btn-top" onclick="voiceAssistant.openVoiceModal('pickup-notes', 'pickup')" title="Multilingual Speech Recognition">
@@ -104,8 +104,8 @@
       <h2 data-i18n="gw.hero_title">Select Your Operating Interface</h2>
       <p data-i18n="gw.hero_desc">Choose your operational role and enter your credentials to authenticate and establish an encrypted session on this device.</p>
       <div style="margin-top: 10px;">
-        <button type="button" class="btn-lang-voice-detect" onclick="openLanguageVoiceModal()" style="font-size: 13px; padding: 7px 16px;">
-          🎙️ <span data-i18n="voice.tap_to_speak_hero">Tap to Speak Language / बोलकर भाषा चुनें</span>
+        <button type="button" class="btn-lang-voice-detect" onclick="openLanguageVoiceModal()" style="font-size: 13px; padding: 7px 18px;">
+          🌐 Language
         </button>
       </div>
     </div>
@@ -2116,13 +2116,13 @@ Invitation declined. You will not receive further alerts today.
   <div class="voice-lang-modal" id="voice-lang-modal">
     <div class="voice-lang-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <span style="font-size: 11px; font-weight: 800; color: #38BDF8; letter-spacing: 1px; text-transform: uppercase;">🎙️ Multilingual Speech Recognition</span>
+        <span style="font-size: 11px; font-weight: 800; color: #38BDF8; letter-spacing: 1px; text-transform: uppercase;">🌐 Language Selection & Voice Recognition</span>
         <button type="button" class="modal-close-btn" onclick="closeLanguageVoiceModal()" style="background: none; border: none; color: #94A3B8; font-size: 20px; cursor: pointer;">✕</button>
       </div>
-      <h3 style="margin-bottom: 4px; color: #FFFFFF;" data-i18n="voice.modal_title">Tap to Speak Your Language</h3>
-      <p class="small text-muted" style="margin-bottom: 12px;" data-i18n="voice.modal_desc">Speak in your mother tongue (Hindi, Marathi, Gujarati, Marwari, Tamil, Bengali, English, etc.). EcoFlow will recognize and set your language automatically.</p>
+      <h3 style="margin-bottom: 4px; color: #FFFFFF;" data-i18n="voice.modal_title">Speak or Choose Your Language</h3>
+      <p class="small text-muted" style="margin-bottom: 12px;" data-i18n="voice.modal_desc">Tap the microphone and say your language (e.g. "Marathi", "Gujarati", "Marwari", "Tamil", "Telugu", "Kannada", "Malayalam", "Punjabi", "Bengali", "English", "Hindi"...), or tap any language card below.</p>
 
-      <div class="voice-mic-circle" id="lang-voice-mic-circle" onclick="voiceLangDetector.startListening()">
+      <div class="voice-mic-circle" id="lang-voice-mic-circle" onclick="voiceLangDetector.startListening()" title="Click to speak">
         🎙️
       </div>
 
@@ -2136,26 +2136,31 @@ Invitation declined. You will not receive further alerts today.
       </div>
 
       <div id="lang-voice-status" style="font-size: 13px; font-weight: 700; color: #38BDF8; margin-bottom: 6px;">
-        Tap the microphone and speak your language
+        Tap the microphone and say your language
       </div>
 
       <div class="voice-transcript-box" id="lang-voice-transcript">
-        "Press the mic and say: 'हिन्दी', 'मराठी', 'ગુજરાતી', 'தமிழ்', 'English'..."
+        "Say: 'Marathi', 'Gujarati', 'Marwari', 'Tamil', 'Telugu', 'English', 'Hindi'..."
       </div>
 
       <div id="lang-voice-result" style="margin: 8px 0; font-size: 13px; color: #34D399; font-weight: 700;"></div>
 
       <div style="margin-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px;">
-        <span class="small text-muted" style="display: block; margin-bottom: 6px;">Or tap your language directly:</span>
+        <span class="small text-muted" style="display: block; margin-bottom: 6px;">Or tap any language card for instant audio setup:</span>
         <div class="voice-chip-grid">
-          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('hi')">🇮🇳 हिन्दी (Hindi)</button>
           <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('mr')">🇮🇳 मराठी (Marathi)</button>
           <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('gu')">🇮🇳 ગુજરાતી (Gujarati)</button>
           <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('mwr')">🇮🇳 मारवाड़ी (Marwari)</button>
           <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('ta')">🇮🇳 தமிழ் (Tamil)</button>
           <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('te')">🇮🇳 తెలుగు (Telugu)</button>
-          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('bn')">🇮🇳 বাংলা (Bengali)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('kn')">🇮🇳 ಕನ್ನಡ (Kannada)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('ml')">🇮🇳 മലയാളം (Malayalam)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('pa')">🇮🇳 ਪੰਜਾਬੀ (Punjabi)</button>
           <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('as')">🇮🇳 অসমীয়া (Assamese)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('bn')">🇮🇳 বাংলা (Bengali)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('or')">🇮🇳 ଓଡ଼ିଆ (Odia)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('ur')">🇮🇳 اردو (Urdu)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('hi')">🇮🇳 हिन्दी (Hindi)</button>
           <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('en')">🇬🇧 English</button>
           <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('es')">🇪🇸 Español</button>
           <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('fr')">🇫🇷 Français</button>
