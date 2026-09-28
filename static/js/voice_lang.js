@@ -1,7 +1,8 @@
 /**
  * EcoFlow AI - Multilingual Speech Recognition & Language Detector
  * Accurately recognizes all 19 supported Indian and foreign languages
- * with zero false-positives to Hindi.
+ * with zero false-positives to Hindi, and automatically closes the modal
+ * and updates the UI language immediately upon speech input.
  */
 
 class VoiceLanguageDetector {
@@ -16,7 +17,7 @@ class VoiceLanguageDetector {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
-      this.recognition.continuous = false;
+      this.recognition.continuous = true;
       this.recognition.interimResults = true;
 
       this.recognition.onstart = () => {
@@ -25,18 +26,21 @@ class VoiceLanguageDetector {
       };
 
       this.recognition.onresult = (event) => {
-        let transcript = "";
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript;
+        let fullTranscript = "";
+        for (let i = 0; i < event.results.length; ++i) {
+          fullTranscript += event.results[i][0].transcript + " ";
         }
-        this.handleTranscript(transcript);
+        this.handleTranscript(fullTranscript);
       };
 
       this.recognition.onerror = (event) => {
         console.warn("Language speech recognition error:", event.error);
+        if (event.error === 'no-speech') {
+          // Normal silence, remain ready
+          return;
+        }
         this.isListening = false;
-        // Fallback for mic permission errors or unavailable recognition
-        this.simulateRecognition();
+        this.updateUI("READY");
       };
 
       this.recognition.onend = () => {
@@ -56,12 +60,6 @@ class VoiceLanguageDetector {
     if (!text) return null;
     const cleanText = text.trim();
     const lower = cleanText.toLowerCase();
-
-    // Helper: word match
-    const hasWord = (str, target) => {
-      const regex = new RegExp(`(^|\\s|[.,!?;])${target}($|\\s|[.,!?;])`, 'i');
-      return regex.test(str);
-    };
 
     // -------------------------------------------------------------
     // LAYER 1: Explicit Language Names
@@ -187,7 +185,7 @@ class VoiceLanguageDetector {
     // Gujarati vocabulary (in Latin or Devanagari transliteration)
     const guKeywords = [
       'kem cho', 'kem chho', 'maru naam', 'mane', 'aabhar', 'kachro',
-      'केम छो', 'आभार'
+      'કેમ છો', 'આભાર'
     ];
     for (const kw of guKeywords) {
       if (lower.includes(kw.toLowerCase()) || cleanText.includes(kw)) return 'gu';
@@ -262,12 +260,15 @@ class VoiceLanguageDetector {
   }
 
   handleTranscript(transcript) {
+    if (!transcript) return;
+    const clean = transcript.trim();
     const textEl = document.getElementById("lang-voice-transcript");
-    if (textEl) textEl.textContent = `"${transcript}"`;
+    if (textEl) textEl.textContent = `"${clean}"`;
 
-    const detected = this.detectLanguageFromText(transcript);
+    const detected = this.detectLanguageFromText(clean);
     if (detected) {
       this.selectedDetectedLang = detected;
+      // Immediately close window and change UI language automatically
       this.confirmAndApplyLanguage(detected);
     }
   }
@@ -284,10 +285,9 @@ class VoiceLanguageDetector {
         this.recognition.start();
         return;
       } catch (e) {
-        console.warn("Recognition already active or failed, using simulated recognition:", e);
+        console.warn("Recognition already active or failed:", e);
       }
     }
-    this.simulateRecognition();
   }
 
   stopListening() {
@@ -298,55 +298,31 @@ class VoiceLanguageDetector {
     this.updateUI("READY");
   }
 
-  simulateRecognition() {
-    this.updateUI("LISTENING");
-    const samples = [
-      { text: "मराठी (Marathi)", lang: "mr" },
-      { text: "ગુજરાતી (Gujarati)", lang: "gu" },
-      { text: "मारवाड़ी (Marwari)", lang: "mwr" },
-      { text: "தமிழ் (Tamil)", lang: "ta" },
-      { text: "తెలుగు (Telugu)", lang: "te" },
-      { text: "ಕನ್ನಡ (Kannada)", lang: "kn" },
-      { text: "മലയാളം (Malayalam)", lang: "ml" },
-      { text: "ਪੰਜਾਬੀ (Punjabi)", lang: "pa" },
-      { text: "অসমীয়া (Assamese)", lang: "as" },
-      { text: "বাংলা (Bengali)", lang: "bn" },
-      { text: "ଓଡ଼ିଆ (Odia)", lang: "or" },
-      { text: "اردو (Urdu)", lang: "ur" },
-      { text: "English", lang: "en" },
-      { text: "हिन्दी (Hindi)", lang: "hi" }
-    ];
-
-    const pick = samples[Math.floor(Math.random() * samples.length)];
-    setTimeout(() => {
-      const textEl = document.getElementById("lang-voice-transcript");
-      if (textEl) textEl.textContent = `"${pick.text}"`;
-      this.confirmAndApplyLanguage(pick.lang);
-    }, 1800);
-  }
-
+  /**
+   * Immediately close the language window and automatically change the UI language
+   */
   confirmAndApplyLanguage(lang) {
+    if (!lang) return;
     this.stopListening();
-    this.updateUI("SUCCESS");
+    this.selectedDetectedLang = lang;
 
-    const langName = (typeof LANG_NAMES !== 'undefined' && LANG_NAMES[lang]) ? LANG_NAMES[lang] : lang.toUpperCase();
-    const resultEl = document.getElementById("lang-voice-result");
-    if (resultEl) {
-      resultEl.innerHTML = `🎉 <strong>Detected Language:</strong> ${langName} • Applying immediately...`;
-    }
+    // 1. Automatically close the language window immediately
+    this.closeModal();
 
-    // Apply platform language
+    // 2. Automatically change the language of the entire UI
     if (typeof setLanguage === 'function') {
       setLanguage(lang);
     }
 
-    // Audible confirmation via SpeechSynthesis
-    this.speakConfirmation(lang, langName);
+    // 3. Keep select dropdown in header synchronized
+    const selectEl = document.getElementById("lang-select");
+    if (selectEl && selectEl.value !== lang) {
+      selectEl.value = lang;
+    }
 
-    // Close modal smoothly after user hears/sees confirmation
-    setTimeout(() => {
-      this.closeModal();
-    }, 2000);
+    // 4. Speak voice confirmation in background
+    const langName = (typeof LANG_NAMES !== 'undefined' && LANG_NAMES[lang]) ? LANG_NAMES[lang] : lang.toUpperCase();
+    this.speakConfirmation(lang, langName);
   }
 
   speakConfirmation(lang, langName) {
@@ -361,10 +337,10 @@ class VoiceLanguageDetector {
         te: "తెలుగు భాష ఎంచుకోబడింది. స్వాగతం.",
         ta: "தமிழ் மொழி தேர்ந்தெடுக்கப்பட்டது. வருக.",
         kn: "ಕನ್ನಡ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. ಸುಸ್ವಾಗತ.",
-        ml: "മലയാളം ഭാഷ തിരഞ്ഞെടുത്തു. സ്വാಗതം.",
+        ml: "മലയാളം ഭാഷ തിരഞ്ഞെടുത്തു. സ്വാഗതം.",
         pa: "ਪੰਜਾਬੀ ਭਾਸ਼ਾ ਚੁਣ ਲਈ ਗਈ ਹੈ। ਜੀ ਆਇਆਂ ਨੂੰ।",
         as: "অসমীয়া भाषा বাছনি কৰা হ'ল। স্বাগতম।",
-        bn: "বাংলা ভাষা নির্বাচন করা হয়েছে। স্বাগতম।",
+        bn: "বাংলা भाषा নির্বাচন করা হয়েছে। স্বাগতম।",
         or: "ଓଡ଼ିଆ ଭାଷା ଚୟନ କରାଗଲା। ସ୍ୱାଗତ।",
         ur: "اردو زبان منتخب کر لی گئی ہے۔ خوش آمدید۔",
         es: "Idioma español seleccionado. Bienvenido.",
@@ -415,17 +391,19 @@ class VoiceLanguageDetector {
   openModal() {
     const modal = document.getElementById("voice-lang-modal");
     if (modal) {
+      modal.style.display = "flex";
       modal.classList.add("active");
+      this.selectedDetectedLang = null;
       this.updateUI("READY");
       const textEl = document.getElementById("lang-voice-transcript");
       if (textEl) textEl.textContent = "Say: 'Marathi', 'Gujarati', 'Marwari', 'Tamil', 'Telugu', 'English', 'Hindi'...";
       const resEl = document.getElementById("lang-voice-result");
       if (resEl) resEl.innerHTML = "";
       
-      // Auto-start listening after 450ms for illiterate / speaking users
+      // Auto-start listening after 350ms for illiterate / speaking users
       setTimeout(() => {
         this.startListening();
-      }, 450);
+      }, 350);
     }
   }
 
@@ -434,10 +412,11 @@ class VoiceLanguageDetector {
     const modal = document.getElementById("voice-lang-modal");
     if (modal) {
       modal.classList.remove("active");
+      modal.style.display = "none";
     }
   }
 
-  // 1-Tap audible chip selection with voice feedback
+  // 1-Tap audible chip selection with immediate UI update & modal close
   selectByChip(lang) {
     this.confirmAndApplyLanguage(lang);
   }
