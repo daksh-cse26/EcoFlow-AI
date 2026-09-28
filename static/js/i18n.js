@@ -300,7 +300,300 @@ const I18N = {
     "traceability.step8": "একত্রিত ইনভেন্টরি",
     "traceability.step9": "রিসাইক্লার প্রস্তাব ও বিক্রি",
     "traceability.step10": "প্রেরণ (Dispatch)"
+  },
+  mr: {
+    "app.name": "इकोफ्लो एआय (EcoFlow AI)",
+    "app.tagline": "एआय-सहाय्यित. मानवाद्वारे सत्यापित. डिजिटल स्वरूपात ट्रॅक करण्यायोग्य.",
+    "nav.home": "मुख्यपृष्ठ",
+    "nav.pickups": "पिकअप्स",
+    "nav.scan": "कचरा स्कॅन करा",
+    "nav.rewards": "बक्षिसे",
+    "nav.profile": "प्रोफाइल",
+    "nav.command_map": "कमांड मॅप",
+    "nav.hub_station": "स्टोरेज हब",
+    "nav.recyclers": "रीसायक्लर्स",
+    "nav.ai_admin": "एआय मॉडेल्स",
+    "greeting.title": "शुभ प्रभात, राहुल शर्मा 🌱",
+    "greeting.subtitle": "आपल्या घरगुती पुनर्वापर प्रभावाचा आढावा",
+    "impact.verified_weight": "सत्यापित पुनर्वापर",
+    "impact.pickups_count": "पूर्ण झालेले पिकअप्स",
+    "impact.segregation_score": "वर्गीकरण स्कोअर",
+    "impact.weight_matches": "वजन समानता",
+    "action.scan_waste": "कचरा स्कॅन करा",
+    "action.request_pickup": "पिकअप विनंती करा",
+    "action.track_pickup": "पिकअप ट्रॅक करा",
+    "action.view_settlements": "पारदर्शक सेटलमेंट्स",
+    "scanner.title": "स्थानिक एआय कचरा स्कॅनर",
+    "scanner.sample_presets": "नमुना प्रादेशिक भंगार निवडा:",
+    "scanner.disclaimer": "एआय मूल्यांकन प्राथमिक आहे. स्टोरेज हबवर अंतिम वजन आणि दर्जा तपासला जाईल.",
+    "scanner.detected_material": "ओळखलेली सामग्री",
+    "scanner.confidence": "विश्वासार्हता स्कोअर",
+    "voice.tap_to_speak": "बोलण्यासाठी टॅप करा",
+    "rewards.coming_soon": "लवकरच येत आहे",
+    "rewards.locked_msg": "महानगरपालिका क्षेत्रांमध्ये लवकरच बक्षीस कार्यक्रम सुरू होत आहे.",
+    "settlement.title": "सत्यापित पुनर्वापर सेटलमेंट",
+    "settlement.buying_rate": "कंपनी खरेदी दर",
+    "settlement.final_amount": "अंतिम देय रक्कम",
+    "settlement.weight_match_celebration": "अभिनंदन! आपण स्वच्छ आणि हरित पर्यावरण घडवत आहात."
+  },
+  gu: {
+    "app.name": "ઇકોફ્લો એઆઈ (EcoFlow AI)",
+    "app.tagline": "એઆઈ-સહાયિત. માનવ-પ્રમાણિત. ડિજિટલ ટ્રેસેબલ.",
+    "nav.home": "હોમ",
+    "nav.pickups": "પિકઅપ્સ",
+    "nav.scan": "કચરો સ્કેન કરો",
+    "nav.rewards": "પુરસ્કારો",
+    "greeting.title": "સુપ્રભાત, રાહુલ શર્મા 🌱",
+    "greeting.subtitle": "તમારા ઘરગથ્થુ રિસાયક્લિંગ પ્રભાવની ઝાંખી",
+    "impact.verified_weight": "પ્રમાણિત રિસાયક્લિંગ",
+    "impact.pickups_count": "પૂર્ણ પિકઅપ્સ",
+    "impact.segregation_score": "વર્ગીકરણ સ્કોર",
+    "impact.weight_matches": "વજન મેળ",
+    "action.scan_waste": "કચરો સ્કેન કરો",
+    "action.request_pickup": "ભંગાર પિકઅપ વિનંતી કરો",
+    "action.view_settlements": "પારદર્શક પતાવટ",
+    "scanner.sample_presets": "નમૂનાનો પ્રાદેશિક ભંગાર પસંદ કરો:",
+    "voice.tap_to_speak": "બોલવા માટે ટૅપ કરો",
+    "rewards.coming_soon": "ટૂંક સમયમાં આવી રહ્યું છે",
+    "settlement.title": "પ્રમાણિત રિસાયક્લિંગ પતાવટ",
+    "settlement.buying_rate": "કંપની ખરીદ દર",
+    "settlement.final_amount": "અંતિમ ચૂકવવાપાત્ર રકમ",
+    "settlement.weight_match_celebration": "અભિનંદન! તમે સ્વચ્છ અને હરિયાળું પર્યાવરણ બનાવી રહ્યા છો."
+  },
+  mwr: {
+    "app.name": "इकोफ्लो एआई (EcoFlow AI)",
+    "app.tagline": "एआई सू सहायित। मिनख सू जाँचेड़ो। डिजिटल हिसाब-किताब।",
+    "nav.home": "घर / होम",
+    "nav.pickups": "कबाड़ उठाव",
+    "nav.scan": "कचरो जाँचे",
+    "nav.rewards": "इनाम",
+    "greeting.title": "खम्मा घणी, राहुल शर्मा 🌱",
+    "greeting.subtitle": "थारो घर रो कबाड़ री रीसाइक्लिंग रो ब्यौरो",
+    "impact.verified_weight": "जाँचेड़ो तोल",
+    "impact.pickups_count": "पूरा होया उठाव",
+    "impact.segregation_score": "छांटबा रो नंबर",
+    "impact.weight_matches": "तोल रो मेल",
+    "action.scan_waste": "एआई सू कचरो जाँचे",
+    "action.request_pickup": "कबाड़ उठाव रो संदेसो",
+    "action.view_settlements": "साफ-सुथरो भुगतान",
+    "scanner.sample_presets": "कबाड़ रो नमुनो चुणो:",
+    "voice.tap_to_speak": "बोलबा सारू दबाओ",
+    "rewards.coming_soon": "जल्दी ही आवेगो",
+    "settlement.buying_rate": "कंपनी रो खरीद भाव",
+    "settlement.final_amount": "पूरो मिलबा वाळो रुपियो",
+    "settlement.weight_match_celebration": "बधाई हो! थे एक साफ़ अर हरियाळो पर्यावरण बणा रया हो।"
+  },
+  te: {
+    "app.name": "ఎకోఫ్లో ఏఐ (EcoFlow AI)",
+    "app.tagline": "ఏఐ-సహాయం. మానవ-ధృవీకరణ. డిజిటల్ ట్రేసింగ్.",
+    "nav.home": "హోమ్",
+    "nav.pickups": "పికప్‌లు",
+    "nav.scan": "వ్యర్థాలను స్కాన్ చేయండి",
+    "nav.rewards": "రివార్డులు",
+    "greeting.title": "శుభోదయం, రాహుల్ శర్మ 🌱",
+    "greeting.subtitle": "మీ గృహ రీసైక్లింగ్ ప్రభావ సారాంశం",
+    "impact.verified_weight": "ధృవీకరించిన రీసైక్లింగ్",
+    "impact.pickups_count": "పూర్తయిన పికప్‌లు",
+    "impact.segregation_score": "వేరుచేసే స్కోరు",
+    "impact.weight_matches": "బరువు మ్యాచ్‌లు",
+    "action.scan_waste": "వ్యర్థాలను స్కాన్ చేయండి",
+    "action.request_pickup": "పికప్ షెడ్యూల్ చేయండి",
+    "action.view_settlements": "పారదర్శక చెల్లింపులు",
+    "scanner.sample_presets": "నమూనా వ్యర్థాలను ఎంచుకోండి:",
+    "voice.tap_to_speak": "మాట్లాడటానికి నొక్కండి",
+    "rewards.coming_soon": "త్వరలో రాబోతోంది",
+    "settlement.buying_rate": "కంపెనీ కొనుగోలు ధర",
+    "settlement.final_amount": "తుది చెల్లింపు మొత్తం",
+    "settlement.weight_match_celebration": "అభినందనలు! మీరు పరిశుభ్రమైన మరియు పచ్చని పర్యావరణాన్ని నిర్మిస్తున్నారు."
+  },
+  ta: {
+    "app.name": "எக்கோஃப்ளோ ஏஐ (EcoFlow AI)",
+    "app.tagline": "ஏஐ-உதவி. மனித-சரிபார்ப்பு. டிஜிட்டல் கண்காணிப்பு.",
+    "nav.home": "முகப்பு",
+    "nav.pickups": "பிக்அப்கள்",
+    "nav.scan": "குப்பையை ஸ்கேன் செய்",
+    "nav.rewards": "வெகுமதிகள்",
+    "greeting.title": "காலை வணக்கம், ராகுல் சர்மா 🌱",
+    "greeting.subtitle": "உங்கள் வீட்டு மறுசுழற்சி விவரங்கள்",
+    "impact.verified_weight": "சரிபார்க்கப்பட்ட மறுசுழற்சி",
+    "impact.pickups_count": "முடிக்கப்பட்ட பிக்அப்கள்",
+    "impact.segregation_score": "பிரித்தல் மதிப்பெண்",
+    "impact.weight_matches": "எடைப் பொருத்தங்கள்",
+    "action.scan_waste": "குப்பையை ஸ்கேன் செய்",
+    "action.request_pickup": "பிக்அப் கோரிக்கை",
+    "action.view_settlements": "வெளிப்படையான தீர்வுகள்",
+    "scanner.sample_presets": "மாதிரி பழைய பொருட்களைத் தேர்வுசெய்க:",
+    "voice.tap_to_speak": "பேச தட்டவும்",
+    "rewards.coming_soon": "விரைவில் வருகிறது",
+    "settlement.buying_rate": "நிறுவன கொள்முதல் விலை",
+    "settlement.final_amount": "இறுதி தொகை",
+    "settlement.weight_match_celebration": "வாழ்த்துக்கள்! தூய்மையான மற்றும் பசுமையான சூழலை உருவாக்குகிறீர்கள்."
+  },
+  kn: {
+    "app.name": "ಎಕೋಫ್ಲೋ ಎಐ (EcoFlow AI)",
+    "app.tagline": "ಎಐ-ಸಹಾಯ. ಮಾನವ-ಪರಿಶೀಲನೆ. ಡಿಜಿಟಲ್ ಟ್ರೇಸಿಂಗ್.",
+    "nav.home": "ಮುಖಪುಟ",
+    "nav.pickups": "ಪಿಕಪ್‌ಗಳು",
+    "nav.scan": "ತ್ಯಾಜ್ಯ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+    "nav.rewards": "ಬಹುಮಾನಗಳು",
+    "greeting.title": "ಶುಭೋದಯ, ರಾಹುಲ್ ಶರ್ಮಾ 🌱",
+    "impact.verified_weight": "ಪರಿಶೀಲಿಸಿದ ಮರುಬಳಕೆ",
+    "action.scan_waste": "ತ್ಯಾಜ್ಯ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+    "action.request_pickup": "ಪಿಕಪ್ ವಿನಂತಿಸಿ",
+    "voice.tap_to_speak": "ಮಾತನಾಡಲು ಸ್ಪರ್ಶಿಸಿ",
+    "rewards.coming_soon": "ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ",
+    "settlement.weight_match_celebration": "ಅಭಿನಂದನೆಗಳು! ನೀವು ಸ್ವಚ್ಛ ಮತ್ತು ಹಸಿರು ಪರಿಸರವನ್ನು ನಿರ್ಮಿಸುತ್ತಿದ್ದೀರಿ."
+  },
+  ml: {
+    "app.name": "എക്കോഫ്ലോ എഐ (EcoFlow AI)",
+    "app.tagline": "എഐ സഹായം. മനുഷ്യ പരിശോധന. ഡിജിറ്റൽ ട്രാക്കിംഗ്.",
+    "nav.home": "ഹോം",
+    "nav.pickups": "പിക്കപ്പുകൾ",
+    "nav.scan": "മാലിന്യം സ്കാൻ ചെയ്യുക",
+    "greeting.title": "സുപ്രഭാതം, രാഹുൽ ശർമ്മ 🌱",
+    "impact.verified_weight": "സ്ഥിരീകരിച്ച പുനരുപയോഗം",
+    "action.scan_waste": "മാലിന്യം സ്കാൻ ചെയ്യുക",
+    "action.request_pickup": "പിക്കപ്പ് ഷെഡ്യൂൾ ചെയ്യുക",
+    "voice.tap_to_speak": "സംസാരിക്കാൻ ടാപ്പ് ചെയ്യുക",
+    "rewards.coming_soon": "ഉടൻ വരുന്നു",
+    "settlement.weight_match_celebration": "അഭിനന്ദനങ്ങൾ! നിങ്ങൾ ശുചിത്വമുള്ളതും ഹരിതാഭവുമായ ഒരു പരിസ്ഥിതി സൃഷ്ടിക്കുന്നു."
+  },
+  pa: {
+    "app.name": "ਈਕੋਫਲੋ ਏਆਈ (EcoFlow AI)",
+    "app.tagline": "ਏਆਈ-ਸਹਾਇਤਾ। ਮਨੁੱਖੀ-ਤਸਦੀਕ। ਡਿਜੀਟਲ ਟ੍ਰੇਸਿੰਗ।",
+    "nav.home": "ਮੁੱਖ ਪੰਨਾ",
+    "nav.pickups": "ਪਿਕਅੱਪ",
+    "nav.scan": "ਕੂੜਾ ਸਕੈਨ ਕਰੋ",
+    "greeting.title": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਰਾਹੁਲ ਸ਼ਰਮਾ 🌱",
+    "impact.verified_weight": "ਤਸਦੀਕਸ਼ੁਦਾ ਰੀਸਾਈਕਲਿੰਗ",
+    "action.scan_waste": "ਕੂੜਾ ਸਕੈਨ ਕਰੋ",
+    "action.request_pickup": "ਪਿਕਅੱਪ ਬੇਨਤੀ ਕਰੋ",
+    "voice.tap_to_speak": "ਬੋਲਣ ਲਈ ਟੈਪ ਕਰੋ",
+    "rewards.coming_soon": "ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ",
+    "settlement.weight_match_celebration": "ਮੁਬਾਰਕਾਂ! ਤੁਸੀਂ ਇੱਕ ਸਾਫ਼ ਅਤੇ ਹਰਿਆ-ਭਰਿਆ ਵਾਤਾਵਰਣ ਬਣਾ ਰਹੇ ਹੋ।"
+  },
+  or: {
+    "app.name": "ଇକୋଫ୍ଲୋ ଏଆଇ (EcoFlow AI)",
+    "app.tagline": "ଏଆଇ-ସହାୟତା। ମାନବ-ଯାଞ୍ଚ। ଡିଜିଟାଲ୍ ଟ୍ରାକିଂ।",
+    "greeting.title": "ଶୁଭ ସକାଳ, ରାହୁଲ ଶର୍ମା 🌱",
+    "impact.verified_weight": "ଯାଞ୍ଚ ହୋଇଥିବା ରିସାଇକ୍ଲିଂ",
+    "action.scan_waste": "ବର୍ଜ୍ୟବସ୍ତୁ ସ୍କାନ୍ କରନ୍ତୁ",
+    "settlement.weight_match_celebration": "ଅଭିନନ୍ଦନ! ଆପଣ ଏକ ସ୍ୱଚ୍ଛ ଓ ସବୁଜ ପରିବେଶ ଗଠନ କରୁଛନ୍ତି।"
+  },
+  ur: {
+    "app.name": "ایکو فلو اے آئی (EcoFlow AI)",
+    "app.tagline": "اے آئی کی مدد۔ انسانی تصدیق۔ ڈیجیٹل نگرانی۔",
+    "nav.home": "ہوم",
+    "nav.pickups": "پک اپس",
+    "nav.scan": "کچرا اسکین کریں",
+    "greeting.title": "صبح بخیر، راہول شرما 🌱",
+    "impact.verified_weight": "تصدیق شدہ ری سائیکلنگ",
+    "action.scan_waste": "کچرا اسکین کریں",
+    "action.request_pickup": "پک اپ کی درخواست",
+    "voice.tap_to_speak": "بولنے کے لیے ٹیپ کریں",
+    "rewards.coming_soon": "جلد آ رہا ہے",
+    "settlement.weight_match_celebration": "مبارک ہو! آپ ایک صاف اور سرسبز ماحول بنا رہے ہیں۔"
+  },
+  es: {
+    "app.name": "EcoFlow AI",
+    "app.tagline": "Asistido por IA. Verificado por Humanos. Digitalmente Trazable.",
+    "nav.home": "Inicio",
+    "nav.pickups": "Recolecciones",
+    "nav.scan": "Escanear Residuos",
+    "nav.rewards": "Recompensas",
+    "greeting.title": "Buenos Días, Rahul Sharma 🌱",
+    "greeting.subtitle": "Resumen del Impacto de Reciclaje en su Hogar",
+    "impact.verified_weight": "Reciclaje Verificado",
+    "impact.pickups_count": "Recolecciones Completadas",
+    "impact.segregation_score": "Puntuación de Segregación",
+    "impact.weight_matches": "Coincidencias de Peso",
+    "action.scan_waste": "Escanear Residuos con IA",
+    "action.request_pickup": "Programar Recolección",
+    "action.view_settlements": "Liquidaciones Transparentes",
+    "voice.tap_to_speak": "Toque para Hablar",
+    "rewards.coming_soon": "PRÓXIMAMENTE",
+    "settlement.weight_match_celebration": "¡Felicitaciones! Estás creando un entorno más limpio y verde."
+  },
+  fr: {
+    "app.name": "EcoFlow AI",
+    "app.tagline": "Assisté par IA. Vérifié par l'humain. Numériquement traçable.",
+    "nav.home": "Accueil",
+    "nav.pickups": "Collectes",
+    "nav.scan": "Scanner Déchets",
+    "nav.rewards": "Récompenses",
+    "greeting.title": "Bonjour, Rahul Sharma 🌱",
+    "greeting.subtitle": "Aperçu de l'impact du recyclage de votre foyer",
+    "impact.verified_weight": "Recyclage Vérifié",
+    "action.scan_waste": "Scanner avec l'IA",
+    "action.request_pickup": "Demander une Collecte",
+    "voice.tap_to_speak": "Appuyez pour Parler",
+    "rewards.coming_soon": "BIENTÔT DISPONIBLE",
+    "settlement.weight_match_celebration": "Félicitations ! Vous contribuez à un environnement plus propre et plus vert."
+  },
+  de: {
+    "app.name": "EcoFlow AI",
+    "app.tagline": "KI-unterstützt. Menschlich verifiziert. Digital rückverfolgbar.",
+    "nav.home": "Startseite",
+    "nav.pickups": "Abholungen",
+    "nav.scan": "Müll Scannen",
+    "greeting.title": "Guten Morgen, Rahul Sharma 🌱",
+    "impact.verified_weight": "Verifiziertes Recycling",
+    "action.scan_waste": "Mit KI Scannen",
+    "action.request_pickup": "Abholung Anfordern",
+    "voice.tap_to_speak": "Tippen zum Sprechen",
+    "rewards.coming_soon": "DEMNÄCHST",
+    "settlement.weight_match_celebration": "Herzlichen Glückwunsch! Sie schaffen eine sauberere und grünere Umwelt."
+  },
+  ja: {
+    "app.name": "EcoFlow AI",
+    "app.tagline": "AI支援・人間検証・デジタル追跡可能",
+    "nav.home": "ホーム",
+    "nav.pickups": "回収履歴",
+    "nav.scan": "ゴミをスキャン",
+    "greeting.title": "おはようございます、ラフル・シャルマ様 🌱",
+    "impact.verified_weight": "検証済みリサイクル",
+    "action.scan_waste": "AIでゴミをスキャン",
+    "action.request_pickup": "回収をリクエスト",
+    "voice.tap_to_speak": "タップして話す",
+    "rewards.coming_soon": "近日公開",
+    "settlement.weight_match_celebration": "おめでとうございます！より清潔で環境に優しい未来を築いています。"
+  },
+  ar: {
+    "app.name": "إيكوفلو ذكاء اصطناعي (EcoFlow AI)",
+    "app.tagline": "بمساعدة الذكاء الاصطناعي. موثق بشرياً. قابل للتتبع رقمياً.",
+    "nav.home": "الرئيسية",
+    "nav.pickups": "الشحنات المستلمة",
+    "nav.scan": "مسح النفايات",
+    "greeting.title": "صباح الخير، راهول شارما 🌱",
+    "impact.verified_weight": "إعادة التدوير الموثقة",
+    "action.scan_waste": "مسح النفايات بالذكاء الاصطناعي",
+    "action.request_pickup": "طلب استلام المخلفات",
+    "voice.tap_to_speak": "اضغط للتحدث",
+    "rewards.coming_soon": "قريباً",
+    "settlement.weight_match_celebration": "تهانينا! أنت تسهم في بناء بيئة أنظف وأكثر خضرة."
   }
+};
+
+const LANG_NAMES = {
+  en: "English",
+  hi: "हिन्दी",
+  mr: "मराठी",
+  gu: "ગુજરાતી",
+  mwr: "मारवाड़ी",
+  te: "తెలుగు",
+  ta: "தமிழ்",
+  kn: "ಕನ್ನಡ",
+  ml: "മലയാളം",
+  pa: "ਪੰਜਾਬੀ",
+  as: "অসমীয়া",
+  bn: "বাংলা",
+  or: "ଓଡ଼ିଆ",
+  ur: "اردو",
+  es: "Español",
+  fr: "Français",
+  de: "Deutsch",
+  ja: "日本語",
+  ar: "العربية"
 };
 
 let currentLang = 'en';
@@ -310,8 +603,61 @@ function setLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('ecoflow_lang', lang);
     applyTranslations();
+
+    // Update printed label on the trigger box
+    const labelEl = document.getElementById("lang-current-label");
+    if (labelEl) {
+      labelEl.textContent = LANG_NAMES[lang] || lang.toUpperCase();
+    }
+    document.querySelectorAll(".lang-option-item").forEach(item => {
+      item.classList.toggle("active", item.dataset.lang === lang);
+    });
   }
 }
+
+function toggleLanguageDropdown(event) {
+  if (event) event.stopPropagation();
+  const menu = document.getElementById("lang-dropdown-menu");
+  const btn = document.getElementById("lang-current-btn");
+  if (!menu || !btn) return;
+  const isOpen = menu.classList.toggle("open");
+  btn.classList.toggle("open", isOpen);
+  btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+}
+
+function closeLanguageDropdown() {
+  const menu = document.getElementById("lang-dropdown-menu");
+  const btn = document.getElementById("lang-current-btn");
+  if (menu) menu.classList.remove("open");
+  if (btn) {
+    btn.classList.remove("open");
+    btn.setAttribute("aria-expanded", "false");
+  }
+}
+
+function selectLanguage(lang, displayName) {
+  setLanguage(lang);
+  const labelEl = document.getElementById("lang-current-label");
+  if (labelEl) {
+    labelEl.textContent = displayName || LANG_NAMES[lang] || lang.toUpperCase();
+  }
+  closeLanguageDropdown();
+}
+
+// Global click outside listener
+document.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("lang-dropdown");
+  if (dropdown && !dropdown.contains(e.target)) {
+    closeLanguageDropdown();
+  }
+});
+
+// Close on Escape key
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeLanguageDropdown();
+  }
+});
 
 function t(key, fallback = '') {
   if (I18N[currentLang] && I18N[currentLang][key]) {
@@ -332,7 +678,20 @@ function applyTranslations() {
     const key = el.getAttribute('data-i18n-placeholder');
     el.placeholder = t(key);
   });
-  document.querySelectorAll('.lang-btn').forEach(btn => {
+  document.querySelectorAll('.lang-option-item').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === currentLang);
   });
 }
+
+// Initialize on DOM load
+document.addEventListener("DOMContentLoaded", () => {
+  const savedLang = localStorage.getItem("ecoflow_lang") || "en";
+  if (I18N[savedLang]) {
+    setLanguage(savedLang);
+    const labelEl = document.getElementById("lang-current-label");
+    if (labelEl) {
+      labelEl.textContent = LANG_NAMES[savedLang] || "English";
+    }
+  }
+});
+

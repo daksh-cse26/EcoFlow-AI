@@ -64,14 +64,108 @@
       </button>
     </nav>
 
-    <!-- Language Selector & AI Voice Assistant Trigger -->
+    <!-- Custom Language Dropdown & AI Voice Assistant Trigger -->
     <div class="header-right">
-      <div class="lang-selector-group" title="Select Indian Regional Language">
-        <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
-        <button class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिन्दी</button>
-        <button class="lang-btn" data-lang="as" onclick="setLanguage('as')">অসমীয়া</button>
-        <button class="lang-btn" data-lang="bn" onclick="setLanguage('bn')">বাংলা</button>
+      <div class="custom-lang-dropdown" id="lang-dropdown">
+        <button type="button" class="lang-dropdown-btn" id="lang-current-btn" onclick="toggleLanguageDropdown(event)" aria-haspopup="listbox" aria-expanded="false" title="Choose Language">
+          <span class="lang-globe-icon">🌐</span>
+          <span class="lang-current-label" id="lang-current-label">English</span>
+          <span class="lang-dropdown-arrow">▼</span>
+        </button>
+
+        <div class="lang-dropdown-menu" id="lang-dropdown-menu" role="listbox">
+          <div class="lang-dropdown-header">
+            <span>Select Platform Language</span>
+          </div>
+
+          <!-- Indian Languages Group -->
+          <div class="lang-group-title">🇮🇳 Indian Regional Languages</div>
+          <div class="lang-options-grid">
+            <button type="button" class="lang-option-item active" data-lang="en" onclick="selectLanguage('en', 'English')">
+              <span class="lang-opt-name">English</span>
+              <span class="lang-opt-native">Default</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="hi" onclick="selectLanguage('hi', 'हिन्दी')">
+              <span class="lang-opt-name">Hindi</span>
+              <span class="lang-opt-native">हिन्दी</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="mr" onclick="selectLanguage('mr', 'मराठी')">
+              <span class="lang-opt-name">Marathi</span>
+              <span class="lang-opt-native">मराठी</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="gu" onclick="selectLanguage('gu', 'ગુજરાતી')">
+              <span class="lang-opt-name">Gujarati</span>
+              <span class="lang-opt-native">ગુજરાતી</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="mwr" onclick="selectLanguage('mwr', 'मारवाड़ी')">
+              <span class="lang-opt-name">Marwari</span>
+              <span class="lang-opt-native">मारवाड़ी</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="te" onclick="selectLanguage('te', 'తెలుగు')">
+              <span class="lang-opt-name">Telugu</span>
+              <span class="lang-opt-native">తెలుగు</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="ta" onclick="selectLanguage('ta', 'தமிழ்')">
+              <span class="lang-opt-name">Tamil</span>
+              <span class="lang-opt-native">தமிழ்</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="kn" onclick="selectLanguage('kn', 'ಕನ್ನಡ')">
+              <span class="lang-opt-name">Kannada</span>
+              <span class="lang-opt-native">ಕನ್ನಡ</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="ml" onclick="selectLanguage('ml', 'മലയാളം')">
+              <span class="lang-opt-name">Malayalam</span>
+              <span class="lang-opt-native">മലയാളം</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="pa" onclick="selectLanguage('pa', 'ਪੰਜਾਬੀ')">
+              <span class="lang-opt-name">Punjabi</span>
+              <span class="lang-opt-native">ਪੰਜਾਬੀ</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="as" onclick="selectLanguage('as', 'অসমীয়া')">
+              <span class="lang-opt-name">Assamese</span>
+              <span class="lang-opt-native">অসমীয়া</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="bn" onclick="selectLanguage('bn', 'বাংলা')">
+              <span class="lang-opt-name">Bengali</span>
+              <span class="lang-opt-native">বাংলা</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="or" onclick="selectLanguage('or', 'ଓଡ଼ିଆ')">
+              <span class="lang-opt-name">Odia</span>
+              <span class="lang-opt-native">ଓଡ଼ିଆ</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="ur" onclick="selectLanguage('ur', 'اردو')">
+              <span class="lang-opt-name">Urdu</span>
+              <span class="lang-opt-native">اردو</span>
+            </button>
+          </div>
+
+          <!-- Foreign Languages Group -->
+          <div class="lang-group-title">🌍 Foreign Languages</div>
+          <div class="lang-options-grid">
+            <button type="button" class="lang-option-item" data-lang="es" onclick="selectLanguage('es', 'Español')">
+              <span class="lang-opt-name">Spanish</span>
+              <span class="lang-opt-native">Español</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="fr" onclick="selectLanguage('fr', 'Français')">
+              <span class="lang-opt-name">French</span>
+              <span class="lang-opt-native">Français</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="de" onclick="selectLanguage('de', 'Deutsch')">
+              <span class="lang-opt-name">German</span>
+              <span class="lang-opt-native">Deutsch</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="ja" onclick="selectLanguage('ja', '日本語')">
+              <span class="lang-opt-name">Japanese</span>
+              <span class="lang-opt-native">日本語</span>
+            </button>
+            <button type="button" class="lang-option-item" data-lang="ar" onclick="selectLanguage('ar', 'العربية')">
+              <span class="lang-opt-name">Arabic</span>
+              <span class="lang-opt-native">العربية</span>
+            </button>
+          </div>
+        </div>
       </div>
+
       <button class="voice-btn-top" onclick="voiceAssistant.openVoiceModal('pickup-notes', 'pickup')" title="Multilingual Speech Recognition">
         🎙️ <span data-i18n="voice.tap_to_speak">Voice Assistant</span>
       </button>

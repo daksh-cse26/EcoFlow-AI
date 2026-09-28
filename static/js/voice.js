@@ -67,11 +67,27 @@ class VoiceAssistant {
     }
 
     // Set voice recognition locale according to current language
+    // Set voice recognition locale according to current language
     const langLocales = {
       en: "en-IN",
       hi: "hi-IN",
       as: "as-IN",
-      bn: "bn-IN"
+      bn: "bn-IN",
+      mr: "mr-IN",
+      gu: "gu-IN",
+      mwr: "hi-IN",
+      te: "te-IN",
+      ta: "ta-IN",
+      kn: "kn-IN",
+      ml: "ml-IN",
+      pa: "pa-IN",
+      or: "or-IN",
+      ur: "ur-IN",
+      es: "es-ES",
+      fr: "fr-FR",
+      de: "de-DE",
+      ja: "ja-JP",
+      ar: "ar-SA"
     };
     if (this.recognition) {
       this.recognition.lang = langLocales[currentLang] || "en-IN";
@@ -114,23 +130,47 @@ class VoiceAssistant {
       en: [
         "Please collect my recyclable waste tomorrow between 10 AM and 12 PM.",
         "I have approximately 10 kg of old copper wires and discarded circuit boards.",
-        "Please schedule pickup for 25 kg of newspapers and flattened cardboard boxes.",
-        "Can you verify what rate you pay for clean PET plastic bottles?"
+        "Please schedule pickup for 25 kg of newspapers and flattened cardboard boxes."
       ],
       hi: [
         "कृपया कल सुबह 10 से 12 बजे के बीच मेरा पुनर्चक्रण कचरा एकत्र करें।",
-        "मेरे पास लगभग 10 किलो तांबे के तार और पुराने कंप्यूटर पार्ट्स हैं।",
-        "कृपया 25 किलो अखबार और गत्ते के डिब्बों के लिए पिकअप शेड्यूल करें।"
+        "मेरे पास लगभग 10 किलो तांबे के तार और पुराने कंप्यूटर पार्ट्स हैं।"
+      ],
+      mr: [
+        "कृपया उद्या सकाळी १० ते १२ दरम्यान माझा कचरा संकलित करा.",
+        "माझ्याकडे सुमारे १० किलो जुन्या तांब्याच्या तारा आणि भंगार आहे."
+      ],
+      gu: [
+        "કૃપા કરીને આવતીકાલે સવારે ૧૦ થી ૧૨ દરમિયાન મારો ભંગાર કચરો એકત્રિત કરો.",
+        "મારી પાસે આશરે ૧૦ કિલો તાંબાના વાયર અને સર્કિટ બોર્ડ છે."
+      ],
+      mwr: [
+        "म्हारो कबाड़ काल सवेरे १० सू १२ बजे उठाय लेवो सा।",
+        "म्हारी कनै १० किलो तांबा रा तार अर जूना अखबार है।"
+      ],
+      te: [
+        "దయచేసి రేపు ఉదయం 10 నుండి 12 గంటల మధ్య నా రీసైక్లింగ్ వ్యర్థాలను సేకరించండి.",
+        "నా వద్ద దాదాపు 10 కిలోల రాగి తీగలు మరియు కంప్యూటర్ బోర్డులు ఉన్నాయి."
+      ],
+      ta: [
+        "தயவுசெய்து நாளை காலை 10 முதல் 12 மணிக்குள் என் கழிவுகளை சேகரிக்கவும்.",
+        "என்னிடம் சுமார் 10 கிலோ பழைய செப்பு கம்பிகள் உள்ளன."
+      ],
+      es: [
+        "Por favor recolecte mis residuos reciclables mañana entre las 10 AM y 12 PM.",
+        "Tengo aproximadamente 10 kg de cables de cobre viejos y cartón."
+      ],
+      fr: [
+        "Veuillez collecter mes déchets recyclables demain entre 10h et 12h.",
+        "J'ai environ 10 kg de câbles en cuivre et cartons."
       ],
       as: [
         "অনুগ্ৰহ কৰি কাইলৈ পুৱা ১০ বজাৰ পৰা ১২ বজাৰ ভিতৰত মোৰ আৱৰ্জনা সংগ্ৰহ কৰক।",
-        "মোৰ ওচৰত প্ৰায় ১০ কেজি তামৰ তাঁৰ আৰু কম্পিউটাৰৰ বৰ্ড আছে।",
-        "অনুগ্ৰহ কৰি ২৫ কেজি বাতৰি কাকত আৰু কাৰ্ডবৰ্ডৰ বাবে পিকআপ বুক কৰক।"
+        "মোৰ ওচৰত প্ৰায় ১০ কেজি তামৰ তাঁৰ আৰু কম্পিউটাৰৰ বৰ্ড আছে।"
       ],
       bn: [
         "দয়া করে আগামীকাল সকাল ১০টা থেকে ১২টার মধ্যে আমার বর্জ্য সংগ্রহ করুন।",
-        "আমার কাছে প্রায় ১০ কেজি তামার তার এবং সার্কিট বোর্ড রয়েছে।",
-        "২৫ কেজি খবরের কাগজ এবং কার্ডবোর্ডের জন্য পিকআপ বুক করুন।"
+        "আমার কাছে প্রায় ১০ কেজি তামার তার এবং সার্কিট বোর্ড রয়েছে।"
       ]
     };
 
