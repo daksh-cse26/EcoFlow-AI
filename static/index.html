@@ -83,6 +83,11 @@
         <span class="lang-select-arrow" aria-hidden="true">▼</span>
       </div>
 
+      <!-- Illiterate / Voice Language Auto-Detection Button -->
+      <button type="button" class="btn-lang-voice-detect" id="btn-lang-voice-detect" onclick="openLanguageVoiceModal()" title="Tap to speak your language (बोलकर भाषा चुनें)">
+        🎙️ <span data-i18n="voice.tap_to_speak_lang">Tap to Speak</span>
+      </button>
+
       <button class="voice-btn-top" onclick="voiceAssistant.openVoiceModal('pickup-notes', 'pickup')" title="Multilingual Speech Recognition">
         🎙️ <span data-i18n="voice.tap_to_speak">Voice Assistant</span>
       </button>
@@ -98,6 +103,11 @@
       <span class="gateway-badge" data-i18n="gw.badge">🌱 Secure Multi-Stakeholder Node</span>
       <h2 data-i18n="gw.hero_title">Select Your Operating Interface</h2>
       <p data-i18n="gw.hero_desc">Choose your operational role and enter your credentials to authenticate and establish an encrypted session on this device.</p>
+      <div style="margin-top: 10px;">
+        <button type="button" class="btn-lang-voice-detect" onclick="openLanguageVoiceModal()" style="font-size: 13px; padding: 7px 16px;">
+          🎙️ <span data-i18n="voice.tap_to_speak_hero">Tap to Speak Language / बोलकर भाषा चुनें</span>
+        </button>
+      </div>
     </div>
 
     <!-- 6 Role Selection Cards -->
@@ -162,6 +172,22 @@
       <div class="gateway-form-header">
         <span class="gateway-form-title" id="gateway-role-title">🏠 Household Citizen Portal</span>
         <span class="small text-muted" data-i18n="gw.vault_label">🔒 AES Encrypted Vault</span>
+      </div>
+
+      <!-- Sequential Text-To-Speech (TTS) Narrator Bar for Illiterate Users -->
+      <div class="gateway-tts-bar" id="gateway-tts-bar">
+        <div class="gateway-tts-left" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <button type="button" class="btn-tts-toggle" id="btn-tts-toggle" onclick="toggleLoginTTS()">
+            <span class="tts-icon">🔊</span>
+            <span id="tts-toggle-text">Voice Guide: Read Out Aloud (Line by Line)</span>
+          </button>
+          <button type="button" class="btn-tts-speak-again" id="btn-tts-speak-again" onclick="loginTTSNarrator.replayCurrentField()" style="display: none;" title="Repeat active field instructions">
+            🔄 Repeat
+          </button>
+        </div>
+        <div class="gateway-tts-right">
+          <span class="tts-narrator-pill" id="tts-narrator-status">Tap to activate automatic voice guidance for illiterate users</span>
+        </div>
       </div>
 
       <!-- Specific Context Notices -->
@@ -262,6 +288,25 @@
         </div>
       </div>
 
+      <!-- Household Step-by-Step Interactive Tutorial & Feature Video Tutorials Banner -->
+      <div class="tutorial-guide-banner">
+        <div class="tut-banner-content">
+          <div class="tut-banner-icon">🎓</div>
+          <div>
+            <h4 style="margin: 0; color: #FFFFFF;" data-i18n="tut.hh_banner_title">Household Quick Tutorial & Videos</h4>
+            <p class="small text-muted mb-0" data-i18n="tut.hh_banner_desc">Step-by-step interactive walkthrough & animated video guides for each feature.</p>
+          </div>
+        </div>
+        <div class="tut-banner-actions">
+          <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('household')">
+            🧭 Start Step-by-Step Tour
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('hh_scanner')">
+            🎥 Feature Video Demos
+          </button>
+        </div>
+      </div>
+
       <!-- TAB 1: HOME -->
       <section class="household-tab-pane active" id="hh-tab-home">
         <div class="impact-grid">
@@ -348,7 +393,10 @@
         <div class="sub-interface-header">
           <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
           <span class="sub-interface-title">📦 Your Scrap Pickups</span>
-          <button class="btn btn-sm btn-primary" onclick="openPickupModal()">+ New</button>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_pickup')">🎥 Video Demo</button>
+            <button class="btn btn-sm btn-primary" onclick="openPickupModal()">+ New</button>
+          </div>
         </div>
         <div id="household-pickups-list">
           <div class="queue-item-card">
@@ -378,6 +426,7 @@
         <div class="sub-interface-header">
           <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
           <span class="sub-interface-title">📸 Local AI Waste Scanner</span>
+          <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_scanner')">🎥 Video Demo</button>
         </div>
         <div class="scanner-viewport">
           <div class="laser-line"></div>
@@ -436,6 +485,7 @@
         <div class="sub-interface-header">
           <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
           <span class="sub-interface-title">🧾 Transparent Settlement</span>
+          <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_settlement')">🎥 Video Demo</button>
         </div>
         <div id="settlement-receipt-view">
           <!-- Injected via settlement.js -->
@@ -447,6 +497,7 @@
         <div class="sub-interface-header">
           <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
           <span class="sub-interface-title">🎁 Eco Citizen Rewards</span>
+          <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_rewards')">🎥 Video Demo</button>
         </div>
         <div class="rewards-header-banner">
           <span class="coming-soon-pill" data-i18n="rewards.coming_soon">COMING SOON</span>
@@ -745,6 +796,25 @@
       <p class="text-muted" data-i18n="col.header_desc">Inclusive workflows supporting Smartphone App (Mode 1), Two-Way SMS (Mode 2), and Coordinator Physical Logs (Mode 3).</p>
     </div>
 
+    <!-- Field Collector Step-by-Step Interactive Tutorial & Feature Video Demos Banner -->
+    <div class="tutorial-guide-banner">
+      <div class="tut-banner-content">
+        <div class="tut-banner-icon">🚚</div>
+        <div>
+          <h4 style="margin: 0; color: #FFFFFF;" data-i18n="tut.col_banner_title">Field Collector Operational Training</h4>
+          <p class="small text-muted mb-0" data-i18n="tut.col_banner_desc">Guided tour and short feature video tutorials on Mode 1, Mode 2 SMS, and Lot Sealing.</p>
+        </div>
+      </div>
+      <div class="tut-banner-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('collector')">
+          🧭 Start Collector Tour
+        </button>
+        <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('col_modes')">
+          🎥 Collector Video Demos
+        </button>
+      </div>
+    </div>
+
     <!-- Collector Mode Tabs -->
     <nav class="portal-subnav-bar">
       <button class="portal-subnav-btn active" data-mode="mode1" onclick="switchCollectorMode('mode1')" data-i18n="col.tab_mode1">📱 Mode 1: Smartphone App</button>
@@ -768,13 +838,19 @@
         </div>
 
         <div style="padding: 16px;">
-          <div class="hub-authority-banner">
-            <strong>Active Collection Assignment</strong>
-            <p class="small mt-1">Pickup ID: PR-2026-000844 • 25 kg Newspaper & Cardboard</p>
+          <div class="hub-authority-banner" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>Active Collection Assignment</strong>
+              <p class="small mt-1 mb-0">Pickup ID: PR-2026-000844 • 25 kg Newspaper & Cardboard</p>
+            </div>
+            <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('col_assignment')">🎥 Video Demo</button>
           </div>
 
           <div class="assessment-card mb-2 text-center">
-            <h4>Digital Waste Lot QR</h4>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <h4 style="margin: 0;">Digital Waste Lot QR</h4>
+              <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('col_seallot')">🎥 Video Demo</button>
+            </div>
             <p class="small text-muted mb-2">Lot: <strong id="collector-lot-id-badge">LOT-2026-000184</strong></p>
             <div style="display: flex; justify-content: center; margin: 10px 0;">
               <canvas id="collector-active-qr" width="150" height="150" style="border: 1px solid var(--border-glass); border-radius: 8px;"></canvas>
@@ -794,7 +870,10 @@
           <div class="hub-card mt-2" style="background: rgba(16, 185, 129, 0.08); border: 1px dashed var(--primary-leaf); padding: 14px; border-radius: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <span style="font-weight: 700; color: #34D399; font-size: 13px;">📴 Grassroots Peer Registration</span>
-              <span class="badge-green" style="font-size: 10px;">COLLECTOR PERMISSION</span>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('col_grassroots')">🎥 Video Demo</button>
+                <span class="badge-green" style="font-size: 10px;">COLLECTOR PERMISSION</span>
+              </div>
             </div>
             <p class="small text-muted mb-2">Empower informal waste-pickers without phones. Register them to generate an official <strong>COL-NP-</strong> Collector ID with physical lot token.</p>
             <button type="button" class="btn btn-outline btn-block" style="border-color: var(--primary-leaf); color: #34D399; font-weight: 700;" onclick="openPhonelessCollectorModal()">
@@ -2033,9 +2112,157 @@ Invitation declined. You will not receive further alerts today.
     </div>
   </div>
 
+  <!-- Voice Language Auto-Detection Modal (For Illiterate / Speaking Users) -->
+  <div class="voice-lang-modal" id="voice-lang-modal">
+    <div class="voice-lang-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-size: 11px; font-weight: 800; color: #38BDF8; letter-spacing: 1px; text-transform: uppercase;">🎙️ Multilingual Speech Recognition</span>
+        <button type="button" class="modal-close-btn" onclick="closeLanguageVoiceModal()" style="background: none; border: none; color: #94A3B8; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+      <h3 style="margin-bottom: 4px; color: #FFFFFF;" data-i18n="voice.modal_title">Tap to Speak Your Language</h3>
+      <p class="small text-muted" style="margin-bottom: 12px;" data-i18n="voice.modal_desc">Speak in your mother tongue (Hindi, Marathi, Gujarati, Marwari, Tamil, Bengali, English, etc.). EcoFlow will recognize and set your language automatically.</p>
+
+      <div class="voice-mic-circle" id="lang-voice-mic-circle" onclick="voiceLangDetector.startListening()">
+        🎙️
+      </div>
+
+      <div class="voice-wave-container" id="lang-voice-waves">
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+      </div>
+
+      <div id="lang-voice-status" style="font-size: 13px; font-weight: 700; color: #38BDF8; margin-bottom: 6px;">
+        Tap the microphone and speak your language
+      </div>
+
+      <div class="voice-transcript-box" id="lang-voice-transcript">
+        "Press the mic and say: 'हिन्दी', 'मराठी', 'ગુજરાતી', 'தமிழ்', 'English'..."
+      </div>
+
+      <div id="lang-voice-result" style="margin: 8px 0; font-size: 13px; color: #34D399; font-weight: 700;"></div>
+
+      <div style="margin-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px;">
+        <span class="small text-muted" style="display: block; margin-bottom: 6px;">Or tap your language directly:</span>
+        <div class="voice-chip-grid">
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('hi')">🇮🇳 हिन्दी (Hindi)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('mr')">🇮🇳 मराठी (Marathi)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('gu')">🇮🇳 ગુજરાતી (Gujarati)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('mwr')">🇮🇳 मारवाड़ी (Marwari)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('ta')">🇮🇳 தமிழ் (Tamil)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('te')">🇮🇳 తెలుగు (Telugu)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('bn')">🇮🇳 বাংলা (Bengali)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('as')">🇮🇳 অসমীয়া (Assamese)</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('en')">🇬🇧 English</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('es')">🇪🇸 Español</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('fr')">🇫🇷 Français</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('de')">🇩🇪 Deutsch</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('ja')">🇯🇵 日本語</button>
+          <button type="button" class="voice-lang-chip" onclick="voiceLangDetector.selectByChip('ar')">🇸🇦 العربية</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeLanguageVoiceModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step-by-Step Interactive Tutorial Guide Modal -->
+  <div class="tutorial-guide-modal" id="tutorial-guide-modal">
+    <div class="tut-guide-header">
+      <span class="tut-guide-badge" id="tut-guide-badge">🏠 Household Recycling Guide</span>
+      <div class="tut-guide-dots" id="tut-guide-dots"></div>
+      <button type="button" onclick="closeStepTutorial()" style="background: none; border: none; color: #94A3B8; font-size: 18px; cursor: pointer;">✕</button>
+    </div>
+    <h4 id="tut-guide-title" style="margin: 8px 0 6px 0; color: #FFFFFF;">1. Title</h4>
+    <p id="tut-guide-desc" class="small text-muted" style="line-height: 1.5; min-height: 60px; margin-bottom: 8px;">Description text</p>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span class="small text-muted" id="tut-guide-counter">Step 1 of 5</span>
+      <div style="display: flex; gap: 6px;">
+        <button type="button" class="btn btn-sm btn-outline" id="tut-guide-btn-speak" onclick="tutorialController.speakCurrentStep()" title="Read Step Aloud in your language">
+          🔊 Speak
+        </button>
+        <button type="button" class="btn btn-sm btn-outline" id="tut-guide-btn-video" style="border-color: #38BDF8; color: #38BDF8;" title="Watch Short Feature Video">
+          🎥 Watch Video
+        </button>
+      </div>
+    </div>
+    <div class="tut-guide-actions">
+      <button type="button" class="btn btn-sm btn-outline" id="tut-guide-btn-prev" onclick="tutorialController.prevStep()" style="display: none;">◀ Previous</button>
+      <button type="button" class="btn btn-sm btn-primary" id="tut-guide-btn-next" onclick="tutorialController.nextStep()" style="margin-left: auto;">Next Step ▶</button>
+    </div>
+  </div>
+
+  <!-- Feature Video Demonstration Modal Player -->
+  <div class="tutorial-video-modal" id="tutorial-video-modal">
+    <div class="tut-video-card">
+      <div class="tut-video-header">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 11px; background: rgba(56, 189, 248, 0.2); color: #38BDF8; font-weight: 800; padding: 2px 8px; border-radius: 10px;">FEATURE VIDEO TUTORIAL</span>
+            <h3 id="tut-video-title" style="margin: 0; color: #FFFFFF; font-size: 16px;">Feature Title</h3>
+          </div>
+          <p class="small text-muted mb-0" id="tut-video-sub" style="margin-top: 2px;">Feature subtitle and workflow context</p>
+        </div>
+        <button type="button" onclick="closeVideoModal()" style="background: none; border: none; color: #94A3B8; font-size: 22px; cursor: pointer;">✕</button>
+      </div>
+
+      <div class="tut-video-body">
+        <!-- Main Player Viewport & Controls -->
+        <div class="tut-video-main">
+          <div class="tut-video-viewport">
+            <canvas id="tut-video-canvas" width="680" height="380"></canvas>
+          </div>
+
+          <!-- Video Controls Bar -->
+          <div class="tut-video-controls">
+            <div class="tut-video-progress-bar" id="tut-video-progress-bar" onclick="const rect = this.getBoundingClientRect(); const pct = ((event.clientX - rect.left) / rect.width) * 100; tutorialController.seekVideo(pct);">
+              <div class="tut-video-progress-fill" id="tut-video-progress-fill"></div>
+            </div>
+
+            <div class="tut-video-ctrl-row">
+              <div class="tut-ctrl-left">
+                <button type="button" class="tut-icon-btn" id="tut-video-play-btn" onclick="tutorialController.toggleVideoPlay()">❚❚</button>
+                <button type="button" class="tut-icon-btn" id="tut-video-restart-btn" onclick="tutorialController.restartVideo()" title="Restart">↺</button>
+                <button type="button" class="tut-icon-btn active" id="tut-video-voice-btn" onclick="tutorialController.toggleVoiceover()" title="Voiceover Audio Narration">🔊</button>
+                <span class="small" id="tut-video-time-display" style="font-family: monospace; color: #94A3B8; margin-left: 6px;">0:00 / 0:20</span>
+              </div>
+              <div class="tut-ctrl-right">
+                <span class="small text-muted" style="font-size: 10px;">Speed:</span>
+                <button type="button" class="tut-speed-btn" data-speed="0.75" onclick="tutorialController.setSpeed(0.75)">0.75x</button>
+                <button type="button" class="tut-speed-btn active" data-speed="1.0" onclick="tutorialController.setSpeed(1.0)">1.0x</button>
+                <button type="button" class="tut-speed-btn" data-speed="1.5" onclick="tutorialController.setSpeed(1.5)">1.5x</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Synchronized Captions & Audio Narration -->
+          <div class="tut-video-caption-box">
+            <span id="tut-video-caption-text">Loading feature animation...</span>
+          </div>
+        </div>
+
+        <!-- Sidebar Feature Playlist -->
+        <div class="tut-video-sidebar">
+          <div class="tut-sidebar-title">Interface Feature Videos</div>
+          <div class="tut-video-playlist-items" id="tut-video-playlist-items">
+            <!-- Injected via tutorialController.renderVideoPlaylist() -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/i18n.js"></script>
   <script src="js/voice.js"></script>
+  <script src="js/voice_lang.js"></script>
+  <script src="js/login_tts.js"></script>
+  <script src="js/tutorial.js"></script>
   <script src="js/gis_map.js"></script>
   <script src="js/qr_engine.js"></script>
   <script src="js/settlement.js"></script>
