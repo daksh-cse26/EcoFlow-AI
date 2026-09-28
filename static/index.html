@@ -42,27 +42,14 @@
       </div>
     </div>
 
-    <!-- Perspective / Stakeholder Switcher -->
-    <nav class="role-switcher-bar" aria-label="Perspective Switcher">
-      <button class="role-btn active" data-role="household" onclick="switchPerspective('household')">
-        🏠 Household App
+    <!-- Active Authenticated Session Badge (when logged in) -->
+    <div class="active-session-badge" id="active-session-badge" style="display: none;">
+      <span class="session-role-pill" id="session-role-pill">🏠 Household Portal</span>
+      <span class="session-user-name" id="session-user-name">Rahul Sharma</span>
+      <button type="button" class="btn-switch-portal" onclick="confirmSwitchPortal()" title="Switch Interface / Logout">
+        🔒 Logout / Switch
       </button>
-      <button class="role-btn" data-role="coordinator" onclick="switchPerspective('coordinator')">
-        📋 Field Coordinator
-      </button>
-      <button class="role-btn" data-role="collector" onclick="switchPerspective('collector')">
-        🚚 Field Collector
-      </button>
-      <button class="role-btn" data-role="hub" onclick="switchPerspective('hub')">
-        ⚖️ Storage Hub (Authority)
-      </button>
-      <button class="role-btn" data-role="recycler" onclick="switchPerspective('recycler')">
-        🏭 Recycler Portal
-      </button>
-      <button class="role-btn" data-role="admin" onclick="switchPerspective('admin')">
-        🗺️ Command Center
-      </button>
-    </nav>
+    </div>
 
     <!-- Language Selector Box & AI Voice Assistant Trigger -->
     <div class="header-right">
@@ -103,10 +90,165 @@
   </header>
 
   <!-- ==================================================
+       PORTAL GATEWAY & ONBOARDING AUTHENTICATION SCREEN
+       (Active upon first load; locks to chosen interface after login)
+       ================================================== -->
+  <section class="portal-gateway-screen" id="portal-gateway-screen" style="display: none;">
+    <div class="gateway-hero">
+      <span class="gateway-badge">🌱 Secure Multi-Stakeholder Node</span>
+      <h2>Select Your Operating Interface</h2>
+      <p>Choose your operational role and enter your credentials to authenticate and establish an encrypted session on this device.</p>
+    </div>
+
+    <!-- 6 Role Selection Cards -->
+    <div class="gateway-role-grid">
+      <div class="portal-role-card selected" data-role="household" onclick="selectGatewayRole('household')">
+        <div class="portal-card-header">
+          <span class="portal-card-icon">🏠</span>
+          <span class="portal-selected-indicator">✓</span>
+        </div>
+        <div class="portal-card-title">Household App</div>
+        <div class="portal-card-desc">Citizen scrap scanner, preliminary AI assessment, pickup request & receipts.</div>
+      </div>
+
+      <div class="portal-role-card" data-role="coordinator" onclick="selectGatewayRole('coordinator')">
+        <div class="portal-card-header">
+          <span class="portal-card-icon">📋</span>
+          <span class="portal-selected-indicator">✓</span>
+        </div>
+        <div class="portal-card-title">Field Coordinator</div>
+        <div class="portal-card-desc">Zonal dispatch management, collector assignment & load balancing.</div>
+      </div>
+
+      <div class="portal-role-card" data-role="collector" onclick="selectGatewayRole('collector')">
+        <div class="portal-card-header">
+          <span class="portal-card-icon">🚚</span>
+          <span class="portal-selected-indicator">✓</span>
+        </div>
+        <div class="portal-card-title">Field Collector</div>
+        <div class="portal-card-desc">Mobile & offline collection, QR digital lot creation & transport.</div>
+      </div>
+
+      <div class="portal-role-card" data-role="hub" onclick="selectGatewayRole('hub')">
+        <div class="portal-card-header">
+          <span class="portal-card-icon">⚖️</span>
+          <span class="portal-selected-indicator">✓</span>
+        </div>
+        <div class="portal-card-title">Storage Hub (Authority)</div>
+        <div class="portal-card-desc">Calibrated physical weighing, material quality verification & official settlements.</div>
+      </div>
+
+      <div class="portal-role-card" data-role="recycler" onclick="selectGatewayRole('recycler')">
+        <div class="portal-card-header">
+          <span class="portal-card-icon">🏭</span>
+          <span class="portal-selected-indicator">✓</span>
+        </div>
+        <div class="portal-card-title">Recycler Portal</div>
+        <div class="portal-card-desc">B2B industrial catalog, aggregate batch bids, digital contract & gate-pass dispatch.</div>
+      </div>
+
+      <div class="portal-role-card" data-role="admin" onclick="selectGatewayRole('admin')">
+        <div class="portal-card-header">
+          <span class="portal-card-icon">🗺️</span>
+          <span class="portal-selected-indicator">✓</span>
+        </div>
+        <div class="portal-card-title">Command Center</div>
+        <div class="portal-card-desc">Master executive GIS, neural models, encrypted registry & whitelist access.</div>
+      </div>
+    </div>
+
+    <!-- Dynamic Credentials Form Box -->
+    <div class="gateway-form-box">
+      <div class="gateway-form-header">
+        <span class="gateway-form-title" id="gateway-role-title">🏠 Household Citizen Portal</span>
+        <span class="small text-muted">🔒 AES Encrypted Vault</span>
+      </div>
+
+      <!-- Specific Context Notices -->
+      <div id="gf-admin-notice" style="display: none; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #93C5FD;">
+        🛡️ <strong>Restricted Executive Access:</strong> Only <code>dakssinghi@gmail.com</code> and authorized administrators on the whitelist have access to this portal. Phone number and address are not required.
+      </div>
+
+      <div id="gf-collector-notice" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #A7F3D0;">
+        🚚 <strong>Automated Identity:</strong> Upon entering your details, an individual, unique Collector ID (e.g. <code>COL-2026-XXXXX</code>) will be permanently generated for you and encrypted on the database.
+      </div>
+
+      <div class="gateway-fields-grid">
+        <!-- Name -->
+        <div class="gateway-field" id="gf-name-container">
+          <label for="gw-name">
+            <span>Full Name</span>
+            <span class="field-tag field-tag-req">* Mandatory</span>
+          </label>
+          <input type="text" id="gw-name" class="form-input" placeholder="e.g. Rahul Sharma" oninput="validateGatewayInputs()" />
+        </div>
+
+        <!-- Mobile Phone -->
+        <div class="gateway-field" id="gf-phone-container">
+          <label for="gw-phone">
+            <span>Mobile Number</span>
+            <span class="field-tag field-tag-req">* Mandatory</span>
+          </label>
+          <input type="tel" id="gw-phone" class="form-input" placeholder="e.g. +91 98640 12345" oninput="validateGatewayInputs()" />
+        </div>
+
+        <!-- Email Address -->
+        <div class="gateway-field" id="gf-email-container">
+          <label for="gw-email">
+            <span>Email Address</span>
+            <span class="field-tag field-tag-req">* Mandatory</span>
+          </label>
+          <input type="email" id="gw-email" class="form-input" placeholder="e.g. user@example.com" oninput="validateGatewayInputs()" />
+        </div>
+
+        <!-- Employee ID (Coordinator only) -->
+        <div class="gateway-field" id="gf-employee-id-container" style="display: none;">
+          <label for="gw-emp-id">
+            <span>Employee ID</span>
+            <span class="field-tag field-tag-req">* Mandatory</span>
+          </label>
+          <input type="text" id="gw-emp-id" class="form-input" placeholder="e.g. EMP-2026-104" oninput="validateGatewayInputs()" />
+        </div>
+
+        <!-- Master Password (Admin only) -->
+        <div class="gateway-field" id="gf-password-container" style="display: none;">
+          <label for="gw-password">
+            <span>Master Password</span>
+            <span class="field-tag field-tag-req">* Mandatory</span>
+          </label>
+          <input type="password" id="gw-password" class="form-input" placeholder="Enter secure password" oninput="validateGatewayInputs()" />
+          <div style="text-align: right; margin-top: 4px;">
+            <a href="javascript:void(0)" onclick="openForgotPasswordModal()" style="font-size: 11px; color: var(--primary-mint); text-decoration: underline;">Forgot Password?</a>
+          </div>
+        </div>
+
+        <!-- Physical Address -->
+        <div class="gateway-field field-full" id="gf-address-container">
+          <label for="gw-address">
+            <span>Physical / Operating Address</span>
+            <span class="field-tag field-tag-req">* Mandatory</span>
+          </label>
+          <textarea id="gw-address" class="form-input" rows="2" placeholder="e.g. House 42, Green Park Avenue, North Zone, Guwahati" oninput="validateGatewayInputs()"></textarea>
+        </div>
+      </div>
+
+      <!-- Dynamic Login Button (Reveals once all mandatory fields are filled) -->
+      <div class="gateway-submit-container" id="gateway-submit-container">
+        <button type="button" class="btn-gateway-submit" id="btn-gateway-submit" onclick="submitGatewayLogin()">
+          ✨ Authenticate & Enter Portal ▶
+        </button>
+        <div class="gateway-security-notice">
+          <span>🔒 Credentials encrypted & saved locally. Next time you open EcoFlow AI, you will enter directly without logging in.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================
        VIEW 1: HOUSEHOLD APPLICATION PERSPECTIVE
        Section 6: Mobile-first Household interface
        ================================================== -->
-  <main class="perspective-view active" id="view-household">
+  <main class="perspective-view" id="view-household">
     <div class="household-container">
       
       <!-- Top Household Bar -->
@@ -969,6 +1111,8 @@
     <!-- Admin Nav Tabs -->
     <nav class="role-switcher-bar mb-2" style="background: rgba(15, 23, 42, 0.6);" aria-label="Admin Navigation">
       <button class="admin-nav-item role-btn active" data-tab="map" onclick="switchAdminTab('map')">🗺️ Command Map (GIS)</button>
+      <button class="admin-nav-item role-btn" data-tab="registry" onclick="switchAdminTab('registry')">🔒 Encrypted User Registry</button>
+      <button class="admin-nav-item role-btn" data-tab="whitelist" onclick="switchAdminTab('whitelist')">🛡️ Admin Whitelist (Daksh)</button>
       <button class="admin-nav-item role-btn" data-tab="ai_models" onclick="switchAdminTab('ai_models')">🤖 AI Models & Testing</button>
       <button class="admin-nav-item role-btn" data-tab="feedback" onclick="switchAdminTab('feedback')">📊 AI Feedback Dataset</button>
       <button class="admin-nav-item role-btn" data-tab="traceability" onclick="switchAdminTab('traceability')">🔗 Traceability Explorer</button>
@@ -1148,6 +1292,70 @@
             <!-- Injected via app.js -->
           </tbody>
         </table>
+      </div>
+    <!-- ADMIN TAB 7: ENCRYPTED CITIZEN & WORKFORCE REGISTRY -->
+    <div class="admin-tab-pane" id="admin-tab-registry">
+      <div class="hub-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 class="mb-1">🔒 Encrypted Citizen & Workforce Registry</h3>
+            <p class="text-muted small">All household, collector, coordinator and recycler credentials are encrypted at rest with military-grade PBKDF2/AES and decrypted strictly for Command Center.</p>
+          </div>
+          <span class="status-badge status-verified" id="registry-count-badge">Encrypted Database Storage</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Role</th>
+                <th>Name (Decrypted)</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Custom / Collector ID</th>
+                <th>Raw Ciphertext in SQLite</th>
+              </tr>
+            </thead>
+            <tbody id="encrypted-registry-tbody">
+              <!-- Injected via auth.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 8: COMMAND CENTER ACCESS & WHITELIST MANAGEMENT -->
+    <div class="admin-tab-pane" id="admin-tab-whitelist">
+      <div class="hub-card mb-2">
+        <h3 class="mb-1">🛡️ Command Center Whitelist & Access Control</h3>
+        <p class="text-muted small mb-2">Root Owner: <strong style="color:#34D399;">Daksh Singhi (dakssinghi@gmail.com)</strong>. Only the root owner has permission to authorize or revoke Command Center access.</p>
+        
+        <div class="form-group mb-2" style="background: rgba(0, 0, 0, 0.35); padding: 14px; border-radius: 8px; border: 1px solid var(--border-glass);">
+          <label><strong>Authorize New Administrator:</strong></label>
+          <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+            <input type="email" id="new-admin-email" class="form-input" placeholder="Officer Email (e.g. supervisor@ecoflow.ai)" style="flex: 2; min-width: 220px;" />
+            <input type="text" id="new-admin-name" class="form-input" placeholder="Designation (e.g. Operations Director)" style="flex: 2; min-width: 200px;" />
+            <button class="btn btn-primary" onclick="addWhitelistEmail()">+ Authorize Email</button>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Authorized Email</th>
+                <th>Designated Name</th>
+                <th>Encryption & Security Status</th>
+                <th>Registered At</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-whitelist-tbody">
+              <!-- Injected via auth.js -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -1340,6 +1548,73 @@
     </div>
   </div>
 
+  <!-- Collector Celebration & Unique ID Modal -->
+  <div class="security-modal-overlay" id="collector-celebration-modal" role="dialog" aria-modal="true">
+    <div class="security-modal-box">
+      <div style="font-size: 42px; margin-bottom: 8px;">🎉</div>
+      <h3 style="color: #FFFFFF; font-size: 20px; font-weight: 800; margin-bottom: 6px;">Field Collector Onboarded!</h3>
+      <p class="text-muted small">Welcome, <strong id="modal-collector-name" style="color: #34D399;">Field Collector</strong>. Your unique digital identity token has been created:</p>
+      <div class="collector-id-badge-large" id="modal-collector-id">COL-2026-00000</div>
+      <p class="small text-muted mb-2">This ID has been saved to your device and securely encrypted in the master database. All collections, digital QR lots, and daily tasks will be automatically stamped with this ID.</p>
+      <button class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: 700;" onclick="closeCollectorCelebrationModal()">
+        Continue to Field Collector Portal ▶
+      </button>
+    </div>
+  </div>
+
+  <!-- Command Center First-Time Password Setup Modal -->
+  <div class="security-modal-overlay" id="admin-setup-password-modal" role="dialog" aria-modal="true">
+    <div class="security-modal-box text-left">
+      <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800; margin-bottom: 4px;">🔐 Configure Master Security Password</h3>
+      <p class="small text-muted mb-2">First-time access detected for <strong id="admin-setup-email-display" style="color: #34D399;">dakssinghi@gmail.com</strong>. Create your secure master password to lock the Command Center and encrypted registry.</p>
+      <div class="form-group mb-2">
+        <label>Master Password (min 6 characters):</label>
+        <input type="password" id="admin-new-password" class="form-input" placeholder="Create strong password" />
+      </div>
+      <div class="form-group mb-2">
+        <label>Confirm Master Password:</label>
+        <input type="password" id="admin-confirm-password" class="form-input" placeholder="Re-type password" />
+      </div>
+      <p class="disclaimer-note mb-2" style="font-size: 10px;">
+        🛡️ <strong>Irreversible Encryption:</strong> Your password is protected via PBKDF2-HMAC-SHA256 with 600,000 iterations and a 32-byte salt. It is never stored in plaintext and cannot be viewed by anyone.
+      </p>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-primary" style="flex: 1;" onclick="submitAdminMasterPassword()">Set Master Password & Enter</button>
+        <button class="btn btn-secondary" onclick="closeAdminSetupPasswordModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Center Forgot Password Modal -->
+  <div class="security-modal-overlay" id="admin-forgot-password-modal" role="dialog" aria-modal="true">
+    <div class="security-modal-box text-left">
+      <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800; margin-bottom: 4px;">🔑 Reset Master Security Password</h3>
+      <p class="small text-muted mb-2">Enter your registered administrator email to verify your identity and reset your encrypted password.</p>
+      <div class="form-group mb-2">
+        <label>Administrator Email:</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="email" id="admin-forgot-email" class="form-input" value="dakssinghi@gmail.com" />
+          <button class="btn btn-outline" onclick="requestPasswordResetCode()">Send Code</button>
+        </div>
+      </div>
+      <div id="forgot-token-alert" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid var(--primary-leaf); padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;"></div>
+      <div id="forgot-password-step2" style="display: none;">
+        <div class="form-group mb-2">
+          <label>6-Digit Verification Code:</label>
+          <input type="text" id="admin-reset-token" class="form-input" placeholder="e.g. 849201" />
+        </div>
+        <div class="form-group mb-2">
+          <label>New Master Password:</label>
+          <input type="password" id="admin-reset-new-password" class="form-input" placeholder="Enter new master password" />
+        </div>
+        <button class="btn btn-primary" style="width: 100%; margin-top: 6px;" onclick="submitResetPassword()">Confirm Password Reset</button>
+      </div>
+      <div style="text-align: right; margin-top: 10px;">
+        <button class="btn btn-sm btn-secondary" onclick="closeForgotPasswordModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/i18n.js"></script>
   <script src="js/voice.js"></script>
@@ -1347,6 +1622,7 @@
   <script src="js/qr_engine.js"></script>
   <script src="js/settlement.js"></script>
   <script src="js/tour.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

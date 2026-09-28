@@ -8,6 +8,7 @@ import sqlite3
 import json
 import time
 from datetime import datetime, timedelta
+from crypto_vault import encrypt_field, decrypt_field
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ecoflow.db")
 
@@ -384,6 +385,41 @@ def init_db():
     );
     """)
 
+    # 25. Encrypted User Registry (Section: Military-Grade Encrypted Database Storage)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS encrypted_user_registry (
+        user_id TEXT PRIMARY KEY,
+        role TEXT NOT NULL,
+        name_enc TEXT NOT NULL,
+        phone_enc TEXT,
+        email_enc TEXT,
+        address_enc TEXT NOT NULL,
+        custom_id_enc TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    # 26. Admin Whitelist for Command Center Access
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admin_whitelist (
+        email TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        is_root INTEGER DEFAULT 0,
+        password_hash TEXT,
+        password_salt TEXT,
+        reset_token TEXT,
+        reset_token_expiry REAL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_login TIMESTAMP
+    );
+    """)
+
+    # Ensure dakssinghi@gmail.com is seeded as Root Owner with NULL password for first-time setup
+    cursor.execute("""
+    INSERT OR IGNORE INTO admin_whitelist (email, name, is_root, password_hash, password_salt)
+    VALUES ('dakssinghi@gmail.com', 'Daksh Singhi (Owner)', 1, NULL, NULL);
+    """)
+
     conn.commit()
     conn.close()
 
@@ -717,6 +753,21 @@ def seed_demo_data():
         indicative_rate, indicative_value, notes, waste_image, status
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, p3)
+
+    # Seed initial encrypted user records if registry is empty
+    cursor.execute("SELECT COUNT(*) as count FROM encrypted_user_registry")
+    if cursor.fetchone()["count"] == 0:
+        demo_encrypted = [
+            ("USR-DEMO-01", "household", encrypt_field("Rahul Sharma"), encrypt_field("+91 98640 12345"), encrypt_field("rahul.sharma@example.com"), encrypt_field("House 42, Green Park Avenue, North Zone, Guwahati"), encrypt_field("HH-00842")),
+            ("USR-DEMO-02", "coordinator", encrypt_field("Vikram Goswami"), encrypt_field("+91 98640 22334"), encrypt_field("vikram.goswami@ecoflow.ai"), encrypt_field("EcoFlow Field Ops Hub 1, Paltan Bazaar, Guwahati"), encrypt_field("EMP-COORD-104")),
+            ("USR-DEMO-03", "collector", encrypt_field("Raju Ahmed (Kabadiwala)"), encrypt_field("+91 98640 55667"), encrypt_field("raju.ahmed@field.ecoflow.ai"), encrypt_field("Ward 9, Panbazar Scrap Depot, Guwahati"), encrypt_field("COL-2026-0042")),
+            ("USR-DEMO-04", "hub", encrypt_field("Subhash Chandra Barman"), encrypt_field("+91 98640 99887"), encrypt_field("hub.manager@ecoflow.ai"), encrypt_field("EcoFlow Storage Hub 01, Narangi Industrial Estate, Guwahati"), encrypt_field("HUB-AUTH-01")),
+            ("USR-DEMO-05", "recycler", encrypt_field("GreenPlast Industrial Solutions"), encrypt_field("+91 98640 77112"), encrypt_field("procurement@greenplast.in"), encrypt_field("Industrial Growth Centre, Matia, Goalpara"), encrypt_field("REC-OFFTAKE-09"))
+        ]
+        cursor.executemany("""
+        INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, demo_encrypted)
 
     conn.commit()
     conn.close()

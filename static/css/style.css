@@ -185,6 +185,59 @@ body {
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
 }
 
+/* ----------------------------------------------------
+   ACTIVE SESSION BADGE (Replaces Role Switcher on Interfaces)
+---------------------------------------------------- */
+.active-session-badge {
+  display: flex;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  gap: 10px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.session-role-pill {
+  background: var(--primary-leaf);
+  color: #064E3B;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.4px;
+}
+
+.session-user-name {
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-switch-portal {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-switch-portal:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #FCA5A5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
 .header-right {
   display: flex;
   align-items: center;
@@ -1544,4 +1597,311 @@ body {
 .data-table td {
   padding: 8px 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ----------------------------------------------------
+   PORTAL GATEWAY & ONBOARDING AUTHENTICATION
+---------------------------------------------------- */
+.portal-gateway-screen {
+  max-width: 1040px;
+  margin: 28px auto;
+  padding: 0 20px 60px;
+  animation: interface-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.gateway-hero {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.gateway-badge {
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--primary-leaf);
+  color: var(--primary-mint);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  margin-bottom: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.gateway-hero h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.gateway-hero p {
+  color: var(--text-muted);
+  font-size: 13px;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.gateway-role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+@media (max-width: 860px) {
+  .gateway-role-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .gateway-role-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.portal-role-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 2px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.portal-role-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 14px rgba(16, 185, 129, 0.2);
+}
+
+.portal-role-card.selected {
+  background: rgba(13, 92, 58, 0.28);
+  border-color: var(--primary-leaf);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+}
+
+.portal-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.portal-card-icon {
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portal-selected-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: transparent;
+  transition: all 0.2s ease;
+}
+
+.portal-role-card.selected .portal-selected-indicator {
+  background: var(--primary-leaf);
+  border-color: var(--primary-leaf);
+  color: #064E3B;
+  font-weight: 900;
+}
+
+.portal-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.portal-card-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.gateway-form-box {
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  max-width: 660px;
+  margin: 0 auto;
+}
+
+.gateway-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gateway-form-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary-mint);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gateway-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 580px) {
+  .gateway-fields-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gateway-fields-grid .field-full {
+  grid-column: 1 / -1;
+}
+
+.gateway-field label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 5px;
+}
+
+.field-tag-req {
+  color: #EF4444;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.field-tag-opt {
+  color: var(--text-dim);
+  font-size: 10px;
+}
+
+.gateway-submit-container {
+  margin-top: 20px;
+  display: none;
+  animation: interface-enter 0.22s ease-out forwards;
+}
+
+.btn-gateway-submit {
+  width: 100%;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, #10B981 0%, #0D5C3A 100%);
+  color: #FFFFFF;
+  border: 1px solid var(--primary-mint);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-gateway-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 26px rgba(16, 185, 129, 0.6);
+  filter: brightness(1.1);
+}
+
+.btn-gateway-submit:active {
+  transform: translateY(0);
+}
+
+.gateway-security-notice {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* ----------------------------------------------------
+   CELEBRATION & AUTH MODALS
+---------------------------------------------------- */
+.security-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(16px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.security-modal-overlay.open {
+  display: flex;
+  animation: interface-enter 0.2s ease-out forwards;
+}
+
+.security-modal-box {
+  background: #0F172A;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  padding: 26px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(16, 185, 129, 0.3);
+  text-align: center;
+}
+
+.collector-id-badge-large {
+  background: rgba(16, 185, 129, 0.15);
+  border: 2px dashed var(--primary-leaf);
+  color: var(--primary-mint);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  margin: 14px 0;
+  display: inline-block;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  font-family: monospace;
+}
+
+.registry-encrypted-pill {
+  display: inline-block;
+  font-family: monospace;
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--primary-mint);
+  padding: 2px 6px;
+  border-radius: 4px;
 }

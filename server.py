@@ -14,6 +14,7 @@ import urllib.parse
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from database import get_db, init_db, seed_demo_data
 from ai_engine import local_ai, TAXONOMY_CATEGORIES
+from crypto_vault import encrypt_field, decrypt_field, hash_password, verify_password, generate_reset_token
 
 # Change working directory to current script directory to prevent sandbox path issues
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -296,6 +297,33 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                 conn.close()
                 return self._send_json({"settings": settings})
 
+            # 18. Command Center Whitelist (Authorized Admins)
+            elif path == '/api/auth/whitelist':
+                cursor.execute("SELECT email, name, is_root, (password_hash IS NOT NULL) as has_password, created_at, last_login FROM admin_whitelist ORDER BY is_root DESC, created_at ASC")
+                whitelist = [dict(r) for r in cursor.fetchall()]
+                conn.close()
+                return self._send_json({"whitelist": whitelist})
+
+            # 19. Encrypted User Registry (Decrypted strictly for Command Center)
+            elif path == '/api/auth/registry':
+                cursor.execute("SELECT * FROM encrypted_user_registry ORDER BY created_at DESC")
+                raw_rows = cursor.fetchall()
+                decrypted_list = []
+                for r in raw_rows:
+                    decrypted_list.append({
+                        "user_id": r["user_id"],
+                        "role": r["role"],
+                        "name": decrypt_field(r["name_enc"]),
+                        "phone": decrypt_field(r["phone_enc"]) if r["phone_enc"] else "—",
+                        "email": decrypt_field(r["email_enc"]) if r["email_enc"] else "—",
+                        "address": decrypt_field(r["address_enc"]),
+                        "custom_id": decrypt_field(r["custom_id_enc"]) if r["custom_id_enc"] else "—",
+                        "raw_ciphertext": (r["name_enc"][:32] + "...") if r["name_enc"] else "—",
+                        "created_at": r["created_at"]
+                    })
+                conn.close()
+                return self._send_json({"registry": decrypted_list, "total_records": len(decrypted_list)})
+
             else:
                 conn.close()
                 return self._send_json({"error": "Unknown API endpoint"}, status=404)
@@ -312,8 +340,289 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
             conn = get_db()
             cursor = conn.cursor()
 
+            # 0. Auth: Unified Role Onboarding & Login
+            if path == '/api/auth/register-login':
+                role = body.get('role', 'household').strip()
+                name = body.get('name', '').strip()
+                phone = body.get('phone', '').strip()
+                email = body.get('email', '').strip()
+                address = body.get('address', '').strip()
+                employee_id = body.get('employee_id', '').strip()
+                password = body.get('password', '').strip()
+                is_first_setup = body.get('is_first_setup', False)
+
+                if role == 'admin':
+                    if not email:
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Email address is mandatory for Command Center access."}, status=400)
+                    
+                    cursor.execute("SELECT * FROM admin_whitelist WHERE LOWER(email) = LOWER(?)", (email,))
+                    admin = cursor.fetchone()
+                    if not admin:
+                        conn.close()
+                        return self._send_json({
+                            "success": False,
+                            "error": f"Access Denied: '{email}' is not permitted to access Command Center. Only dakssinghi@gmail.com and authorized administrators are allowed."
+                        }, status=403)
+                    
+                    # Check first-time setup
+                    if not admin["password_hash"]:
+                        if is_first_setup:
+                            if not password or len(password) < 6:
+                                conn.close()
+                                return self._send_json({"success": False, "error": "Password must be at least 6 characters."}, status=400)
+                            p_hash, p_salt = hash_password(password)
+                            cursor.execute("UPDATE admin_whitelist SET password_hash = ?, password_salt = ?, last_login = CURRENT_TIMESTAMP WHERE LOWER(email) = LOWER(?)", (p_hash, p_salt, email))
+                            cursor.execute("""
+                            INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                            VALUES ('ADMIN_PASSWORD_SET', 'NULL', 'PBKDF2-HMAC-SHA256 (600k iterations)', ?, 'Command Center Admin', 'Master security password configured')
+                            """, (email,))
+                            conn.commit()
+                            conn.close()
+                            return self._send_json({
+                                "success": True,
+                                "first_time_setup": False,
+                                "message": "Master password configured securely.",
+                                "user": {
+                                    "email": admin["email"],
+                                    "name": admin["name"],
+                                    "role": "admin",
+                                    "is_root": bool(admin["is_root"])
+                                }
+                            })
+                        else:
+                            conn.close()
+                            return self._send_json({
+                                "success": True,
+                                "first_time_setup": True,
+                                "message": "First-time setup detected. Please set up your master security password.",
+                                "user": {
+                                    "email": admin["email"],
+                                    "name": admin["name"],
+                                    "role": "admin",
+                                    "is_root": bool(admin["is_root"])
+                                }
+                            })
+                    else:
+                        # Existing password verification
+                        if not password:
+                            conn.close()
+                            return self._send_json({"success": False, "error": "Master password is required."}, status=400)
+                        if not verify_password(password, admin["password_hash"], admin["password_salt"]):
+                            conn.close()
+                            return self._send_json({"success": False, "error": "Incorrect Command Center master password."}, status=401)
+                        
+                        cursor.execute("UPDATE admin_whitelist SET last_login = CURRENT_TIMESTAMP WHERE LOWER(email) = LOWER(?)", (email,))
+                        conn.commit()
+                        conn.close()
+                        return self._send_json({
+                            "success": True,
+                            "user": {
+                                "email": admin["email"],
+                                "name": admin["name"],
+                                "role": "admin",
+                                "is_root": bool(admin["is_root"])
+                            }
+                        })
+
+                # Field Collector Login & Registration
+                elif role == 'collector':
+                    if not name or not address:
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Name and Address are mandatory for Field Collectors."}, status=400)
+                    
+                    collector_id = f"COL-2026-{random.randint(10000, 99999)}"
+                    user_id = f"USR-{random.randint(100000, 999999)}"
+                    
+                    name_enc = encrypt_field(name)
+                    phone_enc = encrypt_field(phone) if phone else None
+                    email_enc = encrypt_field(email) if email else None
+                    addr_enc = encrypt_field(address)
+                    col_id_enc = encrypt_field(collector_id)
+                    
+                    cursor.execute("""
+                    INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
+                    VALUES (?, 'collector', ?, ?, ?, ?, ?)
+                    """, (user_id, name_enc, phone_enc, email_enc, addr_enc, col_id_enc))
+                    
+                    # Register into employees table for operational simulation
+                    cursor.execute("""
+                    INSERT OR REPLACE INTO employees (employee_id, name, phone, service_zone, mode, availability, assigned_hub, workload, collection_history_count, current_lat, current_lng)
+                    VALUES (?, ?, ?, 'ZONE A', 'smartphone', 'AVAILABLE', 'HUB-001', 0, 1, 26.1850, 91.7500)
+                    """, (collector_id, name, phone or "+91 98000 00000"))
+                    
+                    conn.commit()
+                    conn.close()
+                    return self._send_json({
+                        "success": True,
+                        "collector_id": collector_id,
+                        "user": {
+                            "user_id": user_id,
+                            "name": name,
+                            "role": "collector",
+                            "collector_id": collector_id,
+                            "address": address,
+                            "phone": phone,
+                            "email": email
+                        }
+                    })
+
+                # Field Coordinator Login & Registration
+                elif role == 'coordinator':
+                    if not name or not phone or not email or not address or not employee_id:
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Name, Mobile, Email, Address, and Employee ID are all mandatory for Field Coordinators."}, status=400)
+                    
+                    user_id = f"USR-{random.randint(100000, 999999)}"
+                    name_enc = encrypt_field(name)
+                    phone_enc = encrypt_field(phone)
+                    email_enc = encrypt_field(email)
+                    addr_enc = encrypt_field(address)
+                    emp_enc = encrypt_field(employee_id)
+                    
+                    cursor.execute("""
+                    INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
+                    VALUES (?, 'coordinator', ?, ?, ?, ?, ?)
+                    """, (user_id, name_enc, phone_enc, email_enc, addr_enc, emp_enc))
+                    
+                    conn.commit()
+                    conn.close()
+                    return self._send_json({
+                        "success": True,
+                        "user": {
+                            "user_id": user_id,
+                            "name": name,
+                            "role": "coordinator",
+                            "employee_id": employee_id,
+                            "address": address,
+                            "phone": phone,
+                            "email": email
+                        }
+                    })
+
+                # Household, Storage Hub, Recycler
+                else:
+                    if not name or not phone or not email or not address:
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Name, Mobile Number, Email, and Address are all mandatory."}, status=400)
+                    
+                    user_id = f"USR-{random.randint(100000, 999999)}"
+                    name_enc = encrypt_field(name)
+                    phone_enc = encrypt_field(phone)
+                    email_enc = encrypt_field(email)
+                    addr_enc = encrypt_field(address)
+                    
+                    cursor.execute("""
+                    INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """, (user_id, role, name_enc, phone_enc, email_enc, addr_enc, None))
+                    
+                    conn.commit()
+                    conn.close()
+                    return self._send_json({
+                        "success": True,
+                        "user": {
+                            "user_id": user_id,
+                            "name": name,
+                            "role": role,
+                            "address": address,
+                            "phone": phone,
+                            "email": email
+                        }
+                    })
+
+            # Forgot Password Endpoint
+            elif path == '/api/auth/forgot-password':
+                email = body.get('email', '').strip()
+                cursor.execute("SELECT * FROM admin_whitelist WHERE LOWER(email) = LOWER(?)", (email,))
+                admin = cursor.fetchone()
+                if not admin:
+                    conn.close()
+                    return self._send_json({"success": False, "error": f"'{email}' is not registered as an authorized Command Center administrator."}, status=404)
+                
+                token = generate_reset_token()
+                expiry = time.time() + 900  # 15 minutes
+                cursor.execute("UPDATE admin_whitelist SET reset_token = ?, reset_token_expiry = ? WHERE LOWER(email) = LOWER(?)", (token, expiry, email))
+                conn.commit()
+                conn.close()
+                return self._send_json({
+                    "success": True,
+                    "message": f"Verification reset code dispatched to {email}.",
+                    "token_preview": token
+                })
+
+            # Reset Password Endpoint
+            elif path == '/api/auth/reset-password':
+                email = body.get('email', '').strip()
+                token = body.get('token', '').strip()
+                new_password = body.get('new_password', '').strip()
+                
+                if not new_password or len(new_password) < 6:
+                    conn.close()
+                    return self._send_json({"success": False, "error": "New password must be at least 6 characters long."}, status=400)
+                
+                cursor.execute("SELECT * FROM admin_whitelist WHERE LOWER(email) = LOWER(?)", (email,))
+                admin = cursor.fetchone()
+                if not admin:
+                    conn.close()
+                    return self._send_json({"success": False, "error": "Administrator not found."}, status=404)
+                
+                if not admin["reset_token"] or admin["reset_token"] != token:
+                    conn.close()
+                    return self._send_json({"success": False, "error": "Invalid reset verification code."}, status=400)
+                
+                if time.time() > float(admin["reset_token_expiry"] or 0):
+                    conn.close()
+                    return self._send_json({"success": False, "error": "Reset code has expired. Please request a new one."}, status=400)
+                
+                p_hash, p_salt = hash_password(new_password)
+                cursor.execute("UPDATE admin_whitelist SET password_hash = ?, password_salt = ?, reset_token = NULL, reset_token_expiry = NULL WHERE LOWER(email) = LOWER(?)", (p_hash, p_salt, email))
+                cursor.execute("""
+                INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                VALUES ('ADMIN_PASSWORD_RESET', 'Old Hash', 'PBKDF2-HMAC-SHA256', ?, 'Command Center Admin', 'Password reset with email verification code')
+                """, (email,))
+                conn.commit()
+                conn.close()
+                return self._send_json({"success": True, "message": "Master password reset successfully. Please login with your new credentials."})
+
+            # Whitelist Management Endpoint
+            elif path == '/api/auth/whitelist':
+                caller_email = body.get('caller_email', '').strip().lower()
+                if caller_email != 'dakssinghi@gmail.com':
+                    conn.close()
+                    return self._send_json({"success": False, "error": "Access Denied: Only Daksh Singhi (dakssinghi@gmail.com) has permission to manage the Command Center whitelist."}, status=403)
+                
+                action = body.get('action')
+                target_email = body.get('target_email', '').strip().lower()
+                target_name = body.get('target_name', 'Command Center Officer').strip()
+                
+                if action == 'add':
+                    if not target_email or '@' not in target_email:
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Valid email address required."}, status=400)
+                    cursor.execute("INSERT OR IGNORE INTO admin_whitelist (email, name, is_root) VALUES (?, ?, 0)", (target_email, target_name))
+                    cursor.execute("""
+                    INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                    VALUES ('WHITELIST_ADMIN_ADDED', 'None', ?, 'Daksh Singhi', 'Root Owner', 'Granted Command Center access')
+                    """, (f"{target_name} ({target_email})",))
+                elif action == 'delete':
+                    if target_email == 'dakssinghi@gmail.com':
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Cannot delete Root Owner account (dakssinghi@gmail.com)."}, status=400)
+                    cursor.execute("DELETE FROM admin_whitelist WHERE LOWER(email) = LOWER(?) AND is_root = 0", (target_email,))
+                    cursor.execute("""
+                    INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                    VALUES ('WHITELIST_ADMIN_REMOVED', ?, 'Removed', 'Daksh Singhi', 'Root Owner', 'Revoked Command Center access')
+                    """, (target_email,))
+                
+                conn.commit()
+                cursor.execute("SELECT email, name, is_root, (password_hash IS NOT NULL) as has_password, created_at, last_login FROM admin_whitelist ORDER BY is_root DESC, created_at ASC")
+                updated_whitelist = [dict(r) for r in cursor.fetchall()]
+                conn.close()
+                return self._send_json({"success": True, "whitelist": updated_whitelist})
+
             # 1. AI Scan
-            if path == '/api/ai/scan':
+            elif path == '/api/ai/scan':
                 preset = body.get('preset_type')
                 notes = body.get('notes')
                 image_data = body.get('image_data')

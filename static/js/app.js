@@ -279,7 +279,11 @@ function switchPerspective(role) {
   // Smoothly scroll window to top
   window.scrollTo({ top: 0, behavior: "smooth" });
 
-  // Update Perspective Switcher Buttons
+  // Hide Gateway screen when opening perspective view
+  const gatewayEl = document.getElementById("portal-gateway-screen");
+  if (gatewayEl) gatewayEl.style.display = "none";
+
+  // Update Perspective Switcher Buttons (if present)
   document.querySelectorAll(".role-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.role === role);
   });
@@ -297,6 +301,8 @@ function switchPerspective(role) {
     loadAIModels();
     loadAIFeedbackDataset();
     loadAuditLogs();
+    if (typeof loadEncryptedRegistry === "function") loadEncryptedRegistry();
+    if (typeof loadWhitelist === "function") loadWhitelist();
   } else if (role === "coordinator") {
     loadCoordinatorQueue();
   } else if (role === "collector") {
@@ -423,6 +429,10 @@ function switchAdminTab(tab) {
 
   if (tab === "map" && appState.commandMap) {
     setTimeout(() => appState.commandMap.resize(), 150);
+  } else if (tab === "registry") {
+    if (typeof loadEncryptedRegistry === "function") loadEncryptedRegistry();
+  } else if (tab === "whitelist") {
+    if (typeof loadWhitelist === "function") loadWhitelist();
   }
 }
 
