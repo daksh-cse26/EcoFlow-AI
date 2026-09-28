@@ -531,6 +531,64 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                         }
                     })
 
+            # Grassroots & Phone-less / Basic-Phone Collector Onboarding
+            elif path == '/api/auth/register-phoneless':
+                reg_type = body.get('type', 'no_phone').strip()  # 'no_phone' or 'basic_phone'
+                name = body.get('name', '').strip()
+                address = body.get('address', '').strip()
+                phone = body.get('phone', '').strip()
+                zone = body.get('service_zone', 'ZONE B').strip()
+                materials = body.get('materials', 'Mixed Scrap').strip()
+
+                if not name or not address:
+                    conn.close()
+                    return self._send_json({"success": False, "error": "Name and Operating Address are mandatory."}, status=400)
+
+                # Special collector ID signifying no physical phone or basic phone
+                if reg_type == 'no_phone':
+                    # Special code 'NP' signifying No Physical Phone
+                    collector_id = f"COL-NP-2026-{random.randint(10000, 99999)}"
+                    mode = 'no_phone'
+                    phone_val = "NO_PHYSICAL_PHONE"
+                else:
+                    # Special code 'NS' signifying No Smartphone / Basic Phone SMS
+                    collector_id = f"COL-NS-2026-{random.randint(10000, 99999)}"
+                    mode = 'basic_phone'
+                    phone_val = phone or f"+91 98640 {random.randint(10000, 99999)}"
+
+                user_id = f"USR-{random.randint(100000, 999999)}"
+                name_enc = encrypt_field(name)
+                phone_enc = encrypt_field(phone_val)
+                addr_enc = encrypt_field(address)
+                col_id_enc = encrypt_field(collector_id)
+                meta_enc = encrypt_field(f"Materials: {materials} | Mode: {mode}")
+
+                cursor.execute("""
+                INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (user_id, f"collector_{mode}", name_enc, phone_enc, meta_enc, addr_enc, col_id_enc))
+
+                # Insert into employees table so live municipal dispatch works
+                cursor.execute("""
+                INSERT OR REPLACE INTO employees (employee_id, name, phone, service_zone, mode, availability, assigned_hub, workload, collection_history_count, current_lat, current_lng)
+                VALUES (?, ?, ?, ?, ?, 'AVAILABLE', 'HUB-001', 0, 0, 26.1800, 91.7700)
+                """, (collector_id, name, phone_val, zone, mode))
+
+                cursor.execute("""
+                INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                VALUES ('PHONELESS_COLLECTOR_REGISTERED', 'Unregistered', ?, 'System Gateway', 'Field Operations', 'Grassroots collector onboarding')
+                """, (f"{name} ({collector_id}, Mode: {mode})",))
+
+                conn.commit()
+                conn.close()
+                return self._send_json({
+                    "success": True,
+                    "collector_id": collector_id,
+                    "mode": mode,
+                    "name": name,
+                    "message": "Collector successfully registered with special device-status code."
+                })
+
             # Forgot Password Endpoint
             elif path == '/api/auth/forgot-password':
                 email = body.get('email', '').strip()

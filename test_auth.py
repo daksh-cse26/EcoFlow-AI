@@ -54,6 +54,27 @@ def run_auth_tests():
     assert code == 200 and res["success"] is True, f"Coordinator failed: {res}"
     print("PASS: Coordinator registered with Employee ID EMP-2026-904.")
 
+    # 3b. Phone-less Grassroots Collector Onboarding (Field Collector permission)
+    code, res = post("/api/auth/register-phoneless", {
+        "type": "no_phone",
+        "name": "Mantu Baishya",
+        "address": "Brahmaputra Riverside Scrap Shed 2, Guwahati",
+        "materials": "Iron & Steel, PET Bottles"
+    })
+    assert code == 200 and "COL-NP-" in res["collector_id"], f"Phoneless failed: {res}"
+    print(f"PASS: Phone-less Collector registered with special NP code: {res['collector_id']}")
+
+    # 3c. 10km Proximity SMS Invitation & Basic-Phone Onboarding (Field Coordinator permission)
+    code, res = post("/api/auth/register-phoneless", {
+        "type": "basic_phone",
+        "name": "Shankar Mandal (SMS 10km)",
+        "phone": "+91 98640 88121",
+        "address": "Fancy Bazaar Scrap Cluster, Guwahati",
+        "service_zone": "ZONE B"
+    })
+    assert code == 200 and "COL-NS-" in res["collector_id"], f"Basic phone failed: {res}"
+    print(f"PASS: 10km Basic-Phone Collector registered via SMS with special NS code: {res['collector_id']}")
+
     # 4. Command Center unauthorized email rejection
     code, res = post("/api/auth/register-login", {
         "role": "admin",

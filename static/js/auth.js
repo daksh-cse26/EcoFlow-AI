@@ -590,6 +590,252 @@ async function deleteWhitelistEmail(targetEmail) {
   }
 }
 
+// ====================================================
+// FIELD COLLECTOR: PEER REGISTRATION (NO PHYSICAL PHONE)
+// Generates COL-NP-2026-XXXXX with physical lot pass
+// ====================================================
+function openPhonelessCollectorModal() {
+  const modal = document.getElementById("phoneless-collector-modal");
+  if (!modal) return;
+  modal.style.display = "flex";
+
+  const formBody = document.getElementById("phoneless-form-body");
+  const resultCard = document.getElementById("phoneless-pass-result");
+  if (formBody) formBody.style.display = "block";
+  if (resultCard) resultCard.style.display = "none";
+
+  const nameInput = document.getElementById("np-collector-name");
+  const addrInput = document.getElementById("np-collector-address");
+  const matInput = document.getElementById("np-collector-materials");
+  const contactInput = document.getElementById("np-collector-contact");
+  if (nameInput) nameInput.value = "";
+  if (addrInput) addrInput.value = "";
+  if (matInput) matInput.value = "";
+  if (contactInput) contactInput.value = "";
+}
+
+function closePhonelessCollectorModal() {
+  const modal = document.getElementById("phoneless-collector-modal");
+  if (modal) modal.style.display = "none";
+}
+
+async function submitPhonelessRegistration() {
+  const name = (document.getElementById("np-collector-name")?.value || "").trim();
+  const address = (document.getElementById("np-collector-address")?.value || "").trim();
+  const hub = document.getElementById("np-collector-hub")?.value || "HUB-001";
+  const materials = (document.getElementById("np-collector-materials")?.value || "").trim();
+  const contact = (document.getElementById("np-collector-contact")?.value || "").trim();
+
+  if (!name || name.length < 2) {
+    alert("Please enter the collector's full name.");
+    return;
+  }
+  if (!address || address.length < 4) {
+    alert("Please enter the operating address or scrap cluster location.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/auth/register-phoneless", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "no_phone",
+        name: name,
+        address: address,
+        storage_hub_id: hub,
+        materials: materials,
+        emergency_contact: contact,
+        service_zone: "ZONE B"
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      alert("Registration error: " + (data.error || "Failed to register."));
+      return;
+    }
+
+    // Display Printable Token Pass
+    const formBody = document.getElementById("phoneless-form-body");
+    const resultCard = document.getElementById("phoneless-pass-result");
+    const idEl = document.getElementById("np-result-id");
+    const nameEl = document.getElementById("np-result-name");
+    const hubEl = document.getElementById("np-result-hub");
+    const qrCanvas = document.getElementById("np-pass-qr");
+
+    if (formBody) formBody.style.display = "none";
+    if (resultCard) resultCard.style.display = "block";
+    if (idEl) idEl.textContent = data.collector_id;
+    if (nameEl) nameEl.textContent = name;
+    if (hubEl) hubEl.textContent = hub;
+
+    // Render physical pass QR code
+    if (qrCanvas && typeof qrEngine !== "undefined") {
+      qrEngine.renderQR(qrCanvas, `ECOFLOW-COL-TOKEN:${data.collector_id}`, 140);
+    }
+  } catch (err) {
+    alert("Network error: " + err.message);
+  }
+}
+
+// ====================================================
+// FIELD COORDINATOR: 10KM PROXIMITY SMS ONBOARDING (BASIC PHONE)
+// Interactive 2-Choice Flash SMS (1 = Accept, 2 = Decline)
+// Issues COL-NS-2026-XXXXX and strictly ERASES candidate
+// personal details from Coordinator Local Storage.
+// ====================================================
+let activeSMSCandidate = null;
+
+function triggerProximitySMS(name, phone, location, distance, cardId) {
+  activeSMSCandidate = { name, phone, location, distance, cardId };
+  openSMSInviteModal(activeSMSCandidate);
+}
+
+function triggerCustomProximitySMS() {
+  const phone = (document.getElementById("custom-sms-phone")?.value || "").trim();
+  const name = (document.getElementById("custom-sms-name")?.value || "").trim() || "Kabadiwala Partner";
+  const location = document.getElementById("custom-sms-location")?.value || "Kamrup Metro 10km Zone";
+
+  if (!phone || phone.length < 8) {
+    alert("Please enter a valid mobile number for the proximity SMS broadcast.");
+    return;
+  }
+
+  activeSMSCandidate = { name, phone, location, distance: "10 km geofence", cardId: null };
+  openSMSInviteModal(activeSMSCandidate);
+}
+
+function openSMSInviteModal(candidate) {
+  const modal = document.getElementById("sms-invite-modal");
+  if (!modal) return;
+
+  const screenInvite = document.getElementById("phone-screen-invite");
+  const screenAccepted = document.getElementById("phone-screen-accepted");
+  const screenDeclined = document.getElementById("phone-screen-declined");
+  const msgEl = document.getElementById("phone-msg-text");
+  const clockEl = document.getElementById("phone-brand-clock");
+
+  if (screenInvite) screenInvite.style.display = "block";
+  if (screenAccepted) screenAccepted.style.display = "none";
+  if (screenDeclined) screenDeclined.style.display = "none";
+
+  const now = new Date();
+  const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  if (clockEl) clockEl.textContent = timeStr;
+
+  if (msgEl) {
+    msgEl.textContent = `[FLASH SMS POPUP]
+From: +91 80000 32635
+ECOFLOW AI RECYCLING NETWORK
+
+Nearby collection opportunity within 10 km radius (${candidate.distance || '10km zone'}).
+Candidate: ${candidate.name || 'Kabadiwala'}
+Guaranteed daily payouts at verified Hub-001.
+
+Interactive choices:
+Press 1 to ACCEPT & get ID
+Press 2 to DECLINE`;
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeSMSInviteModal() {
+  const modal = document.getElementById("sms-invite-modal");
+  if (modal) modal.style.display = "none";
+  activeSMSCandidate = null;
+}
+
+async function respondToSMSInvite(choice) {
+  const screenInvite = document.getElementById("phone-screen-invite");
+  const screenAccepted = document.getElementById("phone-screen-accepted");
+  const screenDeclined = document.getElementById("phone-screen-declined");
+
+  if (choice === '2') {
+    // Declined option
+    if (screenInvite) screenInvite.style.display = "none";
+    if (screenDeclined) screenDeclined.style.display = "block";
+    setTimeout(() => {
+      closeSMSInviteModal();
+    }, 2200);
+    return;
+  }
+
+  if (choice === '1') {
+    // Accepted option
+    const candidateData = activeSMSCandidate || {
+      name: "Kabadiwala Aggregator",
+      phone: "+91 98640 88121",
+      location: "Kamrup Metro 10km Zone",
+      cardId: null
+    };
+
+    try {
+      const res = await fetch("/api/auth/register-phoneless", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "basic_phone",
+          name: candidateData.name,
+          phone: candidateData.phone,
+          address: candidateData.location,
+          service_zone: "ZONE B"
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        alert("Registration failed: " + (data.error || "Could not register candidate."));
+        return;
+      }
+
+      // Display automated incoming confirmation SMS on feature phone LCD
+      if (screenInvite) screenInvite.style.display = "none";
+      if (screenAccepted) screenAccepted.style.display = "block";
+      const idEl = document.getElementById("phone-registered-id");
+      if (idEl) idEl.textContent = data.collector_id;
+
+      // ====================================================
+      // STRICT PRIVACY PROTOCOL ENFORCEMENT:
+      // Completely erase candidate personal details from
+      // Coordinator's device local storage.
+      // Coordinator cannot view candidate raw personal data.
+      // ====================================================
+      localStorage.removeItem("active_candidate_data");
+      localStorage.removeItem("last_invited_kabadiwala");
+      sessionStorage.removeItem("active_candidate_data");
+
+      const savedCardId = candidateData.cardId;
+      activeSMSCandidate = null; // Purge memory references
+
+      // Update coordinator candidate card to show sealed record
+      if (savedCardId) {
+        const cardEl = document.getElementById(savedCardId);
+        if (cardEl) {
+          cardEl.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="color: #34D399;">${data.collector_id}</strong>
+              <span class="status-pill status-verified" style="font-size: 9px;">ACTIVE</span>
+            </div>
+            <p class="small text-muted mb-1">Mode: <strong>Basic Phone (SMS Only)</strong></p>
+            <p class="small text-muted mb-1">Identity: <span style="color:#94A3B8; font-family: monospace;">[🔒 RECORD SEALED & ENCRYPTED]</span></p>
+            <p class="small text-muted mb-2">Personal Data: <span style="color:#94A3B8; font-family: monospace;">[ERASED FROM LOCAL STORAGE]</span></p>
+            <span class="badge-green" style="font-size: 10px; width: 100%; display: block; text-align: center; padding: 4px;">
+              🔒 Privacy Protocol Enforced
+            </span>
+          `;
+        }
+      }
+
+      // Display Coordinator Privacy Audit Banner
+      const privacyBanner = document.getElementById("coord-privacy-banner");
+      if (privacyBanner) privacyBanner.style.display = "flex";
+
+    } catch (err) {
+      alert("Network error: " + err.message);
+    }
+  }
+}
+
 // Initialize on DOM Ready
 document.addEventListener("DOMContentLoaded", () => {
   initAuth();

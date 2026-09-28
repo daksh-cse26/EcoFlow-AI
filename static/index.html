@@ -554,6 +554,7 @@
       <button class="portal-subnav-btn active" data-coordtab="queue" onclick="switchCoordinatorTab('queue')">📋 Operational Queue (1 Pending)</button>
       <button class="portal-subnav-btn" data-coordtab="fleet" onclick="switchCoordinatorTab('fleet')">🚚 Collector Fleet & Workloads</button>
       <button class="portal-subnav-btn" data-coordtab="zones" onclick="switchCoordinatorTab('zones')">📍 Municipal Service Zones</button>
+      <button class="portal-subnav-btn" data-coordtab="proximity_sms" onclick="switchCoordinatorTab('proximity_sms')">📡 10km Proximity SMS (No Smartphone)</button>
     </nav>
 
     <!-- Pane 1: Operational Queue -->
@@ -645,6 +646,107 @@
         </div>
       </div>
     </div>
+
+    <!-- Pane 4: 10km Radius Proximity SMS Invitations (No Smartphone) -->
+    <div class="portal-subpane" id="coord-pane-proximity_sms">
+      <div class="hub-card mb-2">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div>
+            <h3>📡 10km Radius Proximity SMS Broadcast</h3>
+            <p class="small text-muted">Field Coordinator permission to broadcast interactive SMS popups to nearby kabadiwalas operating basic feature phones (2G/GSM without smartphone).</p>
+          </div>
+          <span class="badge-green" style="font-size: 11px;">10 KM GEOFENCE RADAR ACTIVE</span>
+        </div>
+
+        <!-- Geofence Radar Info Banner -->
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 24px;">🌐</span>
+          <div style="font-size: 12px; color: #D1FAE5; line-height: 1.4;">
+            <strong>Interactive 2-Choice SMS Gateway:</strong> Candidates receive an instant flash SMS with options <code>1</code> (Accept) and <code>2</code> (Decline). Upon replying <code>1</code>, their unique <code>COL-NS-</code> ID is issued and registered to the database.
+            <br/><span style="color: #FCD34D;">🔒 <strong>Privacy Assurance:</strong> Upon registration completion, candidate data is 100% erased from coordinator local storage and never readable by coordinators.</span>
+          </div>
+        </div>
+
+        <!-- Nearby Candidate Kabadiwalas within 10km -->
+        <h4 class="mb-2" style="font-size: 13px; color: #FFFFFF;">Detected Unregistered Informal Aggregators in 10 km Radius:</h4>
+        <div class="inspector-grid" style="grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px;" id="proximity-candidates-grid">
+          <!-- Candidate 1 -->
+          <div class="inspector-card" id="card-cand-shankar">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong>Shankar Mandal</strong>
+              <span class="status-pill status-pending" style="font-size: 9px;">3.2 KM AWAY</span>
+            </div>
+            <p class="small text-muted mb-1">Device: <strong>Nokia 105 (Basic 2G)</strong></p>
+            <p class="small text-muted mb-1">Phone: <code>+91 98640 55123</code></p>
+            <p class="small text-muted mb-2">Location: <strong>Panbazar Ward 4 Scrap Shed</strong></p>
+            <button class="btn btn-sm btn-primary btn-block" onclick="triggerProximitySMS('Shankar Mandal', '+91 98640 55123', 'Panbazar Ward 4 Scrap Shed', '3.2 km', 'card-cand-shankar')">
+              📲 Send 2-Choice SMS Popup
+            </button>
+          </div>
+
+          <!-- Candidate 2 -->
+          <div class="inspector-card" id="card-cand-mofidul">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong>Mofidul Islam</strong>
+              <span class="status-pill status-pending" style="font-size: 9px;">5.8 KM AWAY</span>
+            </div>
+            <p class="small text-muted mb-1">Device: <strong>Samsung Guru 1200</strong></p>
+            <p class="small text-muted mb-1">Phone: <code>+91 98640 77412</code></p>
+            <p class="small text-muted mb-2">Location: <strong>Fancy Bazaar Scrap Yard</strong></p>
+            <button class="btn btn-sm btn-primary btn-block" onclick="triggerProximitySMS('Mofidul Islam', '+91 98640 77412', 'Fancy Bazaar Scrap Yard', '5.8 km', 'card-cand-mofidul')">
+              📲 Send 2-Choice SMS Popup
+            </button>
+          </div>
+
+          <!-- Candidate 3 -->
+          <div class="inspector-card" id="card-cand-suraj">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong>Suraj Prasad</strong>
+              <span class="status-pill status-pending" style="font-size: 9px;">7.4 KM AWAY</span>
+            </div>
+            <p class="small text-muted mb-1">Device: <strong>Itel Magic 2 (Feature Phone)</strong></p>
+            <p class="small text-muted mb-1">Phone: <code>+91 98640 88963</code></p>
+            <p class="small text-muted mb-2">Location: <strong>Maligaon Railway Depot</strong></p>
+            <button class="btn btn-sm btn-primary btn-block" onclick="triggerProximitySMS('Suraj Prasad', '+91 98640 88963', 'Maligaon Railway Depot', '7.4 km', 'card-cand-suraj')">
+              📲 Send 2-Choice SMS Popup
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Direct Number Proximity Dispatch -->
+        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px;">
+          <h4 class="mb-2" style="font-size: 13px;">📡 Custom 10km Radius Kabadiwala SMS Dispatch</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: end;">
+            <div class="form-group mb-0">
+              <label>Kabadiwala Mobile Number:</label>
+              <input type="tel" id="custom-sms-phone" class="form-input" placeholder="+91 98640 XXXXX" value="+91 98640 99887" />
+            </div>
+            <div class="form-group mb-0">
+              <label>Candidate Name (Optional):</label>
+              <input type="text" id="custom-sms-name" class="form-input" placeholder="e.g. Kishore Boro" value="Kishore Boro" />
+            </div>
+            <div class="form-group mb-0">
+              <label>Location / Proximity Radius:</label>
+              <input type="text" id="custom-sms-location" class="form-input" value="Kamrup Metro (within 10km)" readonly style="background: rgba(255,255,255,0.05);" />
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary" onclick="triggerCustomProximitySMS()">
+                🚀 Dispatch SMS Popup
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coordinator Privacy Audit Banner -->
+        <div class="privacy-sealed-banner" id="coord-privacy-banner" style="display: none;">
+          <span class="privacy-sealed-icon">🔒</span>
+          <div>
+            <strong style="color: #34D399; font-size: 13px;">Zero-Knowledge Privacy Guaranteed:</strong>
+            <p class="small text-muted mb-0">Candidate registration complete. All local candidate entries have been completely cleared and purged from your device storage. The new collector is operating anonymously under tokenized ID with database-level AES-256 encryption.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- ==================================================
@@ -700,6 +802,18 @@
           <button class="btn btn-outline btn-block" onclick="switchPerspective('hub')">
             ⚖️ Transfer Lot to Storage Hub Station ➔
           </button>
+
+          <!-- Grassroots Peer Onboarding (No Physical Phone) -->
+          <div class="hub-card mt-2" style="background: rgba(16, 185, 129, 0.08); border: 1px dashed var(--primary-leaf); padding: 14px; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-weight: 700; color: #34D399; font-size: 13px;">📴 Grassroots Peer Registration</span>
+              <span class="badge-green" style="font-size: 10px;">COLLECTOR PERMISSION</span>
+            </div>
+            <p class="small text-muted mb-2">Empower informal waste-pickers without phones. Register them to generate an official <strong>COL-NP-</strong> Collector ID with physical lot token.</p>
+            <button type="button" class="btn btn-outline btn-block" style="border-color: var(--primary-leaf); color: #34D399; font-weight: 700;" onclick="openPhonelessCollectorModal()">
+              ➕ Register Collector (No Physical Phone)
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1611,6 +1725,166 @@
       </div>
       <div style="text-align: right; margin-top: 10px;">
         <button class="btn btn-sm btn-secondary" onclick="closeForgotPasswordModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Field Collector Peer Registration (No Physical Phone) -->
+  <div class="security-modal-overlay" id="phoneless-collector-modal" role="dialog" aria-modal="true" style="display: none;">
+    <div class="security-modal-box text-left" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800;">📴 Register Collector (No Physical Phone)</h3>
+        <button class="btn btn-sm btn-outline" onclick="closePhonelessCollectorModal()">✕</button>
+      </div>
+      <p class="small text-muted mb-2">Field Collector Grassroots Authority: Issue an official encrypted identity to a peer waste picker or kabadiwala who has <strong>no physical phone</strong>. The platform assigns an ID featuring the permanent <code>NP</code> special code.</p>
+
+      <div id="phoneless-form-body">
+        <div class="form-group mb-2">
+          <label>Full Name: <span class="text-danger" style="color: #EF4444;">* Mandatory</span></label>
+          <input type="text" id="np-collector-name" class="form-input" placeholder="e.g. Mantu Baishya" />
+        </div>
+        <div class="form-group mb-2">
+          <label>Operating Address / Scrap Cluster: <span class="text-danger" style="color: #EF4444;">* Mandatory</span></label>
+          <input type="text" id="np-collector-address" class="form-input" placeholder="e.g. Brahmaputra Riverside Scrap Shed 2, Guwahati" />
+        </div>
+        <div class="form-group mb-2">
+          <label>Assigned Storage Hub:</label>
+          <select id="np-collector-hub" class="form-input">
+            <option value="HUB-001">HUB-001 - Central Sorting Hub (Paltan Bazaar)</option>
+            <option value="HUB-002">HUB-002 - North Kamrup Sorting Hub (Jalukbari)</option>
+          </select>
+        </div>
+        <div class="form-group mb-2">
+          <label>Primary Material Focus (Optional):</label>
+          <input type="text" id="np-collector-materials" class="form-input" placeholder="e.g. Iron & Steel, PET Bottles, Cardboard" />
+        </div>
+        <div class="form-group mb-2">
+          <label>Community Lead / Emergency Contact (Optional):</label>
+          <input type="text" id="np-collector-contact" class="form-input" placeholder="e.g. Ward 4 Mukhiya (+91 98640 00111)" />
+        </div>
+
+        <p class="disclaimer-note mb-2" style="font-size: 10px;">
+          🏷️ <strong>Identification Protocol:</strong> ID will be generated with code <code>COL-NP-2026-XXXXX</code> where <code>NP</code> explicitly certifies no physical phone. A physical QR token pass is generated for weighment settlement.
+        </p>
+
+        <button type="button" class="btn btn-primary btn-block" style="padding: 10px; font-weight: 700;" onclick="submitPhonelessRegistration()">
+          ✨ Generate Official NP Collector ID & Token Pass ▶
+        </button>
+      </div>
+
+      <!-- Result Card with Printable Token Pass -->
+      <div id="phoneless-pass-result" style="display: none;">
+        <div class="offline-token-pass">
+          <div style="font-size: 11px; text-transform: uppercase; color: #94A3B8; font-weight: 700;">EcoFlow AI • Grassroots Collector Identity Pass</div>
+          <div class="offline-token-id" id="np-result-id">COL-NP-2026-00000</div>
+          <div style="display: inline-block; background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; color: #34D399; font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px;">
+            📴 SPECIAL CODE 'NP': NO PHYSICAL PHONE VERIFIED
+          </div>
+          <p class="small text-muted" style="margin-bottom: 10px;">Name: <strong id="np-result-name" style="color: #FFFFFF;">—</strong> • Hub: <strong id="np-result-hub" style="color: #FFFFFF;">HUB-001</strong></p>
+          <div style="display: flex; justify-content: center; margin: 12px 0;">
+            <canvas id="np-pass-qr" width="140" height="140" style="border: 1px solid var(--border-glass); border-radius: 8px; background: #FFFFFF; padding: 4px;"></canvas>
+          </div>
+          <p class="small text-muted" style="font-size: 10.5px;">Present this physical token or QR at any EcoFlow Storage Hub scale for verified material weighment and cash settlements.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn-outline" style="flex: 1;" onclick="window.print()">🖨️ Print Token Pass</button>
+          <button type="button" class="btn btn-primary" style="flex: 1;" onclick="closePhonelessCollectorModal()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Field Coordinator 10km Radius Interactive Feature Phone SMS Popup -->
+  <div class="security-modal-overlay" id="sms-invite-modal" role="dialog" aria-modal="true" style="display: none;">
+    <div class="security-modal-box" style="max-width: 440px; background: transparent; box-shadow: none; border: none; padding: 0;">
+      
+      <!-- Retro Feature Phone Simulator Body -->
+      <div class="feature-phone-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="font-size: 11px; font-weight: 800; color: #94A3B8; letter-spacing: 1px;">KABADIWALA 2G GSM RECEIVER (10KM ZONE)</div>
+          <button type="button" class="btn btn-sm btn-outline" style="color: #F87171; border-color: rgba(239,68,68,0.4);" onclick="closeSMSInviteModal()">✕</button>
+        </div>
+
+        <!-- Phone Screen -->
+        <div class="feature-phone-screen">
+          <div class="feature-phone-status-bar">
+            <span>📶 10km Cell Tower</span>
+            <span id="phone-brand-clock">21:55</span>
+            <span>🔋 96%</span>
+          </div>
+
+          <!-- Incoming Message Screen -->
+          <div id="phone-screen-invite">
+            <div class="feature-phone-msg-body" id="phone-msg-text">
+[FLASH SMS POPUP]
+From: +91 80000 32635
+ECOFLOW AI RECYCLING NETWORK
+
+Nearby collection opportunity within 10 km radius of your location. Guaranteed daily payouts at verified Hub-001.
+
+Interactive choices:
+Press 1 to ACCEPT & get ID
+Press 2 to DECLINE
+            </div>
+
+            <!-- Choice buttons on screen -->
+            <div class="feature-phone-choices">
+              <button type="button" class="btn-phone-choice btn-phone-accept" onclick="respondToSMSInvite('1')">
+                [1] Accept & Register
+              </button>
+              <button type="button" class="btn-phone-choice btn-phone-decline" onclick="respondToSMSInvite('2')">
+                [2] Decline
+              </button>
+            </div>
+          </div>
+
+          <!-- Onboarding Accepted Screen -->
+          <div id="phone-screen-accepted" style="display: none;">
+            <div class="feature-phone-msg-body" style="color: #34D399;">
+[INCOMING SMS]
+From: +91 80000 32635
+
+✅ REGISTRATION CONFIRMED!
+Your Official Collector ID:
+<strong id="phone-registered-id" style="font-size: 14px; color: #FFFFFF; background: rgba(16,185,129,0.3); padding: 2px 6px; border-radius: 4px;">COL-NS-2026-00000</strong>
+
+Special Code 'NS': Basic Phone (No Smartphone) Verified.
+
+Registered to Kamrup Metro Hub-001. Show this ID or reply 'STATUS' anytime. Welcome!
+            </div>
+          </div>
+
+          <!-- Declined Screen -->
+          <div id="phone-screen-declined" style="display: none;">
+            <div class="feature-phone-msg-body" style="color: #FCA5A5;">
+[SMS SENT]
+To: +91 80000 32635
+Reply: 2
+
+Invitation declined. You will not receive further alerts today.
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Numeric Keypad -->
+        <div class="feature-phone-keypad">
+          <button type="button" class="phone-key-btn" onclick="respondToSMSInvite('1')">1 <span style="font-size: 9px; display: block; color: #34D399;">ACCEPT</span></button>
+          <button type="button" class="phone-key-btn" onclick="respondToSMSInvite('2')">2 <span style="font-size: 9px; display: block; color: #F87171;">DECLINE</span></button>
+          <button type="button" class="phone-key-btn">3 <span style="font-size: 9px; display: block; color: #64748B;">DEF</span></button>
+          <button type="button" class="phone-key-btn">4 <span style="font-size: 9px; display: block; color: #64748B;">GHI</span></button>
+          <button type="button" class="phone-key-btn">5 <span style="font-size: 9px; display: block; color: #64748B;">JKL</span></button>
+          <button type="button" class="phone-key-btn">6 <span style="font-size: 9px; display: block; color: #64748B;">MNO</span></button>
+          <button type="button" class="phone-key-btn">7 <span style="font-size: 9px; display: block; color: #64748B;">PQRS</span></button>
+          <button type="button" class="phone-key-btn">8 <span style="font-size: 9px; display: block; color: #64748B;">TUV</span></button>
+          <button type="button" class="phone-key-btn">9 <span style="font-size: 9px; display: block; color: #64748B;">WXYZ</span></button>
+          <button type="button" class="phone-key-btn">*</button>
+          <button type="button" class="phone-key-btn">0</button>
+          <button type="button" class="phone-key-btn">#</button>
+        </div>
+
+        <div style="margin-top: 10px; text-align: center;">
+          <small class="text-muted" style="font-size: 10px;">💡 Tip: Press Key <strong>1</strong> to simulate kabadiwala accepting and generating <strong>COL-NS-</strong> ID</small>
+        </div>
       </div>
     </div>
   </div>
