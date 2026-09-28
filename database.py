@@ -420,6 +420,34 @@ def init_db():
     VALUES ('dakssinghi@gmail.com', 'Daksh Singhi (Owner)', 1, NULL, NULL);
     """)
 
+    # 27. Authorized Field Coordinators Directory (Command Center Verified)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS authorized_coordinators (
+        employee_id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        service_zone TEXT NOT NULL,
+        email TEXT,
+        phone TEXT,
+        status TEXT DEFAULT 'ACTIVE',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    coordinators_seed = [
+        ('EMP-2026-101', 'Priyanka Baruah', 'ZONE B', 'priyanka.b@ecoflow.ai', '+91 98640 10001'),
+        ('EMP-2026-102', 'Vikram Goswami', 'ZONE A', 'vikram.g@ecoflow.ai', '+91 98640 10002'),
+        ('EMP-2026-103', 'Ramen Das', 'ZONE C', 'ramen.d@ecoflow.ai', '+91 98640 10003'),
+        ('EMP-2026-104', 'Ananya Sharma', 'ZONE D', 'ananya.s@ecoflow.ai', '+91 98640 10004'),
+        ('EMP-2026-904', 'Kavita Deka', 'ZONE C', 'kavita.deka@ecoflow.ai', '+91 98640 44556'),
+        ('COORD-01', 'Vikram Goswami', 'ZONE A', 'vikram.g@ecoflow.ai', '+91 98640 10002'),
+        ('COORD-02', 'Priyanka Baruah', 'ZONE B', 'priyanka.b@ecoflow.ai', '+91 98640 10001')
+    ]
+    for c in coordinators_seed:
+        cursor.execute("""
+        INSERT OR IGNORE INTO authorized_coordinators (employee_id, name, service_zone, email, phone, status)
+        VALUES (?, ?, ?, ?, ?, 'ACTIVE')
+        """, c)
+
     conn.commit()
     conn.close()
 

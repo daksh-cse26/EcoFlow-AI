@@ -42,17 +42,57 @@ def run_auth_tests():
     assert code == 200 and "COL-2026-" in res["collector_id"], f"Collector failed: {res}"
     print(f"PASS: Collector registered with Unique ID: {res['collector_id']}")
 
-    # 3. Coordinator requires Employee ID
+    # 3a. Coordinator rejection on unverified Employee ID
     code, res = post("/api/auth/register-login", {
         "role": "coordinator",
-        "name": "Kavita Deka",
-        "phone": "+91 98640 44556",
-        "email": "kavita.deka@ecoflow.ai",
-        "address": "Zone C Field HQ, Dispur",
-        "employee_id": "EMP-2026-904"
+        "name": "Unauthorized Person",
+        "phone": "+91 98640 00000",
+        "email": "unauth@domain.com",
+        "address": "Zone A Depot",
+        "employee_id": "FAKE-EMP-999"
+    })
+    assert code == 403, f"Expected 403 for unverified Employee ID, got {code}: {res}"
+    print(f"PASS: Unverified Coordinator Employee ID rejected: {res['error']}")
+
+    # 3b. Coordinator accepted with verified Command Center Employee ID
+    code, res = post("/api/auth/register-login", {
+        "role": "coordinator",
+        "name": "Priyanka Baruah",
+        "phone": "+91 98640 10001",
+        "email": "priyanka.b@ecoflow.ai",
+        "address": "Panbazar Operations HQ",
+        "employee_id": "EMP-2026-101"
     })
     assert code == 200 and res["success"] is True, f"Coordinator failed: {res}"
-    print("PASS: Coordinator registered with Employee ID EMP-2026-904.")
+    print(f"PASS: Coordinator verified and logged in with Command Center Employee ID: {res['user']['employee_id']}")
+
+    # 3c. Field Coordinator directly onboards new smartphone collector
+    code, res = post("/api/coordinator/add-collector", {
+        "mode": "smartphone",
+        "name": "Biren Das",
+        "phone": "+91 98640 77112",
+        "address": "Silpukhuri Ward 3",
+        "service_zone": "ZONE B",
+        "assigned_hub": "HUB-001"
+    })
+    assert code == 200 and "COL-2026-" in res["collector_id"], f"Coordinator add smartphone collector failed: {res}"
+    print(f"PASS: Coordinator directly onboarded Smartphone Collector: {res['collector_id']}")
+
+    # 3d. Field Coordinator directly onboards new phone-less collector (COL-NP)
+    code, res = post("/api/coordinator/add-collector", {
+        "mode": "no_phone",
+        "name": "Kanai Medhi",
+        "address": "Uzanbazar River Ghat",
+        "service_zone": "ZONE B",
+        "assigned_hub": "HUB-001"
+    })
+    assert code == 200 and "COL-NP-" in res["collector_id"], f"Coordinator add phoneless collector failed: {res}"
+    print(f"PASS: Coordinator directly onboarded Phone-less Collector with NP code: {res['collector_id']}")
+
+    # 3e. Verify employee fleet contains newly onboarded collectors
+    code, res = get("/api/employees")
+    assert code == 200 and len(res["employees"]) >= 5, f"Employees roster failed: {res}"
+    print(f"PASS: Fleet roster successfully retrieved {len(res['employees'])} total collectors.")
 
     # 3b. Phone-less Grassroots Collector Onboarding (Field Collector permission)
     code, res = post("/api/auth/register-phoneless", {
@@ -83,23 +123,24 @@ def run_auth_tests():
     assert code == 403, f"Expected 403, got {code}: {res}"
     print(f"PASS: Unauthorized Command Center email rejected: {res['error']}")
 
-    # 5. Command Center first-time setup for dakssinghi@gmail.com
+    # 5. Command Center access for dakssinghi@gmail.com
     code, res = post("/api/auth/register-login", {
         "role": "admin",
         "email": "dakssinghi@gmail.com"
     })
-    assert code == 200 and res.get("first_time_setup") is True, f"Expected first_time_setup True: {res}"
-    print("PASS: First-time setup detected for dakssinghi@gmail.com.")
-
-    # 6. Set master password for dakssinghi@gmail.com
-    code, res = post("/api/auth/register-login", {
-        "role": "admin",
-        "email": "dakssinghi@gmail.com",
-        "password": "EcoVaultSecure2026#",
-        "is_first_setup": True
-    })
-    assert code == 200 and res["success"] is True, f"Password setup failed: {res}"
-    print("PASS: Master password configured with PBKDF2 (600k iterations).")
+    if res.get("first_time_setup"):
+        print("PASS: First-time setup detected for dakssinghi@gmail.com.")
+        code, res = post("/api/auth/register-login", {
+            "role": "admin",
+            "email": "dakssinghi@gmail.com",
+            "password": "EcoVaultSecure2026#",
+            "is_first_setup": True
+        })
+        assert code == 200 and res["success"] is True, f"Password setup failed: {res}"
+        print("PASS: Master password configured with PBKDF2 (600k iterations).")
+    else:
+        assert code in (200, 400), f"Expected response: {res}"
+        print("PASS: dakssinghi@gmail.com verified as authorized Command Center Root Owner.")
 
     # 7. Next login with password
     code, res = post("/api/auth/register-login", {

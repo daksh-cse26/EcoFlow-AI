@@ -207,7 +207,10 @@
             <span>Employee ID</span>
             <span class="field-tag field-tag-req">* Mandatory</span>
           </label>
-          <input type="text" id="gw-emp-id" class="form-input" placeholder="e.g. EMP-2026-104" oninput="validateGatewayInputs()" />
+          <input type="text" id="gw-emp-id" class="form-input" placeholder="e.g. EMP-2026-101" oninput="validateGatewayInputs()" />
+          <small style="display: block; font-size: 10.5px; color: #94A3B8; margin-top: 4px;">
+            🛡️ <em>Strictly verified against Command Center Directory (e.g. <code>EMP-2026-101</code>, <code>EMP-2026-102</code>, <code>EMP-2026-103</code>, <code>EMP-2026-104</code>, <code>EMP-2026-904</code>)</em>
+          </small>
         </div>
 
         <!-- Master Password (Admin only) -->
@@ -573,40 +576,24 @@
     <!-- Pane 2: Collector Fleet & Workloads -->
     <div class="portal-subpane" id="coord-pane-fleet">
       <div class="hub-card mb-2">
-        <h3 class="mb-2">Assigned Municipal Collector Fleet</h3>
-        <div class="inspector-grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px;">
-          <div class="inspector-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <strong>Rameshwar Boro</strong>
-              <span class="badge-green">ONLINE</span>
-            </div>
-            <p class="small text-muted mb-1">ID: COL-00142 • Phone: +91 98765 43210</p>
-            <p class="small text-muted mb-1">Mode: <strong>Mode 1 (Smartphone)</strong></p>
-            <p class="small text-muted mb-2">Zone: <strong>Zone B</strong> • Active Workload: 1</p>
-            <button class="btn btn-sm btn-outline btn-block" onclick="switchPerspective('collector'); switchCollectorMode('mode1');">Open Smartphone Terminal ➔</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 style="margin-bottom: 2px;">🚚 Field Collector Fleet & Workloads</h3>
+            <p class="small text-muted mb-0">Direct Coordinator Authority: Manage active collector fleet and onboard new collectors directly in this terminal.</p>
           </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-outline" style="border-color: #34D399; color: #34D399; font-weight: 700;" onclick="openCoordinatorAddCollectorModal('no_phone')">
+              📴 Add Phone-less Collector (COL-NP)
+            </button>
+            <button type="button" class="btn btn-primary" style="font-weight: 700;" onclick="openCoordinatorAddCollectorModal('smartphone')">
+              ➕ Add New Collector
+            </button>
+          </div>
+        </div>
 
-          <div class="inspector-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <strong>Abdul Karim</strong>
-              <span class="badge-green">ONLINE (SMS)</span>
-            </div>
-            <p class="small text-muted mb-1">ID: COL-00156 • Phone: +91 98765 43211</p>
-            <p class="small text-muted mb-1">Mode: <strong>Mode 2 (Basic Phone SMS)</strong></p>
-            <p class="small text-muted mb-2">Zone: <strong>Zone B</strong> • Active Workload: 0</p>
-            <button class="btn btn-sm btn-outline btn-block" onclick="switchPerspective('collector'); switchCollectorMode('mode2');">Open SMS Simulator ➔</button>
-          </div>
-
-          <div class="inspector-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <strong>Dhaniram Deka</strong>
-              <span class="status-pill status-verified">ACTIVE (LOG)</span>
-            </div>
-            <p class="small text-muted mb-1">ID: COL-00173 • Phone: (No Smartphone)</p>
-            <p class="small text-muted mb-1">Mode: <strong>Mode 3 (Coordinator Dispatch Sheet)</strong></p>
-            <p class="small text-muted mb-2">Zone: <strong>Zone B</strong> • Active Workload: 0</p>
-            <button class="btn btn-sm btn-outline btn-block" onclick="switchPerspective('collector'); switchCollectorMode('mode3');">Open Dispatch Sheet ➔</button>
-          </div>
+        <!-- Dynamic Collector Fleet Grid -->
+        <div class="inspector-grid" id="coordinator-fleet-list" style="grid-template-columns: repeat(3, 1fr); gap: 16px;">
+          <!-- Injected dynamically via loadCoordinatorFleet() -->
         </div>
       </div>
     </div>
@@ -1227,6 +1214,7 @@
       <button class="admin-nav-item role-btn active" data-tab="map" onclick="switchAdminTab('map')">🗺️ Command Map (GIS)</button>
       <button class="admin-nav-item role-btn" data-tab="registry" onclick="switchAdminTab('registry')">🔒 Encrypted User Registry</button>
       <button class="admin-nav-item role-btn" data-tab="whitelist" onclick="switchAdminTab('whitelist')">🛡️ Admin Whitelist (Daksh)</button>
+      <button class="admin-nav-item role-btn" data-tab="coordinators" onclick="switchAdminTab('coordinators')">📋 Verified Coordinators</button>
       <button class="admin-nav-item role-btn" data-tab="ai_models" onclick="switchAdminTab('ai_models')">🤖 AI Models & Testing</button>
       <button class="admin-nav-item role-btn" data-tab="feedback" onclick="switchAdminTab('feedback')">📊 AI Feedback Dataset</button>
       <button class="admin-nav-item role-btn" data-tab="traceability" onclick="switchAdminTab('traceability')">🔗 Traceability Explorer</button>
@@ -1467,6 +1455,71 @@
             </thead>
             <tbody id="admin-whitelist-tbody">
               <!-- Injected via auth.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 9: AUTHORIZED FIELD COORDINATORS DIRECTORY -->
+    <div class="admin-tab-pane" id="admin-tab-coordinators">
+      <div class="hub-card mb-2">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 class="mb-1">📋 Command Center Authorized Field Coordinators Directory</h3>
+            <p class="text-muted small">Field Coordinators authenticating at the login gateway must strictly match an active Employee ID registered in this directory.</p>
+          </div>
+          <span class="badge-green" id="admin-coord-count-badge">7 Verified Officers</span>
+        </div>
+
+        <!-- Add Coordinator Form -->
+        <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <h4 class="mb-2" style="font-size: 13px;">➕ Authorize New Field Coordinator Employee ID</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr 1fr auto; gap: 10px; align-items: end;">
+            <div class="form-group mb-0">
+              <label>Employee ID:</label>
+              <input type="text" id="new-coord-empid" class="form-input" placeholder="e.g. EMP-2026-105" />
+            </div>
+            <div class="form-group mb-0">
+              <label>Full Name:</label>
+              <input type="text" id="new-coord-name" class="form-input" placeholder="e.g. Dipankar Sarma" />
+            </div>
+            <div class="form-group mb-0">
+              <label>Assigned Zone:</label>
+              <select id="new-coord-zone" class="form-input">
+                <option value="ZONE A">ZONE A - North Kamrup</option>
+                <option value="ZONE B" selected>ZONE B - Central Panbazar</option>
+                <option value="ZONE C">ZONE C - Dispur Capital</option>
+                <option value="ZONE D">ZONE D - East Narangi</option>
+              </select>
+            </div>
+            <div class="form-group mb-0">
+              <label>Official Email:</label>
+              <input type="email" id="new-coord-email" class="form-input" placeholder="officer@ecoflow.ai" />
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary" onclick="adminAuthorizeCoordinator()">
+                Authorize ID ▶
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table of Authorized Coordinators -->
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Coordinator Name</th>
+                <th>Service Zone</th>
+                <th>Official Email</th>
+                <th>Contact</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="admin-coordinators-tbody">
+              <!-- Injected dynamically via loadAdminCoordinators() -->
             </tbody>
           </table>
         </div>
@@ -1886,6 +1939,97 @@ Invitation declined. You will not receive further alerts today.
           <small class="text-muted" style="font-size: 10px;">💡 Tip: Press Key <strong>1</strong> to simulate kabadiwala accepting and generating <strong>COL-NS-</strong> ID</small>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Field Coordinator Directly Onboards New Collector -->
+  <div class="security-modal-overlay" id="coord-add-collector-modal" role="dialog" aria-modal="true" style="display: none;">
+    <div class="security-modal-box text-left" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800;">🚚 Onboard Field Collector (Coordinator Direct)</h3>
+        <button class="btn btn-sm btn-outline" onclick="closeCoordinatorAddCollectorModal()">✕</button>
+      </div>
+      <p class="small text-muted mb-2">Field Coordinator Authority: Register a new municipal waste collector directly into the fleet across Smartphone, Basic 2G SMS, or Grassroots No-Phone modes.</p>
+
+      <div id="coord-add-collector-form-body">
+        <div class="form-group mb-2">
+          <label>Operating Hardware / Communication Mode:</label>
+          <select id="coord-col-mode" class="form-input" onchange="onCoordinatorModeChange(this.value)">
+            <option value="smartphone">📱 Mode 1: Smartphone App (COL-2026-XXXXX)</option>
+            <option value="basic_phone">💬 Mode 2: Basic Feature Phone / SMS (COL-NS-2026-XXXXX)</option>
+            <option value="no_phone">📴 Mode 3: No Physical Phone / Grassroots (COL-NP-2026-XXXXX)</option>
+          </select>
+        </div>
+
+        <div class="form-group mb-2">
+          <label>Collector Full Name: <span class="text-danger" style="color: #EF4444;">* Mandatory</span></label>
+          <input type="text" id="coord-col-name" class="form-input" placeholder="e.g. Biren Das" />
+        </div>
+
+        <div class="form-group mb-2" id="coord-col-phone-group">
+          <label id="coord-col-phone-label">Mobile Number: <span class="text-danger" style="color: #EF4444;">* Mandatory</span></label>
+          <input type="tel" id="coord-col-phone" class="form-input" placeholder="e.g. +91 98640 77112" />
+        </div>
+
+        <div class="form-group mb-2">
+          <label>Operating Address / Scrap Depot: <span class="text-danger" style="color: #EF4444;">* Mandatory</span></label>
+          <input type="text" id="coord-col-address" class="form-input" placeholder="e.g. Silpukhuri Ward 3 Scrap Shed, Guwahati" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group mb-2">
+            <label>Municipal Service Zone:</label>
+            <select id="coord-col-zone" class="form-input">
+              <option value="ZONE B" selected>ZONE B - Central Paltan & Panbazar</option>
+              <option value="ZONE A">ZONE A - North Kamrup</option>
+              <option value="ZONE C">ZONE C - Dispur Capital</option>
+              <option value="ZONE D">ZONE D - East Narangi</option>
+            </select>
+          </div>
+          <div class="form-group mb-2">
+            <label>Assigned Storage Hub:</label>
+            <select id="coord-col-hub" class="form-input">
+              <option value="HUB-001" selected>HUB-001 - Central Sorting Hub</option>
+              <option value="HUB-002">HUB-002 - North Kamrup Station</option>
+              <option value="HUB-003">HUB-003 - Dispur Eco Depot</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-2">
+          <label>Material Specialization (Optional):</label>
+          <input type="text" id="coord-col-materials" class="form-input" placeholder="e.g. Copper Wires, PET Plastic, Newspaper" value="Mixed Recyclables" />
+        </div>
+
+        <p class="disclaimer-note mb-2" style="font-size: 10px;" id="coord-col-id-note">
+          🔒 <strong>Privacy Assurance:</strong> Upon registration, personal contact details are encrypted in the master database and cleared from your device. You can dispatch and track this collector by ID without retaining personal records.
+        </p>
+
+        <button type="button" class="btn btn-primary btn-block" style="padding: 10px; font-weight: 700;" onclick="submitCoordinatorAddCollector()">
+          ✨ Register Collector to Fleet ▶
+        </button>
+      </div>
+
+      <!-- Result for Phone-less Collector (Printable Pass) -->
+      <div id="coord-collector-pass-result" style="display: none;">
+        <div class="offline-token-pass">
+          <div style="font-size: 11px; text-transform: uppercase; color: #94A3B8; font-weight: 700;">EcoFlow AI • Official Collector Identity Token</div>
+          <div class="offline-token-id" id="coord-col-result-id">COL-NP-2026-00000</div>
+          <div id="coord-col-result-badge" style="display: inline-block; background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; color: #34D399; font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px;">
+            📴 SPECIAL CODE 'NP': NO PHYSICAL PHONE VERIFIED
+          </div>
+          <p class="small text-muted" style="margin-bottom: 10px;">Name: <strong id="coord-col-result-name" style="color: #FFFFFF;">—</strong> • Zone: <strong id="coord-col-result-zone" style="color: #FFFFFF;">ZONE B</strong></p>
+          <div style="display: flex; justify-content: center; margin: 12px 0;">
+            <canvas id="coord-col-pass-qr" width="140" height="140" style="border: 1px solid var(--border-glass); border-radius: 8px; background: #FFFFFF; padding: 4px;"></canvas>
+          </div>
+          <p class="small text-muted" style="font-size: 10.5px;">Present this physical token or QR at any EcoFlow Storage Hub scale for verified material weighment and cash settlements.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn-outline" style="flex: 1;" onclick="window.print()">🖨️ Print Token Pass</button>
+          <button type="button" class="btn btn-primary" style="flex: 1;" onclick="closeCoordinatorAddCollectorModal()">Done & View Fleet</button>
+        </div>
+      </div>
+
     </div>
   </div>
 

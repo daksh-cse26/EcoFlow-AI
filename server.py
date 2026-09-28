@@ -324,6 +324,13 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                 conn.close()
                 return self._send_json({"registry": decrypted_list, "total_records": len(decrypted_list)})
 
+            # 20. Authorized Field Coordinators (Command Center Directory)
+            elif path == '/api/admin/coordinators':
+                cursor.execute("SELECT * FROM authorized_coordinators ORDER BY employee_id ASC")
+                coords = [dict(r) for r in cursor.fetchall()]
+                conn.close()
+                return self._send_json({"coordinators": coords, "count": len(coords)})
+
             else:
                 conn.close()
                 return self._send_json({"error": "Unknown API endpoint"}, status=404)
@@ -473,12 +480,23 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                         conn.close()
                         return self._send_json({"success": False, "error": "Name, Mobile, Email, Address, and Employee ID are all mandatory for Field Coordinators."}, status=400)
                     
+                    # Strict Verification against Command Center Authorized Coordinators
+                    emp_clean = employee_id.strip()
+                    cursor.execute("SELECT * FROM authorized_coordinators WHERE UPPER(employee_id) = UPPER(?) AND status = 'ACTIVE'", (emp_clean,))
+                    coord_auth = cursor.fetchone()
+                    if not coord_auth:
+                        conn.close()
+                        return self._send_json({
+                            "success": False,
+                            "error": f"Employee ID Verification Failed: '{emp_clean}' is not recognized in the Command Center coordinator directory. Access denied."
+                        }, status=403)
+                    
                     user_id = f"USR-{random.randint(100000, 999999)}"
                     name_enc = encrypt_field(name)
                     phone_enc = encrypt_field(phone)
                     email_enc = encrypt_field(email)
                     addr_enc = encrypt_field(address)
-                    emp_enc = encrypt_field(employee_id)
+                    emp_enc = encrypt_field(emp_clean)
                     
                     cursor.execute("""
                     INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
@@ -493,7 +511,8 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                             "user_id": user_id,
                             "name": name,
                             "role": "coordinator",
-                            "employee_id": employee_id,
+                            "employee_id": emp_clean,
+                            "service_zone": coord_auth["service_zone"],
                             "address": address,
                             "phone": phone,
                             "email": email
@@ -678,6 +697,92 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                 updated_whitelist = [dict(r) for r in cursor.fetchall()]
                 conn.close()
                 return self._send_json({"success": True, "whitelist": updated_whitelist})
+
+            # Command Center: Manage Authorized Coordinators Directory
+            elif path == '/api/admin/coordinators':
+                emp_id = body.get('employee_id', '').strip()
+                name = body.get('name', '').strip()
+                zone = body.get('service_zone', 'ZONE B').strip()
+                email = body.get('email', '').strip()
+                phone = body.get('phone', '').strip()
+
+                if not emp_id or not name:
+                    conn.close()
+                    return self._send_json({"success": False, "error": "Employee ID and Coordinator Name are required."}, status=400)
+
+                cursor.execute("""
+                INSERT OR REPLACE INTO authorized_coordinators (employee_id, name, service_zone, email, phone, status)
+                VALUES (?, ?, ?, ?, ?, 'ACTIVE')
+                """, (emp_id, name, zone, email, phone))
+
+                cursor.execute("""
+                INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                VALUES ('COORDINATOR_AUTHORIZED', 'Unregistered', ?, 'Command Center Admin', 'Administrator', 'Authorized new Field Coordinator employee ID')
+                """, (f"{name} ({emp_id})",))
+
+                conn.commit()
+                cursor.execute("SELECT * FROM authorized_coordinators ORDER BY employee_id ASC")
+                coords = [dict(r) for r in cursor.fetchall()]
+                conn.close()
+                return self._send_json({"success": True, "coordinators": coords, "message": f"Coordinator {emp_id} authorized in Command Center."})
+
+            # Field Coordinator: Onboard New Collector directly from Coordinator Interface
+            elif path == '/api/coordinator/add-collector':
+                mode = body.get('mode', 'smartphone').strip()  # 'smartphone', 'basic_phone', 'no_phone'
+                name = body.get('name', '').strip()
+                phone = body.get('phone', '').strip()
+                address = body.get('address', '').strip()
+                zone = body.get('service_zone', 'ZONE B').strip()
+                hub = body.get('assigned_hub', 'HUB-001').strip()
+                specialization = body.get('specialization', 'Mixed Scrap').strip()
+
+                if not name or not address:
+                    conn.close()
+                    return self._send_json({"success": False, "error": "Collector Name and Operating Address are required."}, status=400)
+
+                if mode == 'no_phone':
+                    collector_id = f"COL-NP-2026-{random.randint(10000, 99999)}"
+                    phone_val = "NO_PHYSICAL_PHONE"
+                elif mode == 'basic_phone':
+                    collector_id = f"COL-NS-2026-{random.randint(10000, 99999)}"
+                    phone_val = phone or f"+91 98640 {random.randint(10000, 99999)}"
+                else:
+                    collector_id = f"COL-2026-{random.randint(10000, 99999)}"
+                    phone_val = phone or f"+91 98640 {random.randint(10000, 99999)}"
+
+                user_id = f"USR-{random.randint(100000, 999999)}"
+                name_enc = encrypt_field(name)
+                phone_enc = encrypt_field(phone_val)
+                addr_enc = encrypt_field(address)
+                col_enc = encrypt_field(collector_id)
+                meta_enc = encrypt_field(f"Spec: {specialization} | Mode: {mode} | Coordinator Onboarded")
+
+                cursor.execute("""
+                INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (user_id, f"collector_{mode}", name_enc, phone_enc, meta_enc, addr_enc, col_enc))
+
+                cursor.execute("""
+                INSERT OR REPLACE INTO employees (employee_id, name, phone, service_zone, mode, availability, assigned_hub, workload, collection_history_count, current_lat, current_lng)
+                VALUES (?, ?, ?, ?, ?, 'AVAILABLE', ?, 0, 0, 26.1800, 91.7700)
+                """, (collector_id, name, phone_val, zone, mode, hub))
+
+                cursor.execute("""
+                INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                VALUES ('COORDINATOR_ONBOARDED_COLLECTOR', 'New Collector', ?, 'Field Coordinator', 'Coordinator', 'Collector registered via Coordinator portal')
+                """, (f"{name} ({collector_id}, Mode: {mode})",))
+
+                conn.commit()
+                conn.close()
+                return self._send_json({
+                    "success": True,
+                    "collector_id": collector_id,
+                    "mode": mode,
+                    "name": name,
+                    "service_zone": zone,
+                    "assigned_hub": hub,
+                    "message": f"Collector {name} ({collector_id}) successfully onboarded to fleet."
+                })
 
             # 1. AI Scan
             elif path == '/api/ai/scan':

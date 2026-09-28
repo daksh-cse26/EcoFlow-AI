@@ -346,6 +346,9 @@ function switchCoordinatorTab(tab) {
   document.querySelectorAll("#view-coordinator [data-coordtab]").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.coordtab === tab);
   });
+  if (tab === "fleet" && typeof loadCoordinatorFleet === "function") {
+    loadCoordinatorFleet();
+  }
 }
 
 // Collector Mode Tabs (Mode 1 / Mode 2 / Mode 3)
@@ -433,6 +436,8 @@ function switchAdminTab(tab) {
     if (typeof loadEncryptedRegistry === "function") loadEncryptedRegistry();
   } else if (tab === "whitelist") {
     if (typeof loadWhitelist === "function") loadWhitelist();
+  } else if (tab === "coordinators") {
+    if (typeof loadAdminCoordinators === "function") loadAdminCoordinators();
   }
 }
 

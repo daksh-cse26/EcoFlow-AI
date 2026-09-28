@@ -273,10 +273,13 @@ function applyActiveSession(session) {
   // Lock and activate chosen interface view
   switchPerspective(session.role);
 
-  // If Command Center, check if whitelist or registry need initial load
+  // If Command Center, check if whitelist, registry, or coordinator directory need initial load
   if (session.role === 'admin') {
     loadEncryptedRegistry();
     loadWhitelist();
+    loadAdminCoordinators();
+  } else if (session.role === 'coordinator') {
+    loadCoordinatorFleet();
   }
 }
 
@@ -833,6 +836,261 @@ async function respondToSMSInvite(choice) {
     } catch (err) {
       alert("Network error: " + err.message);
     }
+  }
+}
+
+// ====================================================
+// FIELD COORDINATOR: FLEET MANAGEMENT & ADD COLLECTORS
+// Direct authority to onboard Mode 1, Mode 2, and Mode 3 collectors
+// ====================================================
+async function loadCoordinatorFleet() {
+  const container = document.getElementById("coordinator-fleet-list");
+  if (!container) return;
+
+  try {
+    const res = await fetch("/api/employees");
+    const data = await res.json();
+    const emps = data.employees || [];
+
+    if (emps.length === 0) {
+      container.innerHTML = `<p class="text-muted" style="grid-column: 1/-1;">No collectors found in fleet roster.</p>`;
+      return;
+    }
+
+    container.innerHTML = emps.map(e => {
+      const isNoPhone = e.mode === 'no_phone' || (e.employee_id && e.employee_id.includes('-NP-'));
+      const isBasicPhone = e.mode === 'basic_phone' || (e.employee_id && e.employee_id.includes('-NS-'));
+      const modeTitle = isNoPhone ? "Mode 3: No Physical Phone" : (isBasicPhone ? "Mode 2: Basic SMS Phone" : "Mode 1: Smartphone App");
+      const modeBadge = isNoPhone ? "status-verified" : (isBasicPhone ? "badge-green" : "badge-green");
+      const phoneDisplay = isNoPhone ? "📴 No Physical Phone" : (e.phone ? escapeHtml(e.phone) : "—");
+
+      return `
+        <div class="inspector-card" id="fleet-card-${e.employee_id}">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <strong>${escapeHtml(e.name)}</strong>
+            <span class="${modeBadge}" style="font-size: 9.5px;">${e.availability || 'AVAILABLE'}</span>
+          </div>
+          <p class="small text-muted mb-1">ID: <code style="color: #34D399; font-weight: 700;">${e.employee_id}</code></p>
+          <p class="small text-muted mb-1">Mode: <strong>${modeTitle}</strong></p>
+          <p class="small text-muted mb-1">Contact: <span>${phoneDisplay}</span></p>
+          <p class="small text-muted mb-2">Zone: <strong>${e.service_zone}</strong> • Hub: <strong>${e.assigned_hub || 'HUB-001'}</strong> • Workload: ${e.workload || 0}</p>
+          <div style="display: flex; gap: 6px;">
+            ${isNoPhone 
+              ? `<button class="btn btn-sm btn-outline btn-block" onclick="switchPerspective('collector'); switchCollectorMode('mode3');">Open Dispatch Sheet ➔</button>`
+              : (isBasicPhone 
+                ? `<button class="btn btn-sm btn-outline btn-block" onclick="switchPerspective('collector'); switchCollectorMode('mode2');">Open SMS Terminal ➔</button>`
+                : `<button class="btn btn-sm btn-outline btn-block" onclick="switchPerspective('collector'); switchCollectorMode('mode1');">Open App Terminal ➔</button>`
+              )
+            }
+          </div>
+        </div>
+      `;
+    }).join("");
+  } catch (err) {
+    console.warn("Could not load coordinator fleet:", err);
+  }
+}
+
+function openCoordinatorAddCollectorModal(defaultMode) {
+  const modal = document.getElementById("coord-add-collector-modal");
+  if (!modal) return;
+  modal.style.display = "flex";
+
+  const formBody = document.getElementById("coord-add-collector-form-body");
+  const passResult = document.getElementById("coord-collector-pass-result");
+  if (formBody) formBody.style.display = "block";
+  if (passResult) passResult.style.display = "none";
+
+  const modeSel = document.getElementById("coord-col-mode");
+  if (modeSel) {
+    modeSel.value = defaultMode || "smartphone";
+    onCoordinatorModeChange(modeSel.value);
+  }
+
+  const nameInput = document.getElementById("coord-col-name");
+  const phoneInput = document.getElementById("coord-col-phone");
+  const addrInput = document.getElementById("coord-col-address");
+  if (nameInput) nameInput.value = "";
+  if (phoneInput) phoneInput.value = "";
+  if (addrInput) addrInput.value = "";
+}
+
+function closeCoordinatorAddCollectorModal() {
+  const modal = document.getElementById("coord-add-collector-modal");
+  if (modal) modal.style.display = "none";
+  loadCoordinatorFleet();
+}
+
+function onCoordinatorModeChange(mode) {
+  const phoneGroup = document.getElementById("coord-col-phone-group");
+  const noteEl = document.getElementById("coord-col-id-note");
+  if (mode === 'no_phone') {
+    if (phoneGroup) phoneGroup.style.display = "none";
+    if (noteEl) {
+      noteEl.innerHTML = `📴 <strong>No Phone Protocol:</strong> Generates unique ID <code>COL-NP-2026-XXXXX</code> ('NP' signifies No Physical Phone). A printable QR lot pass will be generated on completion.`;
+    }
+  } else if (mode === 'basic_phone') {
+    if (phoneGroup) phoneGroup.style.display = "block";
+    if (noteEl) {
+      noteEl.innerHTML = `💬 <strong>Basic SMS Protocol:</strong> Generates unique ID <code>COL-NS-2026-XXXXX</code> ('NS' signifies No Smartphone / Basic SMS). Collector receives assignments via 2G SMS.`;
+    }
+  } else {
+    if (phoneGroup) phoneGroup.style.display = "block";
+    if (noteEl) {
+      noteEl.innerHTML = `📱 <strong>Smartphone App Protocol:</strong> Generates unique ID <code>COL-2026-XXXXX</code> with full digital QR workflow and offline synchronization.`;
+    }
+  }
+}
+
+async function submitCoordinatorAddCollector() {
+  const mode = document.getElementById("coord-col-mode")?.value || "smartphone";
+  const name = (document.getElementById("coord-col-name")?.value || "").trim();
+  const phone = (document.getElementById("coord-col-phone")?.value || "").trim();
+  const address = (document.getElementById("coord-col-address")?.value || "").trim();
+  const zone = document.getElementById("coord-col-zone")?.value || "ZONE B";
+  const hub = document.getElementById("coord-col-hub")?.value || "HUB-001";
+  const materials = (document.getElementById("coord-col-materials")?.value || "").trim() || "Mixed Recyclables";
+
+  if (!name || name.length < 2) {
+    alert("Please enter the collector's full name.");
+    return;
+  }
+  if (mode !== 'no_phone' && (!phone || phone.length < 8)) {
+    alert("Please enter a valid mobile number for this collector.");
+    return;
+  }
+  if (!address || address.length < 4) {
+    alert("Please enter the operating address or scrap cluster location.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/coordinator/add-collector", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mode: mode,
+        name: name,
+        phone: phone,
+        address: address,
+        service_zone: zone,
+        assigned_hub: hub,
+        specialization: materials
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      alert("Registration Error: " + (data.error || "Failed to onboard collector."));
+      return;
+    }
+
+    // Strict Zero-Knowledge Privacy Protocol: clear local storage
+    localStorage.removeItem("last_added_collector_temp");
+    sessionStorage.removeItem("last_added_collector_temp");
+
+    if (mode === 'no_phone') {
+      // Show Printable Token Pass with COL-NP- ID
+      const formBody = document.getElementById("coord-add-collector-form-body");
+      const passResult = document.getElementById("coord-collector-pass-result");
+      const idEl = document.getElementById("coord-col-result-id");
+      const nameEl = document.getElementById("coord-col-result-name");
+      const zoneEl = document.getElementById("coord-col-result-zone");
+      const qrCanvas = document.getElementById("coord-col-pass-qr");
+
+      if (formBody) formBody.style.display = "none";
+      if (passResult) passResult.style.display = "block";
+      if (idEl) idEl.textContent = data.collector_id;
+      if (nameEl) nameEl.textContent = name;
+      if (zoneEl) zoneEl.textContent = zone;
+
+      if (qrCanvas && typeof qrEngine !== "undefined") {
+        qrEngine.renderQR(qrCanvas, `ECOFLOW-COL-TOKEN:${data.collector_id}`, 140);
+      }
+    } else {
+      alert(`🎉 Collector Successfully Onboarded to Fleet!\n\nCollector: ${name}\nID: ${data.collector_id}\nMode: ${mode.toUpperCase()}\nZone: ${zone}\n\nCredentials encrypted in master database.`);
+      closeCoordinatorAddCollectorModal();
+    }
+
+    loadCoordinatorFleet();
+  } catch (err) {
+    alert("Network Error: " + err.message);
+  }
+}
+
+// ====================================================
+// COMMAND CENTER: AUTHORIZED COORDINATORS DIRECTORY
+// Verifies employee IDs allowed to access Field Coordinator Interface
+// ====================================================
+async function loadAdminCoordinators() {
+  const tbody = document.getElementById("admin-coordinators-tbody");
+  if (!tbody) return;
+
+  try {
+    const res = await fetch("/api/admin/coordinators");
+    const data = await res.json();
+    if (!data.coordinators) return;
+
+    tbody.innerHTML = data.coordinators.map(c => `
+      <tr>
+        <td><code style="color: #34D399; font-weight: 700; font-size: 13px;">${c.employee_id}</code></td>
+        <td><strong>${escapeHtml(c.name)}</strong></td>
+        <td><span class="category-tag tag-metal">${c.service_zone}</span></td>
+        <td>${c.email || '—'}</td>
+        <td>${c.phone || '—'}</td>
+        <td><span class="status-badge status-verified">ACTIVE (AUTHORIZED)</span></td>
+      </tr>
+    `).join("");
+
+    const countEl = document.getElementById("admin-coord-count-badge");
+    if (countEl) countEl.textContent = `${data.count || data.coordinators.length} Verified Officers`;
+  } catch (err) {
+    console.warn("Could not load authorized coordinators:", err);
+  }
+}
+
+async function adminAuthorizeCoordinator() {
+  const empId = (document.getElementById("new-coord-empid")?.value || "").trim().toUpperCase();
+  const name = (document.getElementById("new-coord-name")?.value || "").trim();
+  const zone = document.getElementById("new-coord-zone")?.value || "ZONE B";
+  const email = (document.getElementById("new-coord-email")?.value || "").trim();
+
+  if (!empId || empId.length < 3) {
+    alert("Please enter a valid Employee ID (e.g. EMP-2026-105).");
+    return;
+  }
+  if (!name || name.length < 2) {
+    alert("Please enter the Coordinator's full name.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/admin/coordinators", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        employee_id: empId,
+        name: name,
+        service_zone: zone,
+        email: email
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      alert("Authorization Error: " + (data.error || "Failed to authorize coordinator."));
+      return;
+    }
+
+    alert(`✅ Employee ID ${empId} successfully authorized in Command Center Directory for ${name} (${zone}).`);
+    const idInput = document.getElementById("new-coord-empid");
+    const nameInput = document.getElementById("new-coord-name");
+    const emailInput = document.getElementById("new-coord-email");
+    if (idInput) idInput.value = "";
+    if (nameInput) nameInput.value = "";
+    if (emailInput) emailInput.value = "";
+
+    loadAdminCoordinators();
+  } catch (err) {
+    alert("Network Error: " + err.message);
   }
 }
 
