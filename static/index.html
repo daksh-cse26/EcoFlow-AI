@@ -47,7 +47,7 @@
       <span class="session-role-pill" id="session-role-pill">🏠 Household Portal</span>
       <span class="session-user-name" id="session-user-name">Rahul Sharma</span>
       <button type="button" class="btn-switch-portal" onclick="confirmSwitchPortal()" title="Switch Interface / Logout">
-        🔒 Logout / Switch
+        <span data-i18n="header.switch_portal">🔒 Logout / Switch</span>
       </button>
     </div>
 
@@ -95,9 +95,9 @@
        ================================================== -->
   <section class="portal-gateway-screen" id="portal-gateway-screen" style="display: none;">
     <div class="gateway-hero">
-      <span class="gateway-badge">🌱 Secure Multi-Stakeholder Node</span>
-      <h2>Select Your Operating Interface</h2>
-      <p>Choose your operational role and enter your credentials to authenticate and establish an encrypted session on this device.</p>
+      <span class="gateway-badge" data-i18n="gw.badge">🌱 Secure Multi-Stakeholder Node</span>
+      <h2 data-i18n="gw.hero_title">Select Your Operating Interface</h2>
+      <p data-i18n="gw.hero_desc">Choose your operational role and enter your credentials to authenticate and establish an encrypted session on this device.</p>
     </div>
 
     <!-- 6 Role Selection Cards -->
@@ -107,8 +107,8 @@
           <span class="portal-card-icon">🏠</span>
           <span class="portal-selected-indicator">✓</span>
         </div>
-        <div class="portal-card-title">Household App</div>
-        <div class="portal-card-desc">Citizen scrap scanner, preliminary AI assessment, pickup request & receipts.</div>
+        <div class="portal-card-title" data-i18n="gw.role_household_title">Household App</div>
+        <div class="portal-card-desc" data-i18n="gw.role_household_desc">Citizen scrap scanner, preliminary AI assessment, pickup request & receipts.</div>
       </div>
 
       <div class="portal-role-card" data-role="coordinator" onclick="selectGatewayRole('coordinator')">
@@ -116,8 +116,8 @@
           <span class="portal-card-icon">📋</span>
           <span class="portal-selected-indicator">✓</span>
         </div>
-        <div class="portal-card-title">Field Coordinator</div>
-        <div class="portal-card-desc">Zonal dispatch management, collector assignment & load balancing.</div>
+        <div class="portal-card-title" data-i18n="gw.role_coordinator_title">Field Coordinator</div>
+        <div class="portal-card-desc" data-i18n="gw.role_coordinator_desc">Zonal dispatch management, collector assignment & load balancing.</div>
       </div>
 
       <div class="portal-role-card" data-role="collector" onclick="selectGatewayRole('collector')">
@@ -125,8 +125,8 @@
           <span class="portal-card-icon">🚚</span>
           <span class="portal-selected-indicator">✓</span>
         </div>
-        <div class="portal-card-title">Field Collector</div>
-        <div class="portal-card-desc">Mobile & offline collection, QR digital lot creation & transport.</div>
+        <div class="portal-card-title" data-i18n="gw.role_collector_title">Field Collector</div>
+        <div class="portal-card-desc" data-i18n="gw.role_collector_desc">Mobile & offline collection, QR digital lot creation & transport.</div>
       </div>
 
       <div class="portal-role-card" data-role="hub" onclick="selectGatewayRole('hub')">
@@ -134,8 +134,8 @@
           <span class="portal-card-icon">⚖️</span>
           <span class="portal-selected-indicator">✓</span>
         </div>
-        <div class="portal-card-title">Storage Hub (Authority)</div>
-        <div class="portal-card-desc">Calibrated physical weighing, material quality verification & official settlements.</div>
+        <div class="portal-card-title" data-i18n="gw.role_hub_title">Storage Hub (Authority)</div>
+        <div class="portal-card-desc" data-i18n="gw.role_hub_desc">Calibrated physical weighing, material quality verification & official settlements.</div>
       </div>
 
       <div class="portal-role-card" data-role="recycler" onclick="selectGatewayRole('recycler')">
@@ -143,8 +143,8 @@
           <span class="portal-card-icon">🏭</span>
           <span class="portal-selected-indicator">✓</span>
         </div>
-        <div class="portal-card-title">Recycler Portal</div>
-        <div class="portal-card-desc">B2B industrial catalog, aggregate batch bids, digital contract & gate-pass dispatch.</div>
+        <div class="portal-card-title" data-i18n="gw.role_recycler_title">Recycler Portal</div>
+        <div class="portal-card-desc" data-i18n="gw.role_recycler_desc">B2B industrial catalog, aggregate batch bids, digital contract & gate-pass dispatch.</div>
       </div>
 
       <div class="portal-role-card" data-role="admin" onclick="selectGatewayRole('admin')">
@@ -152,8 +152,8 @@
           <span class="portal-card-icon">🗺️</span>
           <span class="portal-selected-indicator">✓</span>
         </div>
-        <div class="portal-card-title">Command Center</div>
-        <div class="portal-card-desc">Master executive GIS, neural models, encrypted registry & whitelist access.</div>
+        <div class="portal-card-title" data-i18n="gw.role_admin_title">Command Center</div>
+        <div class="portal-card-desc" data-i18n="gw.role_admin_desc">Master executive GIS, neural models, encrypted registry & whitelist access.</div>
       </div>
     </div>
 
@@ -161,15 +161,15 @@
     <div class="gateway-form-box">
       <div class="gateway-form-header">
         <span class="gateway-form-title" id="gateway-role-title">🏠 Household Citizen Portal</span>
-        <span class="small text-muted">🔒 AES Encrypted Vault</span>
+        <span class="small text-muted" data-i18n="gw.vault_label">🔒 AES Encrypted Vault</span>
       </div>
 
       <!-- Specific Context Notices -->
-      <div id="gf-admin-notice" style="display: none; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #93C5FD;">
+      <div id="gf-admin-notice" data-i18n="gw.admin_notice" style="display: none; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #93C5FD;">
         🛡️ <strong>Restricted Executive Access:</strong> Only <code>dakssinghi@gmail.com</code> and authorized administrators on the whitelist have access to this portal. Phone number and address are not required.
       </div>
 
-      <div id="gf-collector-notice" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #A7F3D0;">
+      <div id="gf-collector-notice" data-i18n="gw.collector_notice" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #A7F3D0;">
         🚚 <strong>Automated Identity:</strong> Upon entering your details, an individual, unique Collector ID (e.g. <code>COL-2026-XXXXX</code>) will be permanently generated for you and encrypted on the database.
       </div>
 
@@ -177,38 +177,38 @@
         <!-- Name -->
         <div class="gateway-field" id="gf-name-container">
           <label for="gw-name">
-            <span>Full Name</span>
-            <span class="field-tag field-tag-req">* Mandatory</span>
+            <span data-i18n="gw.name_label">Full Name</span>
+            <span class="field-tag field-tag-req" data-i18n="gw.mandatory">* Mandatory</span>
           </label>
-          <input type="text" id="gw-name" class="form-input" placeholder="e.g. Rahul Sharma" oninput="validateGatewayInputs()" />
+          <input type="text" id="gw-name" class="form-input" placeholder="e.g. Rahul Sharma" data-i18n-placeholder="gw.name_placeholder" oninput="validateGatewayInputs()" />
         </div>
 
         <!-- Mobile Phone -->
         <div class="gateway-field" id="gf-phone-container">
           <label for="gw-phone">
-            <span>Mobile Number</span>
-            <span class="field-tag field-tag-req">* Mandatory</span>
+            <span data-i18n="gw.phone_label">Mobile Number</span>
+            <span class="field-tag field-tag-req" data-i18n="gw.mandatory">* Mandatory</span>
           </label>
-          <input type="tel" id="gw-phone" class="form-input" placeholder="e.g. +91 98640 12345" oninput="validateGatewayInputs()" />
+          <input type="tel" id="gw-phone" class="form-input" placeholder="e.g. +91 98640 12345" data-i18n-placeholder="gw.phone_placeholder" oninput="validateGatewayInputs()" />
         </div>
 
         <!-- Email Address -->
         <div class="gateway-field" id="gf-email-container">
           <label for="gw-email">
-            <span>Email Address</span>
-            <span class="field-tag field-tag-req">* Mandatory</span>
+            <span data-i18n="gw.email_label">Email Address</span>
+            <span class="field-tag field-tag-req" data-i18n="gw.mandatory">* Mandatory</span>
           </label>
-          <input type="email" id="gw-email" class="form-input" placeholder="e.g. user@example.com" oninput="validateGatewayInputs()" />
+          <input type="email" id="gw-email" class="form-input" placeholder="e.g. user@example.com" data-i18n-placeholder="gw.email_placeholder" oninput="validateGatewayInputs()" />
         </div>
 
         <!-- Employee ID (Coordinator only) -->
         <div class="gateway-field" id="gf-employee-id-container" style="display: none;">
           <label for="gw-emp-id">
-            <span>Employee ID</span>
-            <span class="field-tag field-tag-req">* Mandatory</span>
+            <span data-i18n="gw.emp_id_label">Employee ID</span>
+            <span class="field-tag field-tag-req" data-i18n="gw.mandatory">* Mandatory</span>
           </label>
-          <input type="text" id="gw-emp-id" class="form-input" placeholder="e.g. EMP-2026-101" oninput="validateGatewayInputs()" />
-          <small style="display: block; font-size: 10.5px; color: #94A3B8; margin-top: 4px;">
+          <input type="text" id="gw-emp-id" class="form-input" placeholder="e.g. EMP-2026-101" data-i18n-placeholder="gw.emp_id_placeholder" oninput="validateGatewayInputs()" />
+          <small style="display: block; font-size: 10.5px; color: #94A3B8; margin-top: 4px;" data-i18n="gw.coord_id_hint">
             🛡️ <em>Strictly verified against Command Center Directory (e.g. <code>EMP-2026-101</code>, <code>EMP-2026-102</code>, <code>EMP-2026-103</code>, <code>EMP-2026-104</code>, <code>EMP-2026-904</code>)</em>
           </small>
         </div>
@@ -216,32 +216,32 @@
         <!-- Master Password (Admin only) -->
         <div class="gateway-field" id="gf-password-container" style="display: none;">
           <label for="gw-password">
-            <span>Master Password</span>
-            <span class="field-tag field-tag-req">* Mandatory</span>
+            <span data-i18n="gw.password_label">Master Password</span>
+            <span class="field-tag field-tag-req" data-i18n="gw.mandatory">* Mandatory</span>
           </label>
-          <input type="password" id="gw-password" class="form-input" placeholder="Enter secure password" oninput="validateGatewayInputs()" />
+          <input type="password" id="gw-password" class="form-input" placeholder="Enter secure password" data-i18n-placeholder="gw.password_placeholder" oninput="validateGatewayInputs()" />
           <div style="text-align: right; margin-top: 4px;">
-            <a href="javascript:void(0)" onclick="openForgotPasswordModal()" style="font-size: 11px; color: var(--primary-mint); text-decoration: underline;">Forgot Password?</a>
+            <a href="javascript:void(0)" onclick="openForgotPasswordModal()" style="font-size: 11px; color: var(--primary-mint); text-decoration: underline;" data-i18n="gw.forgot_password">Forgot Password?</a>
           </div>
         </div>
 
         <!-- Physical Address -->
         <div class="gateway-field field-full" id="gf-address-container">
           <label for="gw-address">
-            <span>Physical / Operating Address</span>
-            <span class="field-tag field-tag-req">* Mandatory</span>
+            <span data-i18n="gw.address_label">Physical / Operating Address</span>
+            <span class="field-tag field-tag-req" data-i18n="gw.mandatory">* Mandatory</span>
           </label>
-          <textarea id="gw-address" class="form-input" rows="2" placeholder="e.g. House 42, Green Park Avenue, North Zone, Guwahati" oninput="validateGatewayInputs()"></textarea>
+          <textarea id="gw-address" class="form-input" rows="2" placeholder="e.g. House 42, Green Park Avenue, North Zone, Guwahati" data-i18n-placeholder="gw.address_placeholder" oninput="validateGatewayInputs()"></textarea>
         </div>
       </div>
 
       <!-- Dynamic Login Button (Reveals once all mandatory fields are filled) -->
       <div class="gateway-submit-container" id="gateway-submit-container">
-        <button type="button" class="btn-gateway-submit" id="btn-gateway-submit" onclick="submitGatewayLogin()">
+        <button type="button" class="btn-gateway-submit" id="btn-gateway-submit" onclick="submitGatewayLogin()" data-i18n="gw.btn_submit">
           ✨ Authenticate & Enter Portal ▶
         </button>
         <div class="gateway-security-notice">
-          <span>🔒 Credentials encrypted & saved locally. Next time you open EcoFlow AI, you will enter directly without logging in.</span>
+          <span data-i18n="gw.security_notice">🔒 Credentials encrypted & saved locally. Next time you open EcoFlow AI, you will enter directly without logging in.</span>
         </div>
       </div>
     </div>
@@ -515,8 +515,8 @@
        ================================================== -->
   <main class="perspective-view" id="view-coordinator">
     <div class="page-header mb-2">
-      <h2>📋 Field Operations & Coordinator Dashboard</h2>
-      <p class="text-muted">Manage collector assignments across Zone A, B, C, D with 3 collector communication modes.</p>
+      <h2 data-i18n="coord.header_title">📋 Field Operations & Coordinator Dashboard</h2>
+      <p class="text-muted" data-i18n="coord.header_desc">Manage collector assignments across Zone A, B, C, D with 3 collector communication modes.</p>
     </div>
 
     <div class="coordinator-metrics-row mb-2">
@@ -525,28 +525,28 @@
           <span class="impact-icon">⏳</span>
           <div>
             <div class="impact-val">1</div>
-            <div class="impact-lbl">Pending Requests ➔</div>
+            <div class="impact-lbl" data-i18n="coord.pending_requests">Pending Requests ➔</div>
           </div>
         </div>
         <div class="impact-card" style="cursor: pointer;" onclick="switchCoordinatorTab('fleet')">
           <span class="impact-icon">🚚</span>
           <div>
             <div class="impact-val">3</div>
-            <div class="impact-lbl">Collectors Available ➔</div>
+            <div class="impact-lbl" data-i18n="coord.collectors_available">Collectors Available ➔</div>
           </div>
         </div>
         <div class="impact-card" style="cursor: pointer;" onclick="switchPerspective('collector')">
           <span class="impact-icon">📱</span>
           <div>
             <div class="impact-val">Mode 1/2/3</div>
-            <div class="impact-lbl">Smart / SMS / Physical ➔</div>
+            <div class="impact-lbl" data-i18n="coord.comm_modes">Smart / SMS / Physical ➔</div>
           </div>
         </div>
         <div class="impact-card" style="cursor: pointer;" onclick="switchCoordinatorTab('zones')">
           <span class="impact-icon">⏱️</span>
           <div>
             <div class="impact-val">15 min</div>
-            <div class="impact-lbl">Zone Timeout Policy ➔</div>
+            <div class="impact-lbl" data-i18n="coord.timeout_policy">Zone Timeout Policy ➔</div>
           </div>
         </div>
       </div>
@@ -554,10 +554,10 @@
 
     <!-- Coordinator Subnav Tabs -->
     <nav class="portal-subnav-bar">
-      <button class="portal-subnav-btn active" data-coordtab="queue" onclick="switchCoordinatorTab('queue')">📋 Operational Queue (1 Pending)</button>
-      <button class="portal-subnav-btn" data-coordtab="fleet" onclick="switchCoordinatorTab('fleet')">🚚 Collector Fleet & Workloads</button>
-      <button class="portal-subnav-btn" data-coordtab="zones" onclick="switchCoordinatorTab('zones')">📍 Municipal Service Zones</button>
-      <button class="portal-subnav-btn" data-coordtab="proximity_sms" onclick="switchCoordinatorTab('proximity_sms')">📡 10km Proximity SMS (No Smartphone)</button>
+      <button class="portal-subnav-btn active" data-coordtab="queue" onclick="switchCoordinatorTab('queue')" data-i18n="coord.tab_queue">📋 Operational Queue</button>
+      <button class="portal-subnav-btn" data-coordtab="fleet" onclick="switchCoordinatorTab('fleet')" data-i18n="coord.tab_fleet">🚚 Collector Fleet & Workloads</button>
+      <button class="portal-subnav-btn" data-coordtab="zones" onclick="switchCoordinatorTab('zones')" data-i18n="coord.tab_zones">📍 Municipal Service Zones</button>
+      <button class="portal-subnav-btn" data-coordtab="proximity_sms" onclick="switchCoordinatorTab('proximity_sms')" data-i18n="coord.tab_sms">📡 10km Proximity SMS (No Smartphone)</button>
     </nav>
 
     <!-- Pane 1: Operational Queue -->
@@ -741,15 +741,15 @@
        ================================================== -->
   <main class="perspective-view" id="view-collector">
     <div class="page-header mb-2">
-      <h2>🚚 Field Collector Multi-Mode Operations</h2>
-      <p class="text-muted">Inclusive workflows supporting Smartphone App (Mode 1), Two-Way SMS (Mode 2), and Coordinator Physical Logs (Mode 3).</p>
+      <h2 data-i18n="col.header_title">🚚 Field Collector Multi-Mode Operations</h2>
+      <p class="text-muted" data-i18n="col.header_desc">Inclusive workflows supporting Smartphone App (Mode 1), Two-Way SMS (Mode 2), and Coordinator Physical Logs (Mode 3).</p>
     </div>
 
     <!-- Collector Mode Tabs -->
     <nav class="portal-subnav-bar">
-      <button class="portal-subnav-btn active" data-mode="mode1" onclick="switchCollectorMode('mode1')">📱 Mode 1: Smartphone App</button>
-      <button class="portal-subnav-btn" data-mode="mode2" onclick="switchCollectorMode('mode2')">💬 Mode 2: SMS Dispatch Terminal (Basic Phone)</button>
-      <button class="portal-subnav-btn" data-mode="mode3" onclick="switchCollectorMode('mode3')">📝 Mode 3: Physical Dispatch Sheet</button>
+      <button class="portal-subnav-btn active" data-mode="mode1" onclick="switchCollectorMode('mode1')" data-i18n="col.tab_mode1">📱 Mode 1: Smartphone App</button>
+      <button class="portal-subnav-btn" data-mode="mode2" onclick="switchCollectorMode('mode2')" data-i18n="col.tab_mode2">💬 Mode 2: SMS Dispatch Terminal (Basic Phone)</button>
+      <button class="portal-subnav-btn" data-mode="mode3" onclick="switchCollectorMode('mode3')" data-i18n="col.tab_mode3">📝 Mode 3: Physical Dispatch Sheet</button>
     </nav>
 
     <!-- Pane 1: Mode 1 Smartphone App -->
@@ -911,15 +911,15 @@
        ================================================== -->
   <main class="perspective-view" id="view-hub">
     <div class="page-header mb-2">
-      <h2>⚖️ Storage Hub Verification Station</h2>
-      <p class="text-muted">The Storage Hub is the <strong>FINAL AUTHORITY</strong> for material classification, physical weight, and quality grading.</p>
+      <h2 data-i18n="hub.header_title">⚖️ Storage Hub Verification Station</h2>
+      <p class="text-muted" data-i18n="hub.header_desc">The Storage Hub is the FINAL AUTHORITY for material classification, physical weight, and quality grading.</p>
     </div>
 
     <!-- Hub Subnav Tabs -->
     <nav class="portal-subnav-bar">
-      <button class="portal-subnav-btn active" data-hubtab="scale" onclick="switchHubTab('scale')">⚖️ Digital Scale Verification Station</button>
-      <button class="portal-subnav-btn" data-hubtab="incoming" onclick="switchHubTab('incoming')">📦 Incoming Lots Queue (2 Lots)</button>
-      <button class="portal-subnav-btn" data-hubtab="inventory" onclick="switchHubTab('inventory')">🏭 Hub Aggregated Inventory</button>
+      <button class="portal-subnav-btn active" data-hubtab="scale" onclick="switchHubTab('scale')" data-i18n="hub.tab_scale">⚖️ Digital Scale Verification Station</button>
+      <button class="portal-subnav-btn" data-hubtab="incoming" onclick="switchHubTab('incoming')" data-i18n="hub.tab_incoming">📦 Incoming Lots Queue</button>
+      <button class="portal-subnav-btn" data-hubtab="inventory" onclick="switchHubTab('inventory')" data-i18n="hub.tab_inventory">🏭 Hub Aggregated Inventory</button>
     </nav>
 
     <!-- Pane 1: Scale Verification Station -->
@@ -1107,8 +1107,8 @@
        ================================================== -->
   <main class="perspective-view" id="view-recycler">
     <div class="page-header mb-2">
-      <h2>🏭 Authorized Recycler Marketplace & Dispatch</h2>
-      <p class="text-muted">Industrial recyclers bid on aggregated lots. <strong>Household settlements remain strictly decoupled from downstream recycler pricing.</strong></p>
+      <h2 data-i18n="rec.header_title">🏭 Authorized Recycler Marketplace & Dispatch</h2>
+      <p class="text-muted" data-i18n="rec.header_desc">Industrial recyclers bid on aggregated lots. Household settlements remain strictly decoupled from downstream recycler pricing.</p>
     </div>
 
     <div class="hub-authority-banner mb-2">
@@ -1117,9 +1117,9 @@
 
     <!-- Recycler Subnav Tabs -->
     <nav class="portal-subnav-bar">
-      <button class="portal-subnav-btn active" data-rectab="offers" onclick="switchRecyclerTab('offers')">🛒 Purchase Offers & Bidding</button>
-      <button class="portal-subnav-btn" data-rectab="directory" onclick="switchRecyclerTab('directory')">🏢 Authorized Recycler Directory</button>
-      <button class="portal-subnav-btn" data-rectab="gatepass" onclick="switchRecyclerTab('gatepass')">🎫 Gate Pass & Dispatch QR</button>
+      <button class="portal-subnav-btn active" data-rectab="offers" onclick="switchRecyclerTab('offers')" data-i18n="rec.tab_offers">🛒 Purchase Offers & Bidding</button>
+      <button class="portal-subnav-btn" data-rectab="directory" onclick="switchRecyclerTab('directory')" data-i18n="rec.tab_directory">🏢 Authorized Recycler Directory</button>
+      <button class="portal-subnav-btn" data-rectab="gatepass" onclick="switchRecyclerTab('gatepass')" data-i18n="rec.tab_gatepass">🎫 Gate Pass & Dispatch QR</button>
     </nav>
 
     <!-- Pane 1: Purchase Offers -->
@@ -1205,21 +1205,21 @@
        ================================================== -->
   <main class="perspective-view" id="view-admin">
     <div class="page-header mb-2">
-      <h2>🗺️ EcoFlow Command Center & AI Management</h2>
-      <p class="text-muted">Real-time geospatial operations, AI model versioning, feedback dataset, and end-to-end digital traceability.</p>
+      <h2 data-i18n="admin.header_title">🗺️ EcoFlow Command Center & AI Management</h2>
+      <p class="text-muted" data-i18n="admin.header_desc">Real-time geospatial operations, AI model versioning, feedback dataset, and end-to-end digital traceability.</p>
     </div>
 
     <!-- Admin Nav Tabs -->
     <nav class="role-switcher-bar mb-2" style="background: rgba(15, 23, 42, 0.6);" aria-label="Admin Navigation">
-      <button class="admin-nav-item role-btn active" data-tab="map" onclick="switchAdminTab('map')">🗺️ Command Map (GIS)</button>
-      <button class="admin-nav-item role-btn" data-tab="registry" onclick="switchAdminTab('registry')">🔒 Encrypted User Registry</button>
-      <button class="admin-nav-item role-btn" data-tab="whitelist" onclick="switchAdminTab('whitelist')">🛡️ Admin Whitelist (Daksh)</button>
-      <button class="admin-nav-item role-btn" data-tab="coordinators" onclick="switchAdminTab('coordinators')">📋 Verified Coordinators</button>
-      <button class="admin-nav-item role-btn" data-tab="ai_models" onclick="switchAdminTab('ai_models')">🤖 AI Models & Testing</button>
-      <button class="admin-nav-item role-btn" data-tab="feedback" onclick="switchAdminTab('feedback')">📊 AI Feedback Dataset</button>
-      <button class="admin-nav-item role-btn" data-tab="traceability" onclick="switchAdminTab('traceability')">🔗 Traceability Explorer</button>
-      <button class="admin-nav-item role-btn" data-tab="taxonomy" onclick="switchAdminTab('taxonomy')">📋 Material Taxonomy</button>
-      <button class="admin-nav-item role-btn" data-tab="audit" onclick="switchAdminTab('audit')">📜 Audit Logs</button>
+      <button class="admin-nav-item role-btn active" data-tab="map" onclick="switchAdminTab('map')" data-i18n="admin.tab_map">🗺️ Command Map (GIS)</button>
+      <button class="admin-nav-item role-btn" data-tab="registry" onclick="switchAdminTab('registry')" data-i18n="admin.tab_registry">🔒 Encrypted User Registry</button>
+      <button class="admin-nav-item role-btn" data-tab="whitelist" onclick="switchAdminTab('whitelist')" data-i18n="admin.tab_whitelist">🛡️ Admin Whitelist (Daksh)</button>
+      <button class="admin-nav-item role-btn" data-tab="coordinators" onclick="switchAdminTab('coordinators')" data-i18n="admin.tab_coordinators">📋 Verified Coordinators</button>
+      <button class="admin-nav-item role-btn" data-tab="ai_models" onclick="switchAdminTab('ai_models')" data-i18n="admin.tab_ai_models">🤖 AI Models & Testing</button>
+      <button class="admin-nav-item role-btn" data-tab="feedback" onclick="switchAdminTab('feedback')" data-i18n="admin.tab_feedback">📊 AI Feedback Dataset</button>
+      <button class="admin-nav-item role-btn" data-tab="traceability" onclick="switchAdminTab('traceability')" data-i18n="admin.tab_traceability">🔗 Traceability Explorer</button>
+      <button class="admin-nav-item role-btn" data-tab="taxonomy" onclick="switchAdminTab('taxonomy')" data-i18n="admin.tab_taxonomy">📋 Material Taxonomy</button>
+      <button class="admin-nav-item role-btn" data-tab="audit" onclick="switchAdminTab('audit')" data-i18n="admin.tab_audit">📜 Audit Logs</button>
     </nav>
 
     <!-- ADMIN TAB 1: GIS COMMAND MAP (Section 41) -->

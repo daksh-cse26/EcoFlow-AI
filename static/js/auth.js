@@ -43,16 +43,7 @@ function selectGatewayRole(role) {
   });
 
   // Role Metadata Titles
-  const roleNames = {
-    household: "🏠 Household Citizen Portal",
-    coordinator: "📋 Field Coordinator Portal",
-    collector: "🚚 Field Collector Portal",
-    hub: "⚖️ Storage Hub (Authority) Station",
-    recycler: "🏭 Recycler Portal",
-    admin: "🗺️ Command Center (Master Control)"
-  };
-  const titleEl = document.getElementById("gateway-role-title");
-  if (titleEl) titleEl.textContent = roleNames[role] || role.toUpperCase();
+  updateGatewayRoleTitle(role);
 
   // Configure field visibility
   const nameField = document.getElementById("gf-name-container");
@@ -67,6 +58,9 @@ function selectGatewayRole(role) {
   // Reset notices
   if (adminNotice) adminNotice.style.display = (role === 'admin') ? "block" : "none";
   if (collectorNotice) collectorNotice.style.display = (role === 'collector') ? "block" : "none";
+
+  const reqText = typeof t === 'function' ? t('gw.mandatory', '* Mandatory') : '* Mandatory';
+  const optText = typeof t === 'function' ? t('gw.optional', '(Optional / If any)') : '(Optional / If any)';
 
   if (role === 'admin') {
     if (nameField) nameField.style.display = "none";
@@ -84,12 +78,12 @@ function selectGatewayRole(role) {
     if (phoneField) {
       phoneField.style.display = "block";
       const lbl = phoneField.querySelector(".field-tag");
-      if (lbl) { lbl.textContent = "(Optional / If any)"; lbl.className = "field-tag field-tag-opt"; }
+      if (lbl) { lbl.textContent = optText; lbl.className = "field-tag field-tag-opt"; }
     }
     if (emailField) {
       emailField.style.display = "block";
       const lbl = emailField.querySelector(".field-tag");
-      if (lbl) { lbl.textContent = "(Optional / If any)"; lbl.className = "field-tag field-tag-opt"; }
+      if (lbl) { lbl.textContent = optText; lbl.className = "field-tag field-tag-opt"; }
     }
     if (addressField) addressField.style.display = "block";
     if (empIdField) empIdField.style.display = "none";
@@ -99,12 +93,12 @@ function selectGatewayRole(role) {
     if (phoneField) {
       phoneField.style.display = "block";
       const lbl = phoneField.querySelector(".field-tag");
-      if (lbl) { lbl.textContent = "* Mandatory"; lbl.className = "field-tag field-tag-req"; }
+      if (lbl) { lbl.textContent = reqText; lbl.className = "field-tag field-tag-req"; }
     }
     if (emailField) {
       emailField.style.display = "block";
       const lbl = emailField.querySelector(".field-tag");
-      if (lbl) { lbl.textContent = "* Mandatory"; lbl.className = "field-tag field-tag-req"; }
+      if (lbl) { lbl.textContent = reqText; lbl.className = "field-tag field-tag-req"; }
     }
     if (addressField) addressField.style.display = "block";
     if (empIdField) empIdField.style.display = "block";
@@ -115,12 +109,12 @@ function selectGatewayRole(role) {
     if (phoneField) {
       phoneField.style.display = "block";
       const lbl = phoneField.querySelector(".field-tag");
-      if (lbl) { lbl.textContent = "* Mandatory"; lbl.className = "field-tag field-tag-req"; }
+      if (lbl) { lbl.textContent = reqText; lbl.className = "field-tag field-tag-req"; }
     }
     if (emailField) {
       emailField.style.display = "block";
       const lbl = emailField.querySelector(".field-tag");
-      if (lbl) { lbl.textContent = "* Mandatory"; lbl.className = "field-tag field-tag-req"; }
+      if (lbl) { lbl.textContent = reqText; lbl.className = "field-tag field-tag-req"; }
     }
     if (addressField) addressField.style.display = "block";
     if (empIdField) empIdField.style.display = "none";
@@ -128,6 +122,19 @@ function selectGatewayRole(role) {
   }
 
   validateGatewayInputs();
+}
+
+function updateGatewayRoleTitle(role = activeGatewayRole) {
+  const roleNames = {
+    household: (typeof t === 'function' ? t('gw.role_household_portal', "🏠 Household Citizen Portal") : "🏠 Household Citizen Portal"),
+    coordinator: (typeof t === 'function' ? t('gw.role_coordinator_portal', "📋 Field Coordinator Portal") : "📋 Field Coordinator Portal"),
+    collector: (typeof t === 'function' ? t('gw.role_collector_portal', "🚚 Field Collector Portal") : "🚚 Field Collector Portal"),
+    hub: (typeof t === 'function' ? t('gw.role_hub_portal', "⚖️ Storage Hub (Authority) Station") : "⚖️ Storage Hub (Authority) Station"),
+    recycler: (typeof t === 'function' ? t('gw.role_recycler_portal', "🏭 Recycler Portal") : "🏭 Recycler Portal"),
+    admin: (typeof t === 'function' ? t('gw.role_admin_portal', "🗺️ Command Center (Master Control)") : "🗺️ Command Center (Master Control)")
+  };
+  const titleEl = document.getElementById("gateway-role-title");
+  if (titleEl) titleEl.textContent = roleNames[role] || (role ? role.toUpperCase() : "");
 }
 
 // Live Validation: Reveal login button when all mandatory details are entered
