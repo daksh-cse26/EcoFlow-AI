@@ -604,7 +604,13 @@ function setLanguage(lang) {
     localStorage.setItem('ecoflow_lang', lang);
     applyTranslations();
 
-    // Update printed label on the trigger box
+    // Synchronize select element if value differs
+    const selectEl = document.getElementById("lang-select");
+    if (selectEl && selectEl.value !== lang) {
+      selectEl.value = lang;
+    }
+
+    // Update printed label if present (backwards compatibility)
     const labelEl = document.getElementById("lang-current-label");
     if (labelEl) {
       labelEl.textContent = LANG_NAMES[lang] || lang.toUpperCase();
@@ -615,49 +621,28 @@ function setLanguage(lang) {
   }
 }
 
+function onLanguageSelectChange(val) {
+  setLanguage(val);
+}
+
 function toggleLanguageDropdown(event) {
   if (event) event.stopPropagation();
-  const menu = document.getElementById("lang-dropdown-menu");
-  const btn = document.getElementById("lang-current-btn");
-  if (!menu || !btn) return;
-  const isOpen = menu.classList.toggle("open");
-  btn.classList.toggle("open", isOpen);
-  btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  const selectEl = document.getElementById("lang-select");
+  if (selectEl) {
+    selectEl.focus();
+    if (typeof selectEl.showPicker === 'function') {
+      try { selectEl.showPicker(); } catch (err) {}
+    }
+  }
 }
 
 function closeLanguageDropdown() {
-  const menu = document.getElementById("lang-dropdown-menu");
-  const btn = document.getElementById("lang-current-btn");
-  if (menu) menu.classList.remove("open");
-  if (btn) {
-    btn.classList.remove("open");
-    btn.setAttribute("aria-expanded", "false");
-  }
+  // Safe fallback for previous listeners
 }
 
 function selectLanguage(lang, displayName) {
   setLanguage(lang);
-  const labelEl = document.getElementById("lang-current-label");
-  if (labelEl) {
-    labelEl.textContent = displayName || LANG_NAMES[lang] || lang.toUpperCase();
-  }
-  closeLanguageDropdown();
 }
-
-// Global click outside listener
-document.addEventListener("click", (e) => {
-  const dropdown = document.getElementById("lang-dropdown");
-  if (dropdown && !dropdown.contains(e.target)) {
-    closeLanguageDropdown();
-  }
-});
-
-// Close on Escape key
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeLanguageDropdown();
-  }
-});
 
 function t(key, fallback = '') {
   if (I18N[currentLang] && I18N[currentLang][key]) {
@@ -686,12 +671,12 @@ function applyTranslations() {
 // Initialize on DOM load
 document.addEventListener("DOMContentLoaded", () => {
   const savedLang = localStorage.getItem("ecoflow_lang") || "en";
+  const selectEl = document.getElementById("lang-select");
+  if (selectEl && I18N[savedLang]) {
+    selectEl.value = savedLang;
+  }
   if (I18N[savedLang]) {
     setLanguage(savedLang);
-    const labelEl = document.getElementById("lang-current-label");
-    if (labelEl) {
-      labelEl.textContent = LANG_NAMES[savedLang] || "English";
-    }
   }
 });
 
