@@ -6472,6 +6472,320 @@ const PHRASE_MAP = {
 };
 
 
+const I18N_EXTRA = {
+  "en": {
+    "tts.voice_guide_btn": "Voice Guide: Read Out Aloud (Line by Line)",
+    "tts.voice_guide_on": "Voice Guide: ON 🔊",
+    "tts.voice_guide_off": "Voice Guide: OFF 🔇",
+    "tts.repeat": "🔄 Repeat",
+    "tts.status": "Tap to activate automatic voice guidance for illiterate users",
+    "tts.status_active": "🔊 Voice guidance active: Speaking line by line",
+    "tut.hh_banner_title": "Household Quick Tutorial & Videos",
+    "tut.hh_banner_desc": "Step-by-step interactive walkthrough & animated video guides for each feature.",
+    "tut.col_banner_title": "Field Collector Operational Training",
+    "tut.col_banner_desc": "Guided tour and short feature video tutorials on Mode 1, Mode 2 SMS, and Lot Sealing.",
+    "tut.start_tour": "🧭 Start Step-by-Step Tour",
+    "tut.col_start_tour": "🧭 Start Collector Tour",
+    "tut.feature_videos": "🎥 Feature Video Demos",
+    "tut.col_feature_videos": "🎥 Collector Video Demos"
+  },
+  "hi": {
+    "tts.voice_guide_btn": "वॉइस गाइड: बोलकर सुनाएं (पंक्ति-दर-पंक्ति)",
+    "tts.voice_guide_on": "वॉइस गाइड: चालू 🔊",
+    "tts.voice_guide_off": "वॉइस गाइड: बंद 🔇",
+    "tts.repeat": "🔄 दोहराएं",
+    "tts.status": "बोलकर सहायता प्राप्त करने के लिए यहां टैप करें",
+    "tts.status_active": "🔊 वॉइस गाइड चालू: पंक्ति-दर-पंक्ति बोल रहा है",
+    "tut.hh_banner_title": "घरेलू त्वरित ट्यूटोरियल और वीडियो",
+    "tut.hh_banner_desc": "प्रत्येक सुविधा के लिए चरण-दर-चरण इंटरैक्टिव वॉकथ्रू और वीडियो गाइड।",
+    "tut.col_banner_title": "फील्ड कलेक्टर संचालन प्रशिक्षण",
+    "tut.col_banner_desc": "मोड 1, मोड 2 एसएमएस और लॉट सीलिंग पर गाइडेड टूर और वीडियो ट्यूटोरियल।",
+    "tut.start_tour": "🧭 चरण-दर-चरण टूर शुरू करें",
+    "tut.col_start_tour": "🧭 कलेक्टर टूर शुरू करें",
+    "tut.feature_videos": "🎥 फीचर वीडियो डेमो",
+    "tut.col_feature_videos": "🎥 कलेक्टर वीडियो डेमो"
+  },
+  "mr": {
+    "tts.voice_guide_btn": "व्हॉइस गाइड: मोठ्याने वाचून दाखवा (ओळ दर ओळ)",
+    "tts.voice_guide_on": "व्हॉइस गाइड: सुरू 🔊",
+    "tts.voice_guide_off": "व्हॉइस गाइड: बंद 🔇",
+    "tts.repeat": "🔄 पुन्हा ऐका",
+    "tts.status": "आवाजाद्वारे मार्गदर्शन मिळवण्यासाठी येथे टॅप करा",
+    "tts.status_active": "🔊 व्हॉइस गाइड सुरू: ओळ दर ओळ मार्गदर्शन सुरू",
+    "tut.hh_banner_title": "घरगुती जलद ट्युटोरियल आणि व्हिडिओ",
+    "tut.hh_banner_desc": "प्रत्येक वैशिष्ट्यासाठी टप्प्याटप्प्याने परस्परसंवादी फेरफटका आणि व्हिडिओ मार्गदर्शक.",
+    "tut.col_banner_title": "फील्ड कलेक्टर ऑपरेशनल प्रशिक्षण",
+    "tut.col_banner_desc": "मोड 1, मोड 2 एसएमएस आणि लॉट सीलिंगवर मार्गदर्शित टूर आणि व्हिडिओ.",
+    "tut.start_tour": "🧭 टप्प्याटप्प्याने टूर सुरू करा",
+    "tut.col_start_tour": "🧭 कलेक्टर टूर सुरू करा",
+    "tut.feature_videos": "🎥 फीचर व्हिडिओ डेमो",
+    "tut.col_feature_videos": "🎥 कलेक्टर व्हिडिओ डेमो"
+  },
+  "gu": {
+    "tts.voice_guide_btn": "વોઇસ ગાઇડ: મોટેથી બોલીને સંભળાવો",
+    "tts.voice_guide_on": "વોઇસ ગાઇડ: ચાલુ 🔊",
+    "tts.voice_guide_off": "વોઇસ ગાઇડ: બંધ 🔇",
+    "tts.repeat": "🔄 ફરી સાંભળો",
+    "tts.status": "બોલીને માર્ગદર્શન મેળવવા માટે અહીં ટેપ કરો",
+    "tts.status_active": "🔊 વોઇસ ગાઇડ ચાલુ: એક પછી એક માર્ગદર્શન આપી રહ્યું છે",
+    "tut.hh_banner_title": "ઘરગથ્થુ ઝડપી ટ્યુટોરીયલ અને વિડીયો",
+    "tut.hh_banner_desc": "દરેક સુવિધા માટે સ્ટેપ-બાય-સ્ટેપ વોકથ્રુ અને વિડીયો માર્ગદર્શિકા.",
+    "tut.col_banner_title": "ફીલ્ડ કલેક્ટર ઓપરેશનલ તાલીમ",
+    "tut.col_banner_desc": "મોડ 1, મોડ 2 એસએમએસ અને લોટ સીલિંગ પર માર્ગદર્શિત ટૂર.",
+    "tut.start_tour": "🧭 પગલું-દર-પગલું ટૂર શરૂ કરો",
+    "tut.col_start_tour": "🧭 કલેક્ટર ટૂર શરૂ કરો",
+    "tut.feature_videos": "🎥 ફીચર વિડિઓ ડેમો",
+    "tut.col_feature_videos": "🎥 કલેક્ટર વિડિઓ ડેમો"
+  },
+  "mwr": {
+    "tts.voice_guide_btn": "आवाज गाइड: बोल'र सुणावो सा",
+    "tts.voice_guide_on": "आवाज गाइड: चालू 🔊",
+    "tts.voice_guide_off": "आवाज गाइड: बंद 🔇",
+    "tts.repeat": "🔄 पाछो सुणो सा",
+    "tts.status": "बोल'र मदद लेवण खातर अठे दबावो सा",
+    "tts.status_active": "🔊 आवाज गाइड चालू है सा: एक-एक बात बोल'र बतावे",
+    "tut.hh_banner_title": "घरेलू सीख और वीडियो सा",
+    "tut.hh_banner_desc": "सगळी चीजां समझण खातर कदम-दर-कदम गाइड और वीडियो देखो सा।",
+    "tut.col_banner_title": "फील्ड कलेक्टर काम-काज सीख",
+    "tut.col_banner_desc": "मोड 1, मोड 2 एसएमएस और सील लगावण रो पूरो तरीको सीखो सा।",
+    "tut.start_tour": "🧭 कदम-दर-कदम सीख शुरू करो",
+    "tut.col_start_tour": "🧭 कलेक्टर सीख शुरू करो",
+    "tut.feature_videos": "🎥 वीडियो डेमो देखो सा",
+    "tut.col_feature_videos": "🎥 कलेक्टर वीडियो देखो सा"
+  },
+  "te": {
+    "tts.voice_guide_btn": "వాయిస్ గైడ్: బిగ్గరగా చదవండి (వరుసగా)",
+    "tts.voice_guide_on": "వాయిస్ గైడ్: ఆన్ 🔊",
+    "tts.voice_guide_off": "వాయిస్ గైడ్: ఆఫ్ 🔇",
+    "tts.repeat": "🔄 పునరావృతం",
+    "tts.status": "వాయిస్ మార్గదర్శకత్వం కోసం ఇక్కడ నొక్కండి",
+    "tts.status_active": "🔊 వాయిస్ గైడ్ యాక్టివ్: వరుసగా మార్గదర్శనం",
+    "tut.hh_banner_title": "గృహ శీఘ్ర ట్యుటోరియల్ మరియు వీడియోలు",
+    "tut.hh_banner_desc": "ప్రతి ఫీచర్ కోసం దశల వారీ ఇంటరాక్టివ్ గైడ్ మరియు యానిమేటెడ్ వీడియోలు.",
+    "tut.col_banner_title": "ఫీల్డ్ కలెక్టర్ కార్యాచరణ శిక్షణ",
+    "tut.col_banner_desc": "మోడ్ 1, మోడ్ 2 ఎస్ఎమ్ఎస్ మరియు లాట్ సీలింగ్ పై శిక్షణ వీడియోలు.",
+    "tut.start_tour": "🧭 స్టెప్-బై-స్టెప్ టూర్ ప్రారంభించండి",
+    "tut.col_start_tour": "🧭 కలెక్టర్ టూర్ ప్రారంభించండి",
+    "tut.feature_videos": "🎥 ఫీచర్ వీడియో డెమోలు",
+    "tut.col_feature_videos": "🎥 కలెక్టర్ వీడియో డెమోలు"
+  },
+  "ta": {
+    "tts.voice_guide_btn": "குரல் வழிகாட்டி: உரக்கப் படியுங்கள் (வரிசையாக)",
+    "tts.voice_guide_on": "குரல் வழிகாட்டி: ஆன் 🔊",
+    "tts.voice_guide_off": "குரல் வழிகாட்டி: ஆஃப் 🔇",
+    "tts.repeat": "🔄 மீண்டும்",
+    "tts.status": "குரல் வழிகாட்டலைப் பெற இங்கே தட்டவும்",
+    "tts.status_active": "🔊 குரல் வழிகாட்டி செயலில் உள்ளது: வரிசையாக பேசுகிறது",
+    "tut.hh_banner_title": "வீட்டு விரைவு பயிற்சி மற்றும் வீடியோக்கள்",
+    "tut.hh_banner_desc": "ஒவ்வொரு அம்சத்திற்கும் படிப்படியான வழிகாட்டுதல் மற்றும் அனிமேஷன் வீடியோக்கள்.",
+    "tut.col_banner_title": "கள சேகரிப்பாளர் செயல்பாட்டு பயிற்சி",
+    "tut.col_banner_desc": "முறை 1, முறை 2 SMS மற்றும் லாட் சீலிங் குறித்த பயிற்சி வீடியோக்கள்.",
+    "tut.start_tour": "🧭 படிப்படியான பயணத்தைத் தொடங்குங்கள்",
+    "tut.col_start_tour": "🧭 சேகரிப்பாளர் பயணத்தைத் தொடங்குங்கள்",
+    "tut.feature_videos": "🎥 வீடியோ விளக்கக்காட்சிகள்",
+    "tut.col_feature_videos": "🎥 சேகரிப்பாளர் வீடியோக்கள்"
+  },
+  "kn": {
+    "tts.voice_guide_btn": "ಧ್ವನಿ ಮಾರ್ಗದರ್ಶಿ: ಗಟ್ಟಿಯಾಗಿ ಓದಿ",
+    "tts.voice_guide_on": "ಧ್ವನಿ ಮಾರ್ಗದರ್ಶಿ: ಆನ್ 🔊",
+    "tts.voice_guide_off": "ಧ್ವನಿ ಮಾರ್ಗದರ್ಶಿ: ಆಫ್ 🔇",
+    "tts.repeat": "🔄 ಪುನರಾವರ್ತಿಸಿ",
+    "tts.status": "ಧ್ವನಿ ಮಾರ್ಗದರ್ಶನಕ್ಕಾಗಿ ಇಲ್ಲಿ ಸ್ಪರ್ಶಿಸಿ",
+    "tts.status_active": "🔊 ಧ್ವನಿ ಮಾರ್ಗದರ್ಶನ ಸಕ್ರಿಯವಾಗಿದೆ: ಹಂತ ಹಂತವಾಗಿ",
+    "tut.hh_banner_title": "ಮನೆಬಳಕೆ ಶೀಘ್ರ ಟ್ಯುಟೋರಿಯಲ್ ಮತ್ತು ವೀಡಿಯೊಗಳು",
+    "tut.hh_banner_desc": "ಪ್ರತಿಯೊಂದು ವೈಶಿಷ್ಟ್ಯಕ್ಕಾಗಿ ಹಂತ-ಹಂತದ ಮಾರ್ಗದರ್ಶಿ ಮತ್ತು ವೀಡಿಯೊಗಳು.",
+    "tut.col_banner_title": "ಫೀಲ್ಡ್ ಕಲೆಕ್ಟರ್ ಕಾರ್ಯಾಚರಣಾ ತರಬೇತಿ",
+    "tut.col_banner_desc": "ಮೋಡ್ 1, ಮೋಡ್ 2 SMS ಮತ್ತು ಲಾಟ್ ಸೀಲಿಂಗ್ ಕುರಿತು ತರಬೇತಿ.",
+    "tut.start_tour": "🧭 ಹಂತ-ಹಂತದ ಪ್ರವಾಸ ಪ್ರಾರಂಭಿಸಿ",
+    "tut.col_start_tour": "🧭 ಕಲೆಕ್ಟರ್ ಪ್ರವಾಸ ಪ್ರಾರಂಭಿಸಿ",
+    "tut.feature_videos": "🎥 ವೀಡಿಯೊ ಡೆಮೊಗಳು",
+    "tut.col_feature_videos": "🎥 ಕಲೆಕ್ಟರ್ ವೀಡಿಯೊಗಳು"
+  },
+  "ml": {
+    "tts.voice_guide_btn": "വോയ്സ് ഗൈഡ്: ഉച്ചത്തിൽ വായിക്കുക",
+    "tts.voice_guide_on": "വോയ്സ് ഗൈഡ്: ഓൺ 🔊",
+    "tts.voice_guide_off": "വോയ്സ് ഗൈഡ്: ഓഫ് 🔇",
+    "tts.repeat": "🔄 ആവർത്തിക്കുക",
+    "tts.status": "വോയ്സ് മാർഗ്ഗനിർദ്ദേശത്തിനായി ഇവിടെ ടാപ്പ് ചെയ്യുക",
+    "tts.status_active": "🔊 വോയ്സ് ഗൈഡ് സജീവം: ഓരോ വരിയായി പറയുന്നു",
+    "tut.hh_banner_title": "ഗാർഹിക ട്യൂട്ടോറിയലും വീഡിയോകളും",
+    "tut.hh_banner_desc": "ഓരോ ഫീച്ചറിനുമുള്ള ഘട്ടം ഘട്ടമായുള്ള ഗൈഡും വീഡിയോകളും.",
+    "tut.col_banner_title": "ഫീൽഡ് കളക്ടർ പ്രവർത്തന പരിശീലനം",
+    "tut.col_banner_desc": "മോഡ് 1, മോഡ് 2 SMS, ലോട്ട് സീലിംഗ് എന്നിവയിലെ പരിശീലനം.",
+    "tut.start_tour": "🧭 ഘട്ടം ഘട്ടമായുള്ള ടൂർ തുടങ്ങുക",
+    "tut.col_start_tour": "🧭 കളക്ടർ ടൂർ തുടങ്ങുക",
+    "tut.feature_videos": "🎥 ഫീച്ചർ വീഡിയോകൾ",
+    "tut.col_feature_videos": "🎥 കളക്ടർ വീഡിയോകൾ"
+  },
+  "pa": {
+    "tts.voice_guide_btn": "ਆਵਾਜ਼ ਗਾਈਡ: ਬੋਲ ਕੇ ਸੁਣਾਓ",
+    "tts.voice_guide_on": "ਆਵਾਜ਼ ਗਾਈਡ: ਚਾਲੂ 🔊",
+    "tts.voice_guide_off": "ਆਵਾਜ਼ ਗਾਈਡ: ਬੰਦ 🔇",
+    "tts.repeat": "🔄 ਦੁਹਰਾਓ",
+    "tts.status": "ਆਵਾਜ਼ੀ ਮਾਰਗਦਰਸ਼ਨ ਲਈ ਇੱਥੇ ਟੈਪ ਕਰੋ",
+    "tts.status_active": "🔊 ਆਵਾਜ਼ੀ ਮਾਰਗਦਰਸ਼ਨ ਸਰਗਰਮ: ਇਕ-ਇਕ ਕਰਕੇ ਬੋਲ ਰਿਹਾ ਹੈ",
+    "tut.hh_banner_title": "ਘਰੇਲੂ ਟਿਊਟੋਰਿਅਲ ਅਤੇ ਵੀਡੀਓ",
+    "tut.hh_banner_desc": "ਹਰੇਕ ਫੀਚਰ ਲਈ ਕਦਮ-ਦਰ-ਕਦਮ ਗਾਈਡ ਅਤੇ ਐਨੀਮੇਟਡ ਵੀਡੀਓਜ਼।",
+    "tut.col_banner_title": "ਫੀਲਡ ਕੁਲੈਕਟਰ ਸਿਖਲਾਈ",
+    "tut.col_banner_desc": "ਮੋਡ 1, ਮੋਡ 2 ਐਸਐਮਐਸ ਅਤੇ ਲਾਟ ਸੀਲਿੰਗ 'ਤੇ ਸਿਖਲਾਈ ਵੀਡੀਓ।",
+    "tut.start_tour": "🧭 ਕਦਮ-ਦਰ-ਕਦਮ ਟੂਰ ਸ਼ੁਰੂ ਕਰੋ",
+    "tut.col_start_tour": "🧭 ਕੁਲੈਕਟਰ ਟੂਰ ਸ਼ੁਰੂ ਕਰੋ",
+    "tut.feature_videos": "🎥 ਵੀਡੀਓ ਡੈਮੋ",
+    "tut.col_feature_videos": "🎥 ਕੁਲੈਕਟਰ ਵੀਡੀਓ"
+  },
+  "as": {
+    "tts.voice_guide_btn": "ভইচ গাইড: ডাঙৰকৈ পঢ়ি শুনক",
+    "tts.voice_guide_on": "ভইচ গাইড: সক্ৰিয় 🔊",
+    "tts.voice_guide_off": "ভইচ গাইড: বন্ধ 🔇",
+    "tts.repeat": "🔄 পুনৰ শুনক",
+    "tts.status": "ভইচ নিৰ্দেশনা পাবলৈ ইয়াত টিপক",
+    "tts.status_active": "🔊 ভইচ গাইড সক্ৰিয়: এটা এটাকৈ নিৰ্দেশনা",
+    "tut.hh_banner_title": "ঘৰুৱা ক্ষিপ্ৰ টিউটৰিয়েল আৰু ভিডিঅ'",
+    "tut.hh_banner_desc": "প্ৰতিটো সুবিধাৰ বাবে খোজ-অনুসৰি গাইড আৰু ভিডিঅ'।",
+    "tut.col_banner_title": "ক্ষেত্ৰ সংগ্ৰাহকৰ কাৰ্যকৰী প্ৰশিক্ষণ",
+    "tut.col_banner_desc": "ম'ড ১, ম'ড ২ SMS আৰু লট ছীলিঙৰ প্ৰশিক্ষণ ভিডিঅ'।",
+    "tut.start_tour": "🧭 খোজ-অনুসৰি ভ্ৰমণ আৰম্ভ কৰক",
+    "tut.col_start_tour": "🧭 সংগ্ৰাহক ভ্ৰমণ আৰম্ভ কৰক",
+    "tut.feature_videos": "🎥 ভিডিঅ' ডেম'",
+    "tut.col_feature_videos": "🎥 সংগ্ৰাহক ভিডিঅ'"
+  },
+  "bn": {
+    "tts.voice_guide_btn": "ভয়েস গাইড: জোরে পড়ে শোনান",
+    "tts.voice_guide_on": "ভয়েস গাইড: চালু 🔊",
+    "tts.voice_guide_off": "ভয়েস গাইড: বন্ধ 🔇",
+    "tts.repeat": "🔄 পুনরায় শুনুন",
+    "tts.status": "ভয়েস নির্দেশনার জন্য এখানে ট্যাপ করুন",
+    "tts.status_active": "🔊 ভয়েস গাইড সক্রিয়: ধাপে ধাপে নির্দেশনা",
+    "tut.hh_banner_title": "গার্হস্থ্য দ্রুত টিউটোরিয়াল ও ভিডিও",
+    "tut.hh_banner_desc": "প্রতিটি বৈশিষ্ট্যের জন্য ধাপে ধাপে ইন্টারেক্টিভ গাইড এবং অ্যানিমেটেড ভিডিও।",
+    "tut.col_banner_title": "ফিল্ড কালেক্টর পরিচালনা প্রশিক্ষণ",
+    "tut.col_banner_desc": "মোড ১, মোড ২ এসএমএস এবং লট সিলিং সংক্রান্ত প্রশিক্ষণ ভিডিও।",
+    "tut.start_tour": "🧭 ধাপে ধাপে ট্যুর শুরু করুন",
+    "tut.col_start_tour": "🧭 কালেক্টর ট্যুর শুরু করুন",
+    "tut.feature_videos": "🎥 ফিচার ভিডিও ডেমো",
+    "tut.col_feature_videos": "🎥 কালেক্টর ভিডিও ডেমো"
+  },
+  "or": {
+    "tts.voice_guide_btn": "ଭଏସ୍ ଗାଇଡ୍: ବଡ଼ ପାଟିରେ ପଢ଼ନ୍ତୁ",
+    "tts.voice_guide_on": "ଭଏସ୍ ଗାଇଡ୍: ଚାଲୁ 🔊",
+    "tts.voice_guide_off": "ଭଏସ୍ ଗାଇଡ୍: ବନ୍ଦ 🔇",
+    "tts.repeat": "🔄 ପୁନରାବୃତ୍ତି",
+    "tts.status": "ଭଏସ୍ ମାର୍ଗଦର୍ଶନ ପାଇଁ ଏଠାରେ ଟ୍ୟାପ୍ କରନ୍ତୁ",
+    "tts.status_active": "🔊 ଭଏସ୍ ଗାଇଡ୍ ସକ୍ରିୟ: ପଦକ୍ଷେପ ଅନୁଯାୟୀ ବୋଲିବା",
+    "tut.hh_banner_title": "ଘରୋଇ ଶୀଘ୍ର ଟ୍ୟୁଟୋରିଆଲ୍ ଏବଂ ଭିଡିଓ",
+    "tut.hh_banner_desc": "ପ୍ରତ୍ୟେକ ବୈଶିଷ୍ଟ୍ୟ ପାଇଁ ପଦକ୍ଷେପ-କ୍ରମେ ଗାଇଡ୍ ଏବଂ ଭିଡିଓ।",
+    "tut.col_banner_title": "ଫିଲ୍ଡ କଲେକ୍ଟର କାର୍ଯ୍ୟକ୍ଷମ ତାଲିମ",
+    "tut.col_banner_desc": "ମୋଡ୍ 1, ମୋଡ୍ 2 SMS ଏବଂ ଲଟ୍ ସିଲିଂ ଉପରେ ତାଲିମ ଭିଡିଓ।",
+    "tut.start_tour": "🧭 ପଦକ୍ଷେପ-କ୍ରମେ ଟୁର୍ ଆରମ୍ଭ କରନ୍ତୁ",
+    "tut.col_start_tour": "🧭 କଲେକ୍ଟର ଟୁର୍ ଆରମ୍ଭ କରନ୍ତୁ",
+    "tut.feature_videos": "🎥 ଭିଡିଓ ଡେମୋ",
+    "tut.col_feature_videos": "🎥 କଲେକ୍ଟର ଭିଡିଓ"
+  },
+  "ur": {
+    "tts.voice_guide_btn": "وائس گائیڈ: اونچی آواز میں پڑھیں",
+    "tts.voice_guide_on": "وائس گائیڈ: آن 🔊",
+    "tts.voice_guide_off": "وائس گائیڈ: بند 🔇",
+    "tts.repeat": "🔄 دوبارہ سنیں",
+    "tts.status": "صوتی رہنمائی کے لیے یہاں ٹیپ کریں",
+    "tts.status_active": "🔊 وائس گائیڈ فعال: سطر بہ سطر رہنمائی جاری",
+    "tut.hh_banner_title": "گھریلو فوری سبق اور ویڈیوز",
+    "tut.hh_banner_desc": "ہر فیچر کے لیے مرحلہ وار گائیڈ اور اینیمیٹڈ ویڈیوز۔",
+    "tut.col_banner_title": "فیلڈ کلیکٹر آپریشنل ٹریننگ",
+    "tut.col_banner_desc": "موڈ 1، موڈ 2 ایس ایم ایس اور لاٹ سیلنگ پر تربیتی ویڈیوز۔",
+    "tut.start_tour": "🧭 مرحلہ وار ٹور شروع کریں",
+    "tut.col_start_tour": "🧭 کلیکٹر ٹور شروع کریں",
+    "tut.feature_videos": "🎥 فیچر ویڈیو ڈیمو",
+    "tut.col_feature_videos": "🎥 کلیکٹر ویڈیوز"
+  },
+  "es": {
+    "tts.voice_guide_btn": "Guía de voz: Leer en voz alta (línea por línea)",
+    "tts.voice_guide_on": "Guía de voz: ACTIVADA 🔊",
+    "tts.voice_guide_off": "Guía de voz: DESACTIVADA 🔇",
+    "tts.repeat": "🔄 Repetir",
+    "tts.status": "Toque para activar la guía por voz paso a paso",
+    "tts.status_active": "🔊 Guía por voz activa: Hablando paso a paso",
+    "tut.hh_banner_title": "Tutorial Rápido del Hogar y Videos",
+    "tut.hh_banner_desc": "Recorrido interactivo paso a paso y videos animados de cada función.",
+    "tut.col_banner_title": "Entrenamiento de Recolector de Campo",
+    "tut.col_banner_desc": "Tutoriales guiados sobre Modo 1, SMS Modo 2 y Sellado de Lotes.",
+    "tut.start_tour": "🧭 Iniciar Recorrido Paso a Paso",
+    "tut.col_start_tour": "🧭 Iniciar Recorrido de Recolector",
+    "tut.feature_videos": "🎥 Videos de Demostración",
+    "tut.col_feature_videos": "🎥 Videos de Recolector"
+  },
+  "fr": {
+    "tts.voice_guide_btn": "Guide vocal : Lire à haute voix (ligne par ligne)",
+    "tts.voice_guide_on": "Guide vocal : ACTIVÉ 🔊",
+    "tts.voice_guide_off": "Guide vocal : DÉSACTIVÉ 🔇",
+    "tts.repeat": "🔄 Répéter",
+    "tts.status": "Appuyez pour activer le guide vocal pas à pas",
+    "tts.status_active": "🔊 Guide vocal actif : Lecture ligne par ligne",
+    "tut.hh_banner_title": "Tutoriel Rapide Domestique & Vidéos",
+    "tut.hh_banner_desc": "Visite guidée interactive pas à pas et vidéos animées pour chaque fonction.",
+    "tut.col_banner_title": "Formation Opérationnelle des Collecteurs",
+    "tut.col_banner_desc": "Tutoriels guidés sur le Mode 1, Mode 2 SMS et le Scellage des Lots.",
+    "tut.start_tour": "🧭 Démarrer la Visite Guidée",
+    "tut.col_start_tour": "🧭 Démarrer le Tour Collecteur",
+    "tut.feature_videos": "🎥 Démonstrations Vidéo",
+    "tut.col_feature_videos": "🎥 Vidéos Collecteurs"
+  },
+  "de": {
+    "tts.voice_guide_btn": "Sprachführung: Laut vorlesen (Zeile für Zeile)",
+    "tts.voice_guide_on": "Sprachführung: EIN 🔊",
+    "tts.voice_guide_off": "Sprachführung: AUS 🔇",
+    "tts.repeat": "🔄 Wiederholen",
+    "tts.status": "Tippen Sie, um die Sprachführung zu aktivieren",
+    "tts.status_active": "🔊 Sprachführung aktiv: Zeile für Zeile vorlesen",
+    "tut.hh_banner_title": "Haushalts-Kurzanleitung & Videos",
+    "tut.hh_banner_desc": "Schritt-für-Schritt-Führung und animierte Videoanleitungen.",
+    "tut.col_banner_title": "Schulung für Vor-Ort-Sammler",
+    "tut.col_banner_desc": "Anleitungen zu Modus 1, SMS-Modus 2 und Chargenversiegelung.",
+    "tut.start_tour": "🧭 Schritt-für-Schritt-Tour starten",
+    "tut.col_start_tour": "🧭 Sammler-Tour starten",
+    "tut.feature_videos": "🎥 Video-Demonstrationen",
+    "tut.col_feature_videos": "🎥 Sammler-Videos"
+  },
+  "ja": {
+    "tts.voice_guide_btn": "音声ガイド: 1行ずつ読み上げ",
+    "tts.voice_guide_on": "音声ガイド: 有効 🔊",
+    "tts.voice_guide_off": "音声ガイド: 無効 🔇",
+    "tts.repeat": "🔄 もう一度",
+    "tts.status": "タップして自動音声ガイダンスを開始",
+    "tts.status_active": "🔊 音声ガイド有効: 1行ずつ読み上げ中",
+    "tut.hh_banner_title": "家庭用クイックチュートリアル＆動画",
+    "tut.hh_banner_desc": "各機能のステップバイステップ対話型ツアーと動画ガイド。",
+    "tut.col_banner_title": "収集担当者オペレーション研修",
+    "tut.col_banner_desc": "モード1、SMSモード2、ロット密封に関する解説動画。",
+    "tut.start_tour": "🧭 ステップ解説を開始",
+    "tut.col_start_tour": "🧭 収集担当者ツアー開始",
+    "tut.feature_videos": "🎥 機能デモ動画",
+    "tut.col_feature_videos": "🎥 収集員向け動画"
+  },
+  "ar": {
+    "tts.voice_guide_btn": "الدليل الصوتي: القراءة بصوت عالٍ (سطراً بسطر)",
+    "tts.voice_guide_on": "الدليل الصوتي: قيد التشغيل 🔊",
+    "tts.voice_guide_off": "الدليل الصوتي: معطل 🔇",
+    "tts.repeat": "🔄 تكرار",
+    "tts.status": "اضغط لتفعيل الإرشاد الصوتي خطوة بخطوة",
+    "tts.status_active": "🔊 الدليل الصوتي نشط: يتحدث سطراً بسطر",
+    "tut.hh_banner_title": "دليل منزلي سريع وفيديوهات",
+    "tut.hh_banner_desc": "جولة إرشادية تفاعلية خطوة بخطوة وفيديوهات متحركة لكل ميزة.",
+    "tut.col_banner_title": "تدريب تشغيلي لجامع النفايات الميداني",
+    "tut.col_banner_desc": "دروس إرشادية حول النمط 1، رسائل SMS النمط 2، وختم الشحنات.",
+    "tut.start_tour": "🧭 بدء الجولة الإرشادية",
+    "tut.col_start_tour": "🧭 بدء جولة جامع النفايات",
+    "tut.feature_videos": "🎥 عروض الفيديو",
+    "tut.col_feature_videos": "🎥 فيديوهات جامع النفايات"
+  }
+};
+
+// Merge I18N_EXTRA into I18N
+Object.keys(I18N_EXTRA).forEach(lang => {
+  if (I18N[lang]) {
+    Object.assign(I18N[lang], I18N_EXTRA[lang]);
+  }
+});
+
 let currentLang = 'en';
 
 function setLanguage(lang) {
@@ -6500,6 +6814,16 @@ function setLanguage(lang) {
   // Update dynamic gateway titles and labels if auth module is loaded
   if (typeof updateGatewayRoleTitle === 'function') {
     updateGatewayRoleTitle();
+  }
+
+  // Update Login Page Voice Guide Narrator
+  if (typeof loginTTSNarrator !== 'undefined' && typeof loginTTSNarrator.onLanguageChange === 'function') {
+    loginTTSNarrator.onLanguageChange(lang);
+  }
+
+  // Update Interactive Tutorial Guide & Videos
+  if (typeof tutorialController !== 'undefined' && typeof tutorialController.onLanguageChange === 'function') {
+    tutorialController.onLanguageChange(lang);
   }
 }
 
@@ -6618,6 +6942,11 @@ function applyTranslations() {
 
   // 5. DOM Phrase Auto-Translator for rich coverage
   translateDOMPhrases();
+
+  // 6. Update Voice Guide Button and status dynamically
+  if (typeof loginTTSNarrator !== 'undefined' && typeof loginTTSNarrator.updateToggleUI === 'function') {
+    loginTTSNarrator.updateToggleUI();
+  }
 }
 
 // Initialize on DOM load

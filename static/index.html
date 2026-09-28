@@ -174,14 +174,14 @@
         <div class="gateway-tts-left" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
           <button type="button" class="btn-tts-toggle" id="btn-tts-toggle" onclick="toggleLoginTTS()">
             <span class="tts-icon">🔊</span>
-            <span id="tts-toggle-text">Voice Guide: Read Out Aloud (Line by Line)</span>
+            <span id="tts-toggle-text" data-i18n="tts.voice_guide_btn">Voice Guide: Read Out Aloud (Line by Line)</span>
           </button>
           <button type="button" class="btn-tts-speak-again" id="btn-tts-speak-again" onclick="loginTTSNarrator.replayCurrentField()" style="display: none;" title="Repeat active field instructions">
-            🔄 Repeat
+            <span id="tts-repeat-text" data-i18n="tts.repeat">🔄 Repeat</span>
           </button>
         </div>
         <div class="gateway-tts-right">
-          <span class="tts-narrator-pill" id="tts-narrator-status">Tap to activate automatic voice guidance for illiterate users</span>
+          <span class="tts-narrator-pill" id="tts-narrator-status" data-i18n="tts.status">Tap to activate automatic voice guidance for illiterate users</span>
         </div>
       </div>
 
@@ -293,10 +293,10 @@
           </div>
         </div>
         <div class="tut-banner-actions">
-          <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('household')">
+          <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('household')" data-i18n="tut.start_tour">
             🧭 Start Step-by-Step Tour
           </button>
-          <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('hh_scanner')">
+          <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('hh_scanner')" data-i18n="tut.feature_videos">
             🎥 Feature Video Demos
           </button>
         </div>
@@ -801,10 +801,10 @@
         </div>
       </div>
       <div class="tut-banner-actions">
-        <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('collector')">
+        <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('collector')" data-i18n="tut.col_start_tour">
           🧭 Start Collector Tour
         </button>
-        <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('col_modes')">
+        <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('col_modes')" data-i18n="tut.col_feature_videos">
           🎥 Collector Video Demos
         </button>
       </div>
