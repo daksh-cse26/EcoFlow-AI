@@ -71,30 +71,13 @@ function updateHouseholdGreeting() {
     icon = "🌅";
   }
 
-  // Get active user name from session
-  let userName = "Rahul Sharma";
-  try {
-    const s = localStorage.getItem("ecoflow_user_session");
-    if (s) {
-      const u = JSON.parse(s);
-      if (u.name) userName = u.name;
-    }
-  } catch (e) {}
+  // Get active user name dynamically
+  const userName = (typeof getActiveUserName === 'function') ? getActiveUserName("User") : "User";
 
   const titleEl = document.getElementById("hh-dynamic-greeting-title");
   if (titleEl) {
-    titleEl.textContent = `${greetingWord}, ${userName} ${icon}`;
+    titleEl.innerHTML = `${greetingWord}, <span class="editable-user-name" onclick="promptChangeUserName()" title="Click to change name" style="cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px;">${userName}</span> ${icon}`;
   }
-
-  // Display detected local timezone
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata";
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const tzPill = document.getElementById("hh-timezone-name");
-    if (tzPill) {
-      tzPill.textContent = `Synced with ${tz} (${timeStr} Local Time)`;
-    }
-  } catch (e) {}
 }
 
 // ----------------------------------------------------

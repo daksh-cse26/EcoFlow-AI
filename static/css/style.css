@@ -3982,5 +3982,40 @@ body {
   font-weight: 800;
 }
 
+/* ==================================================
+   DYNAMIC PERSONALIZATION & COLLECTOR RESTORE STYLES
+   ================================================== */
+.editable-user-name {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.editable-user-name:hover {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38BDF8;
+}
+
+.restore-work-card {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.restore-work-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+}
+
+.privacy-sealed-banner {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 
 

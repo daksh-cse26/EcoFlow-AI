@@ -6825,6 +6825,11 @@ function setLanguage(lang) {
   if (typeof tutorialController !== 'undefined' && typeof tutorialController.onLanguageChange === 'function') {
     tutorialController.onLanguageChange(lang);
   }
+
+  // Update dynamic interface user names & greetings
+  if (typeof updateAllInterfaceUserNames === 'function') {
+    updateAllInterfaceUserNames();
+  }
 }
 
 function onLanguageSelectChange(val) {

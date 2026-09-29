@@ -308,14 +308,10 @@
   <main class="perspective-view active" id="view-household">
     <div class="household-container">
       
-      <!-- Top Household Bar with Timezone Synchronization -->
+      <!-- Top Household Bar -->
       <div class="household-app-bar">
         <div class="user-greeting-box">
-          <div class="greeting-tz-tag" id="hh-timezone-sync-tag">
-            <span class="tz-pulse-dot"></span>
-            <span id="hh-timezone-name">Synced with Asia/Kolkata (IST • Local Time)</span>
-          </div>
-          <h2 id="hh-dynamic-greeting-title">Good Evening, Rahul Sharma 🌆</h2>
+          <h2 id="hh-dynamic-greeting-title">Good Morning, <span class="editable-user-name" id="hh-user-display-name" onclick="promptChangeUserName()" title="Click to change name">User</span> 🌅</h2>
           <p id="hh-dynamic-greeting-sub">AI-Assisted Scrap Recycling & Citizen Circular Economy Hub</p>
         </div>
       </div>
@@ -857,11 +853,11 @@
             <div class="impact-lbl" data-i18n="coord.collectors_available">Collectors Available ➔</div>
           </div>
         </div>
-        <div class="impact-card" style="cursor: pointer;" onclick="switchPerspective('collector')">
-          <span class="impact-icon">📱</span>
+        <div class="impact-card" style="cursor: pointer;" onclick="openCollectorIdVerifyModal()" title="Register & Verify for basic phone / no phone collectors">
+          <span class="impact-icon">🔍</span>
           <div>
-            <div class="impact-val">Mode 1/2/3</div>
-            <div class="impact-lbl" data-i18n="coord.comm_modes">Smart / SMS / Physical ➔</div>
+            <div class="impact-val" style="color: #34D399; font-size: 16px;">Verify ID</div>
+            <div class="impact-lbl">Register & Verify Data ➔</div>
           </div>
         </div>
         <div class="impact-card" style="cursor: pointer;" onclick="switchCoordinatorTab('zones')">
@@ -871,6 +867,19 @@
             <div class="impact-lbl" data-i18n="coord.timeout_policy">Zone Timeout Policy ➔</div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Coordinator Fast Actions Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-glass); border-radius: 8px; padding: 10px 14px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-weight: 600; color: #E2E8F0;">Active Coordinator: <strong id="coord-user-name" style="color: #38BDF8;">Priyanka Baruah</strong></span>
+        <button type="button" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 2px 8px;" onclick="promptChangeUserName()" title="Edit Name">✏️ Edit Name</button>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn btn-primary" id="btn-coord-verify-collector-id" onclick="openCollectorIdVerifyModal()" style="background: linear-gradient(135deg, #10B981, #059669); font-weight: 700; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+          🔍 Register & Verify Data via Collector ID
+        </button>
       </div>
     </div>
 
@@ -903,7 +912,10 @@
             <h3 style="margin-bottom: 2px;">🚚 Field Collector Fleet & Workloads</h3>
             <p class="small text-muted mb-0">Direct Coordinator Authority: Manage active collector fleet and onboard new collectors directly in this terminal.</p>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" style="background: linear-gradient(135deg, #10B981, #059669); font-weight: 700;" onclick="openCollectorIdVerifyModal()">
+              🔍 Register & Verify via Collector ID
+            </button>
             <button type="button" class="btn btn-outline" style="border-color: #34D399; color: #34D399; font-weight: 700;" onclick="openCoordinatorAddCollectorModal('no_phone')">
               📴 Add Phone-less Collector (COL-NP)
             </button>
@@ -1063,8 +1075,8 @@
        ================================================== -->
   <main class="perspective-view" id="view-collector">
     <div class="page-header mb-2">
-      <h2 data-i18n="col.header_title">🚚 Field Collector Multi-Mode Operations</h2>
-      <p class="text-muted" data-i18n="col.header_desc">Inclusive workflows supporting Smartphone App (Mode 1), Two-Way SMS (Mode 2), and Coordinator Physical Logs (Mode 3).</p>
+      <h2 data-i18n="col.header_title">🚚 Field Collector Smartphone Operations</h2>
+      <p class="text-muted" data-i18n="col.header_desc">Digital field operations, doorstep collection and cryptographic QR lot generation.</p>
     </div>
 
     <!-- Field Collector Step-by-Step Interactive Tutorial & Feature Video Demos Banner -->
@@ -1073,7 +1085,7 @@
         <div class="tut-banner-icon">🚚</div>
         <div>
           <h4 style="margin: 0; color: #FFFFFF;" data-i18n="tut.col_banner_title">Field Collector Operational Training</h4>
-          <p class="small text-muted mb-0" data-i18n="tut.col_banner_desc">Guided tour and short feature video tutorials on Mode 1, Mode 2 SMS, and Lot Sealing.</p>
+          <p class="small text-muted mb-0" data-i18n="tut.col_banner_desc">Guided tour and short feature video tutorials on doorstep collection and lot sealing.</p>
         </div>
       </div>
       <div class="tut-banner-actions">
@@ -1086,19 +1098,15 @@
       </div>
     </div>
 
-    <!-- Collector Mode Tabs -->
-    <nav class="portal-subnav-bar">
-      <button class="portal-subnav-btn active" data-mode="mode1" onclick="switchCollectorMode('mode1')" data-i18n="col.tab_mode1">📱 Mode 1: Smartphone App</button>
-      <button class="portal-subnav-btn" data-mode="mode2" onclick="switchCollectorMode('mode2')" data-i18n="col.tab_mode2">💬 Mode 2: SMS Dispatch Terminal (Basic Phone)</button>
-      <button class="portal-subnav-btn" data-mode="mode3" onclick="switchCollectorMode('mode3')" data-i18n="col.tab_mode3">📝 Mode 3: Physical Dispatch Sheet</button>
-    </nav>
-
-    <!-- Pane 1: Mode 1 Smartphone App -->
+    <!-- Pane 1: Smartphone App (The exclusive operational interface for Field Collectors) -->
     <div class="portal-subpane active" id="collector-pane-mode1">
       <div class="household-container">
         <div class="household-app-bar">
           <div class="user-greeting">
-            <h2>Rameshwar Boro (COL-00142)</h2>
+            <h2 style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <span><span id="collector-user-name">Field Collector</span> (<span id="collector-id-badge-hdr">COL-00142</span>)</span>
+              <button type="button" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 2px 8px; border-color: rgba(255,255,255,0.2);" onclick="promptChangeUserName()" title="Edit Name">✏️ Edit Name</button>
+            </h2>
             <p>Assigned Storage Hub: HUB-001 • Zone B</p>
           </div>
           <div class="mt-2">
@@ -1106,6 +1114,17 @@
               ONLINE
             </button>
           </div>
+        </div>
+
+        <!-- Restore / Join using Smartphone Card -->
+        <div class="restore-work-card" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 12px 14px; margin: 12px 16px 0 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <strong style="color: #60A5FA; font-size: 13px;">📱 Joined using a Smartphone?</strong>
+            <p class="small text-muted mb-0">Previously working on basic feature phone SMS or physical coordinator sheets? Enter your Collector ID to restore all work to this smartphone.</p>
+          </div>
+          <button type="button" class="btn btn-sm btn-primary" onclick="openJoinSmartphoneModal()">
+            🔄 Restore Work via Collector ID
+          </button>
         </div>
 
         <div style="padding: 16px;">
@@ -1155,8 +1174,8 @@
       </div>
     </div>
 
-    <!-- Pane 2: Mode 2 SMS Dispatch Simulator -->
-    <div class="portal-subpane" id="collector-pane-mode2">
+    <!-- Pane 2: Mode 2 SMS Dispatch Simulator (Hidden in Field Collector view; data preserved in server) -->
+    <div class="portal-subpane" id="collector-pane-mode2" style="display: none !important;">
       <div class="sms-terminal-container">
         <div class="household-app-bar" style="border-radius: 20px 20px 0 0;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1199,8 +1218,8 @@
       </div>
     </div>
 
-    <!-- Pane 3: Mode 3 Physical Dispatch Log Sheet -->
-    <div class="portal-subpane" id="collector-pane-mode3">
+    <!-- Pane 3: Mode 3 Physical Dispatch Log Sheet (Hidden in Field Collector view; data preserved in server) -->
+    <div class="portal-subpane" id="collector-pane-mode3" style="display: none !important;">
       <div class="hub-card" style="max-width: 800px; margin: 0 auto; background: #13221C;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-glass); padding-bottom: 12px; margin-bottom: 16px;">
           <div>
@@ -2384,6 +2403,128 @@ Invitation declined. You will not receive further alerts today.
     </div>
   </div>
 
+  <!-- Modal 7: Coordinator Register & Verify Data via Collector ID (Minimal Data View) -->
+  <div class="security-modal-overlay" id="collector-id-verify-modal" role="dialog" aria-modal="true" style="display: none;">
+    <div class="security-modal-box text-left" style="max-width: 640px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800;">🔍 Register & Verify Data via Collector ID</h3>
+        <button class="btn btn-sm btn-outline" onclick="closeCollectorIdVerifyModal()">✕</button>
+      </div>
+      <p class="small text-muted mb-2">For field collectors operating basic keypad phones (SMS) or without a smartphone who have not yet logged into a smartphone. Displays <strong>strictly only</strong> collector's name and past successful pickups.</p>
+
+      <!-- Step A: Enter Collector ID -->
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <input type="text" id="coord-lookup-col-id" class="form-input" placeholder="Enter Collector ID (e.g. COL-00156, COL-00173, COL-NP-0024)" style="font-family: monospace; font-weight: 700;" onkeydown="if(event.key==='Enter') lookupCollectorMinimalData()" />
+        <button type="button" class="btn btn-primary" onclick="lookupCollectorMinimalData()" style="white-space: nowrap;">
+          🔎 Lookup
+        </button>
+      </div>
+
+      <!-- Loading / Error states -->
+      <div id="coord-col-lookup-msg" style="display: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 10px;"></div>
+
+      <!-- Step B: Minimal Details Card (Strict Privacy: ONLY Name and Past Successful Pickups) -->
+      <div id="coord-col-minimal-card" style="display: none;">
+        <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div>
+              <span class="small text-muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Collector Name</span>
+              <h4 id="coord-min-name" style="margin: 2px 0 0 0; color: #34D399; font-size: 17px;">-</h4>
+            </div>
+            <div style="text-align: right;">
+              <span class="small text-muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Past Successful Pickups</span>
+              <div id="coord-min-pickups-count" style="font-size: 18px; font-weight: 800; color: #60A5FA;">0</div>
+            </div>
+          </div>
+
+          <!-- Strict Privacy Notice -->
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; color: #A7F3D0; line-height: 1.4;">
+            🔒 <strong>Strict Privacy Guard:</strong> Only the collector's name and past successful pickups are accessible. All other personal data (phone number, home address, earnings, personal notes) are withheld and encrypted on the server.
+          </div>
+
+          <!-- Table of Past Successful Pickups -->
+          <h5 style="color: #E2E8F0; font-size: 12px; margin: 0 0 6px 0;">Past Successful Pickups Record:</h5>
+          <div style="max-height: 140px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.06); border-radius: 6px;">
+            <table class="data-table" style="font-size: 11px; margin: 0;">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Pickup ID</th>
+                  <th>Material</th>
+                  <th>Verified Weight</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="coord-min-pickups-tbody">
+                <!-- Dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step C: Register & Verify New Scrap Data for this Collector -->
+        <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px;">
+          <h4 style="font-size: 13px; color: #FFFFFF; margin: 0 0 10px 0;">⚖️ Register & Verify Data for this Collector</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="small text-muted" style="display: block; margin-bottom: 4px;">Material Category:</label>
+              <select id="coord-verify-material" class="form-input" onchange="onCoordVerifyMaterialChange(this.value)">
+                <option value="Iron Scrap">Iron Scrap (₹26.50/kg)</option>
+                <option value="Newspaper & Cardboard">Newspaper & Cardboard (₹14.00/kg)</option>
+                <option value="Copper Scrap">Copper Scrap (₹504.40/kg)</option>
+                <option value="PET Plastic Bottles">PET Plastic Bottles (₹22.00/kg)</option>
+                <option value="Aluminium Cans">Aluminium Cans (₹105.00/kg)</option>
+                <option value="Electronic Scrap (PCB)">Electronic Scrap (PCB) (₹180.00/kg)</option>
+              </select>
+            </div>
+            <div>
+              <label class="small text-muted" style="display: block; margin-bottom: 4px;">Verified Scale Weight (kg):</label>
+              <input type="number" id="coord-verify-weight" class="form-input" placeholder="e.g. 15.5" step="0.1" min="0.1" value="10.0" />
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+            <div>
+              <label class="small text-muted" style="display: block; margin-bottom: 4px;">Rate Applied (₹/kg):</label>
+              <input type="number" id="coord-verify-rate" class="form-input" value="26.50" step="0.5" />
+            </div>
+            <div>
+              <label class="small text-muted" style="display: block; margin-bottom: 4px;">Source Address / Ward:</label>
+              <input type="text" id="coord-verify-address" class="form-input" placeholder="e.g. Panbazar Ward 4" value="Panbazar Ward 4" />
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-block" style="background: linear-gradient(135deg, #10B981, #059669); font-weight: 700; padding: 10px;" onclick="submitCoordinatorVerifyForCollector()">
+            ✅ Register & Confirm Verification
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 8: Field Collector Restore Work on Smartphone -->
+  <div class="security-modal-overlay" id="collector-restore-modal" role="dialog" aria-modal="true" style="display: none;">
+    <div class="security-modal-box text-left" style="max-width: 500px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800;">📱 Restore Work via Collector ID</h3>
+        <button class="btn btn-sm btn-outline" onclick="closeJoinSmartphoneModal()">✕</button>
+      </div>
+      <p class="small text-muted mb-2">If you previously collected using a basic feature phone (SMS) or physical coordinator vouchers and now have logged in using a smartphone, enter your Collector ID below to restore all your assignments, completed pickups, and digital lot history.</p>
+
+      <div class="form-group mb-2">
+        <label>Enter Collector ID:</label>
+        <input type="text" id="col-restore-id-input" class="form-input" placeholder="e.g. COL-00156, COL-00173, COL-NP-0024" style="font-family: monospace; font-weight: 700;" />
+      </div>
+
+      <div id="col-restore-status-msg" style="display: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 10px;"></div>
+
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeJoinSmartphoneModal()">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitRestoreSmartphoneWork()">
+          🔄 Restore My Work
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Voice Language Auto-Detection Modal (For Illiterate / Speaking Users) -->
   <div class="voice-lang-modal" id="voice-lang-modal">
     <div class="voice-lang-card">
@@ -2596,6 +2737,7 @@ Invitation declined. You will not receive further alerts today.
   <script src="js/voice.js"></script>
   <script src="js/voice_lang.js"></script>
   <script src="js/login_tts.js"></script>
+  <script src="js/video_translations.js"></script>
   <script src="js/tutorial.js"></script>
   <script src="js/gis_map.js"></script>
   <script src="js/qr_engine.js"></script>

@@ -733,9 +733,42 @@ class TutorialController {
   }
 
   /**
+   * Helper to retrieve localized video title, subtitle and step captions
+   */
+  getVideoData(videoKey, lang) {
+    if (!lang) lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+    const base = this.videos[videoKey];
+    if (!base) return null;
+
+    const dict = (typeof window !== 'undefined' && window.VIDEO_TRANSLATIONS && window.VIDEO_TRANSLATIONS[lang])
+      || (typeof window !== 'undefined' && window.VIDEO_TRANSLATIONS && window.VIDEO_TRANSLATIONS['en'])
+      || {};
+    const item = dict[videoKey] || {};
+
+    const title = item.title || base.title;
+    const subtitle = item.subtitle || base.subtitle;
+    const steps = base.steps.map((st, idx) => {
+      const transText = (item.steps && item.steps[idx]) ? item.steps[idx] : st.text;
+      return {
+        ...st,
+        text: transText
+      };
+    });
+
+    return {
+      ...base,
+      title,
+      subtitle,
+      steps
+    };
+  }
+
+  /**
    * Called automatically when UI language changes
    */
   onLanguageChange(lang) {
+    if (!lang) lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+
     const guideModal = document.getElementById("tutorial-guide-modal");
     if (guideModal && guideModal.classList.contains("active")) {
       const wasSpeaking = this.isSpeakingGuide;
@@ -750,9 +783,31 @@ class TutorialController {
 
     const videoModal = document.getElementById("tutorial-video-modal");
     if (videoModal && videoModal.classList.contains("active") && this.activeVideoKey) {
-      const v = this.videos[this.activeVideoKey];
+      const v = this.getVideoData(this.activeVideoKey, lang) || this.videos[this.activeVideoKey];
       if (v) {
-        this.renderVideoPlaylist(v.interface);
+        const titleEl = document.getElementById("tut-video-title");
+        const subEl = document.getElementById("tut-video-sub");
+        if (titleEl) titleEl.textContent = v.title;
+        if (subEl) subEl.textContent = v.subtitle;
+
+        this.renderVideoPlaylist(v.interface, lang);
+
+        // Immediately update live caption in new language
+        let activeStep = v.steps[0];
+        for (const s of v.steps) {
+          if (this.videoCurrentTime >= s.time) {
+            activeStep = s;
+          }
+        }
+        const captionEl = document.getElementById("tut-video-caption-text");
+        if (captionEl) {
+          captionEl.textContent = activeStep.text;
+        }
+
+        // Voiceover in the newly chosen language
+        if (this.videoVoiceoverEnabled && this.isPlayingVideo) {
+          this.speakCaption(activeStep.text);
+        }
       }
     }
   }
@@ -761,7 +816,8 @@ class TutorialController {
   // TUTORIAL VIDEO DEMONSTRATION PLAYER
   // ==========================================
   openVideo(videoKey) {
-    const videoData = this.videos[videoKey];
+    const lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+    const videoData = this.getVideoData(videoKey, lang) || this.videos[videoKey];
     if (!videoData) return;
 
     this.activeVideoKey = videoKey;
@@ -774,14 +830,14 @@ class TutorialController {
       modal.classList.add("active");
     }
 
-    // Populate Video Metadata
+    // Populate Video Metadata with localized text
     const titleEl = document.getElementById("tut-video-title");
     const subEl = document.getElementById("tut-video-sub");
     if (titleEl) titleEl.textContent = videoData.title;
     if (subEl) subEl.textContent = videoData.subtitle;
 
     // Render Side Menu for features of that interface
-    this.renderVideoPlaylist(videoData.interface);
+    this.renderVideoPlaylist(videoData.interface, lang);
 
     // Start video animation loop
     this.startVideoAnimation();
@@ -798,14 +854,15 @@ class TutorialController {
     }
   }
 
-  renderVideoPlaylist(interfaceType) {
+  renderVideoPlaylist(interfaceType, lang) {
     const listContainer = document.getElementById("tut-video-playlist-items");
     if (!listContainer) return;
+    if (!lang) lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
 
     const keys = Object.keys(this.videos).filter(k => this.videos[k].interface === interfaceType);
 
     listContainer.innerHTML = keys.map(k => {
-      const v = this.videos[k];
+      const v = this.getVideoData(k, lang) || this.videos[k];
       const isActive = (k === this.activeVideoKey);
       return `
         <div class="tut-playlist-item ${isActive ? 'active' : ''}" onclick="tutorialController.openVideo('${k}')">
@@ -895,7 +952,8 @@ class TutorialController {
   }
 
   updateVideoFrame() {
-    const videoData = this.videos[this.activeVideoKey];
+    const lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+    const videoData = this.getVideoData(this.activeVideoKey, lang) || this.videos[this.activeVideoKey];
     if (!videoData) return;
 
     // 1. Update Time Display
@@ -912,7 +970,7 @@ class TutorialController {
       progressFill.style.width = `${Math.min(pct, 100)}%`;
     }
 
-    // 3. Find Active Subtitle / Step
+    // 3. Find Active Subtitle / Step in current language
     let activeStep = videoData.steps[0];
     for (const s of videoData.steps) {
       if (this.videoCurrentTime >= s.time) {

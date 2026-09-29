@@ -365,14 +365,14 @@ function switchCoordinatorTab(tab) {
   }
 }
 
-// Collector Mode Tabs (Mode 1 / Mode 2 / Mode 3)
+// Collector Mode Tabs (Only Smartphone App mode is displayed)
 function switchCollectorMode(mode) {
-  document.querySelectorAll("#view-collector .portal-subpane").forEach(pane => {
-    pane.classList.toggle("active", pane.id === `collector-pane-${mode}`);
-  });
-  document.querySelectorAll("#view-collector [data-mode]").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.mode === mode);
-  });
+  const p1 = document.getElementById("collector-pane-mode1");
+  if (p1) p1.classList.add("active");
+  const p2 = document.getElementById("collector-pane-mode2");
+  if (p2) p2.style.display = "none";
+  const p3 = document.getElementById("collector-pane-mode3");
+  if (p3) p3.style.display = "none";
 }
 
 // Storage Hub Tabs (Scale / Incoming / Inventory)
@@ -1315,3 +1315,365 @@ function loadTaxonomyData() {
       `).join("");
     });
 }
+
+// ----------------------------------------------------
+// DYNAMIC USER NAME & INTERFACE PERSONALIZATION
+// (Names are never permanently fixed in any interface)
+// ----------------------------------------------------
+function getActiveUserName(fallback = "Citizen") {
+  try {
+    const custom = localStorage.getItem("ecoflow_custom_user_name");
+    if (custom && custom.trim()) return custom.trim();
+    const s = localStorage.getItem("ecoflow_user_session");
+    if (s) {
+      const u = JSON.parse(s);
+      if (u.name && u.name.trim()) return u.name.trim();
+    }
+  } catch (e) {}
+  return fallback;
+}
+
+function setActiveUserName(newName) {
+  if (!newName || !newName.trim()) return;
+  const trimmed = newName.trim();
+  localStorage.setItem("ecoflow_custom_user_name", trimmed);
+  try {
+    const s = localStorage.getItem("ecoflow_user_session");
+    if (s) {
+      const u = JSON.parse(s);
+      u.name = trimmed;
+      localStorage.setItem("ecoflow_user_session", JSON.stringify(u));
+    }
+  } catch (e) {}
+  updateAllInterfaceUserNames();
+}
+
+function promptChangeUserName() {
+  const current = getActiveUserName("Citizen");
+  const entered = prompt("Enter your name to personalize all interfaces:", current);
+  if (entered !== null && entered.trim() && entered.trim() !== current) {
+    setActiveUserName(entered.trim());
+  }
+}
+
+function updateAllInterfaceUserNames() {
+  const name = getActiveUserName("Citizen");
+
+  // 1. Header session user badge
+  const sessionNameEl = document.getElementById("session-user-name");
+  if (sessionNameEl) {
+    sessionNameEl.innerHTML = `${name} <span style="font-size: 10px; opacity: 0.7;">✏️</span>`;
+  }
+
+  // 2. Household display & greeting
+  const hhDisplayName = document.getElementById("hh-user-display-name");
+  if (hhDisplayName) {
+    hhDisplayName.textContent = name;
+  }
+  if (typeof updateHouseholdGreeting === "function") {
+    updateHouseholdGreeting();
+  }
+
+  // 3. Field Collector
+  const colUserEl = document.getElementById("collector-user-name");
+  if (colUserEl) {
+    colUserEl.textContent = name;
+  }
+
+  // 4. Coordinator
+  const coordUserEl = document.getElementById("coord-user-name");
+  if (coordUserEl) {
+    coordUserEl.textContent = name;
+  }
+
+  // 5. Storage Hub
+  const hubUserEl = document.getElementById("hub-user-name");
+  if (hubUserEl) {
+    hubUserEl.textContent = name;
+  }
+
+  // 6. Recycler
+  const recUserEl = document.getElementById("recycler-user-name");
+  if (recUserEl) {
+    recUserEl.textContent = name;
+  }
+
+  // 7. Command Center Admin
+  const adminUserEl = document.getElementById("admin-user-name");
+  if (adminUserEl) {
+    adminUserEl.textContent = name;
+  }
+}
+
+// ----------------------------------------------------
+// COORDINATOR MINIMAL COLLECTOR ID LOOKUP & REGISTER-VERIFY
+// (Displays ONLY name and past successful pickups; all other data withheld)
+// ----------------------------------------------------
+function openCollectorIdVerifyModal(prefillId = '') {
+  const modal = document.getElementById("collector-id-verify-modal");
+  if (!modal) return;
+  modal.style.display = "flex";
+
+  const idInput = document.getElementById("coord-lookup-col-id");
+  const msgEl = document.getElementById("coord-col-lookup-msg");
+  const cardEl = document.getElementById("coord-col-minimal-card");
+  if (msgEl) msgEl.style.display = "none";
+  if (cardEl) cardEl.style.display = "none";
+
+  if (idInput) {
+    idInput.value = prefillId || "COL-00156";
+    if (prefillId) {
+      lookupCollectorMinimalData();
+    }
+  }
+}
+
+function closeCollectorIdVerifyModal() {
+  const modal = document.getElementById("collector-id-verify-modal");
+  if (modal) modal.style.display = "none";
+}
+
+function lookupCollectorMinimalData() {
+  const inputEl = document.getElementById("coord-lookup-col-id");
+  const msgEl = document.getElementById("coord-col-lookup-msg");
+  const cardEl = document.getElementById("coord-col-minimal-card");
+  if (!inputEl) return;
+
+  const colId = inputEl.value.trim();
+  if (!colId) {
+    if (msgEl) {
+      msgEl.style.display = "block";
+      msgEl.style.background = "rgba(239, 68, 68, 0.15)";
+      msgEl.style.color = "#FCA5A5";
+      msgEl.textContent = "Please enter a Collector ID to lookup.";
+    }
+    return;
+  }
+
+  if (msgEl) {
+    msgEl.style.display = "block";
+    msgEl.style.background = "rgba(59, 130, 246, 0.15)";
+    msgEl.style.color = "#93C5FD";
+    msgEl.textContent = `Looking up minimal privacy records for ${colId}...`;
+  }
+
+  fetch(`/api/coordinator/collector-minimal?collector_id=${encodeURIComponent(colId)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (!data.success) {
+        if (msgEl) {
+          msgEl.style.display = "block";
+          msgEl.style.background = "rgba(239, 68, 68, 0.15)";
+          msgEl.style.color = "#FCA5A5";
+          msgEl.textContent = data.message || "Collector ID not found.";
+        }
+        if (cardEl) cardEl.style.display = "none";
+        return;
+      }
+
+      // Success: Render ONLY name and past successful pickups
+      if (msgEl) msgEl.style.display = "none";
+      if (cardEl) cardEl.style.display = "block";
+
+      const nameEl = document.getElementById("coord-min-name");
+      if (nameEl) nameEl.textContent = data.name || "Collector";
+
+      const countEl = document.getElementById("coord-min-pickups-count");
+      if (countEl) countEl.textContent = `${data.successful_pickups_count || 0} Successful Pickups`;
+
+      const tbody = document.getElementById("coord-min-pickups-tbody");
+      if (tbody) {
+        const pickups = data.successful_pickups || [];
+        if (pickups.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted" style="padding: 12px;">No past successful pickups recorded yet for this collector.</td></tr>`;
+        } else {
+          tbody.innerHTML = pickups.map((p, idx) => `
+            <tr>
+              <td><strong>#${idx + 1}</strong></td>
+              <td><code>${p.pickup_id || p.lot_id}</code></td>
+              <td>${p.material || 'Mixed Recyclables'}</td>
+              <td><span class="badge-green">${p.verified_weight_kg} kg</span></td>
+              <td><small class="text-muted">${(p.date || '').slice(0, 10)}</small></td>
+            </tr>
+          `).join("");
+        }
+      }
+    })
+    .catch(err => {
+      if (msgEl) {
+        msgEl.style.display = "block";
+        msgEl.style.background = "rgba(239, 68, 68, 0.15)";
+        msgEl.style.color = "#FCA5A5";
+        msgEl.textContent = "Error connecting to server. Please check connection.";
+      }
+    });
+}
+
+function onCoordVerifyMaterialChange(mat) {
+  const rateInput = document.getElementById("coord-verify-rate");
+  if (!rateInput) return;
+  const rates = {
+    "Iron Scrap": 26.50,
+    "Newspaper & Cardboard": 14.00,
+    "Copper Scrap": 504.40,
+    "PET Plastic Bottles": 22.00,
+    "Aluminium Cans": 105.00,
+    "Electronic Scrap (PCB)": 180.00
+  };
+  rateInput.value = rates[mat] || 25.00;
+}
+
+function submitCoordinatorVerifyForCollector() {
+  const colIdInput = document.getElementById("coord-lookup-col-id");
+  const matSelect = document.getElementById("coord-verify-material");
+  const weightInput = document.getElementById("coord-verify-weight");
+  const rateInput = document.getElementById("coord-verify-rate");
+  const addressInput = document.getElementById("coord-verify-address");
+
+  if (!colIdInput || !matSelect || !weightInput || !rateInput) return;
+
+  const colId = colIdInput.value.trim();
+  const material = matSelect.value;
+  const weight = parseFloat(weightInput.value);
+  const rate = parseFloat(rateInput.value);
+  const address = addressInput ? addressInput.value.trim() : "Kamrup Metro";
+
+  if (!colId) {
+    alert("Please enter a valid Collector ID.");
+    return;
+  }
+  if (!weight || weight <= 0) {
+    alert("Please enter a valid verified scale weight.");
+    return;
+  }
+
+  fetch("/api/coordinator/register-verify-for-collector", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      collector_id: colId,
+      material: material,
+      verified_weight_kg: weight,
+      rate_per_kg: rate,
+      source_address: address
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.success) {
+      alert(`Verification failed: ${data.message}`);
+      return;
+    }
+
+    alert(`✅ Data Verified & Registered!\n\nCollector: ${data.collector_name} (${data.collector_id})\nLot ID: ${data.lot_id}\nMaterial: ${data.material} (${data.verified_weight_kg} kg)\nTotal Payout: ₹${data.settlement_amount_inr.toFixed(2)}\n\nRecord stored securely on server database.`);
+    
+    // Refresh minimal collector record to show updated successful pickup list
+    lookupCollectorMinimalData();
+  })
+  .catch(err => {
+    alert(`Error connecting to server: ${err.message}`);
+  });
+}
+
+// ----------------------------------------------------
+// FIELD COLLECTOR RESTORE / JOIN SMARTPHONE FLOW
+// ----------------------------------------------------
+function openJoinSmartphoneModal() {
+  const modal = document.getElementById("collector-restore-modal");
+  if (!modal) return;
+  modal.style.display = "flex";
+
+  const msgEl = document.getElementById("col-restore-status-msg");
+  if (msgEl) msgEl.style.display = "none";
+
+  const inputEl = document.getElementById("col-restore-id-input");
+  if (inputEl) {
+    inputEl.value = "COL-00156"; // Default sample ID of basic phone collector
+    inputEl.focus();
+  }
+}
+
+function closeJoinSmartphoneModal() {
+  const modal = document.getElementById("collector-restore-modal");
+  if (modal) modal.style.display = "none";
+}
+
+function submitRestoreSmartphoneWork(customColId = '') {
+  const inputEl = document.getElementById("col-restore-id-input");
+  const msgEl = document.getElementById("col-restore-status-msg");
+  const colId = customColId || (inputEl ? inputEl.value.trim() : "");
+
+  if (!colId) {
+    if (msgEl) {
+      msgEl.style.display = "block";
+      msgEl.style.background = "rgba(239, 68, 68, 0.15)";
+      msgEl.style.color = "#FCA5A5";
+      msgEl.textContent = "Please enter your Collector ID.";
+    }
+    return;
+  }
+
+  if (msgEl) {
+    msgEl.style.display = "block";
+    msgEl.style.background = "rgba(59, 130, 246, 0.15)";
+    msgEl.style.color = "#93C5FD";
+    msgEl.textContent = `Restoring past work and upgrading to Smartphone mode for ${colId}...`;
+  }
+
+  fetch("/api/collector/restore-smartphone", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ collector_id: colId })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.success) {
+      if (msgEl) {
+        msgEl.style.display = "block";
+        msgEl.style.background = "rgba(239, 68, 68, 0.15)";
+        msgEl.style.color = "#FCA5A5";
+        msgEl.textContent = data.message || "Failed to restore work.";
+      }
+      return;
+    }
+
+    // Success: Update Collector UI
+    if (msgEl) {
+      msgEl.style.display = "block";
+      msgEl.style.background = "rgba(16, 185, 129, 0.15)";
+      msgEl.style.color = "#A7F3D0";
+      msgEl.textContent = `✅ Work Restored! Welcome ${data.name}. Mode updated to Smartphone with ${data.restored_lots_count} lots restored.`;
+    }
+
+    // Update Collector greeting and ID badges
+    const hdrName = document.getElementById("collector-user-name");
+    if (hdrName) hdrName.textContent = data.name;
+
+    const hdrId = document.getElementById("collector-id-badge-hdr");
+    if (hdrId) hdrId.textContent = data.collector_id;
+
+    // Save personalized custom name
+    if (typeof setActiveUserName === "function") {
+      setActiveUserName(data.name);
+    }
+
+    setTimeout(() => {
+      closeJoinSmartphoneModal();
+    }, 1400);
+  })
+  .catch(err => {
+    if (msgEl) {
+      msgEl.style.display = "block";
+      msgEl.style.background = "rgba(239, 68, 68, 0.15)";
+      msgEl.style.color = "#FCA5A5";
+      msgEl.textContent = "Error communicating with server.";
+    }
+  });
+}
+
+// Initialize on page load
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof updateAllInterfaceUserNames === "function") {
+    updateAllInterfaceUserNames();
+  }
+});

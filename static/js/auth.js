@@ -49,16 +49,17 @@ function bypassSwitchRole(role) {
   });
 
   // Mock sessions for direct full access
+  const customName = (typeof getActiveUserName === "function") ? getActiveUserName("") : (localStorage.getItem("ecoflow_custom_user_name") || "");
   const mockSessions = {
-    household: { role: 'household', name: 'Rahul Sharma', email: 'rahul.sharma@example.com', address: 'House 42, Green Park Avenue, North Zone, Guwahati' },
-    coordinator: { role: 'coordinator', name: 'Vikram Baruah', employee_id: 'EMP-2026-101', email: 'vikram.coordinator@ecoflow.gov.in', address: 'Zonal Command Office, Sector 4' },
-    collector: { role: 'collector', name: 'Rameshwar Boro', collector_id: 'COL-2026-00142', email: 'collector@ecoflow.gov.in', address: 'North Zone Municipal Shed' },
-    hub: { role: 'hub', name: 'Central Municipal Hub', email: 'hub.central@ecoflow.gov.in', address: 'Municipal Weigh Station & Intake Hub' },
-    recycler: { role: 'recycler', name: 'GreenIndia Metal Recyclers Ltd.', email: 'procurement@greenindia.in', address: 'Industrial Estate, Phase II' },
-    admin: { role: 'admin', name: 'Daksh Singhi', email: 'dakssinghi@gmail.com', is_root: true }
+    household: { role: 'household', name: customName || 'Citizen User', email: 'citizen@ecoflow.gov.in', address: 'House 42, Green Park Avenue, North Zone, Guwahati' },
+    coordinator: { role: 'coordinator', name: customName || 'Field Operations Coordinator', employee_id: 'EMP-2026-101', email: 'coordinator@ecoflow.gov.in', address: 'Zonal Command Office, Sector 4' },
+    collector: { role: 'collector', name: customName || 'Field Collector', collector_id: 'COL-2026-00142', email: 'collector@ecoflow.gov.in', address: 'North Zone Municipal Shed' },
+    hub: { role: 'hub', name: customName || 'Storage Hub Authority', email: 'hub.central@ecoflow.gov.in', address: 'Municipal Weigh Station & Intake Hub' },
+    recycler: { role: 'recycler', name: customName || 'Industrial Recycling Partner', email: 'procurement@greenindia.in', address: 'Industrial Estate, Phase II' },
+    admin: { role: 'admin', name: customName || 'Platform Administrator', email: 'dakssinghi@gmail.com', is_root: true }
   };
 
-  const user = mockSessions[role] || { role: role, name: 'Active User' };
+  const user = mockSessions[role] || { role: role, name: customName || 'Active User' };
   localStorage.setItem("ecoflow_user_session", JSON.stringify(user));
 
   // Hide Gateway screen completely
@@ -67,6 +68,11 @@ function bypassSwitchRole(role) {
 
   // Switch perspective view
   switchPerspective(role);
+
+  // Update dynamic user names across all headers and greetings
+  if (typeof updateAllInterfaceUserNames === "function") {
+    updateAllInterfaceUserNames();
+  }
 
   // Load role data immediately without restrictions
   if (role === 'admin') {

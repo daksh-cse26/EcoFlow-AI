@@ -407,6 +407,49 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                     conn.close()
                     return self._send_json({"has_active": False, "step": 0, "is_locked": False})
 
+            # 21. Field Coordinator: Minimal Collector Lookup (Only Name & Successful Pickups)
+            elif path == '/api/coordinator/collector-minimal':
+                cid = query.get('collector_id', [''])[0].strip()
+                if not cid:
+                    conn.close()
+                    return self._send_json({"error": "collector_id parameter is required"}, status=400)
+
+                cursor.execute("SELECT name, employee_id, mode FROM employees WHERE employee_id = ?", (cid,))
+                emp = cursor.fetchone()
+                if not emp:
+                    conn.close()
+                    return self._send_json({"error": f"Collector ID '{cid}' not found"}, status=404)
+
+                # Fetch ONLY verified and completed pickups/lots
+                cursor.execute("""
+                    SELECT lot_id, preliminary_material, user_estimated_weight, verification_status, collection_timestamp
+                    FROM waste_lots
+                    WHERE collector_id = ?
+                    ORDER BY collection_timestamp DESC
+                """, (cid,))
+                lots = [dict(r) for r in cursor.fetchall()]
+
+                # Filter only necessary fields - STRICT PRIVACY (name and past successful pickups only)
+                pickups_list = []
+                for l in lots:
+                    pickups_list.append({
+                        "lot_id": l["lot_id"],
+                        "material": l["preliminary_material"] or "Recyclable Scrap",
+                        "weight": l["user_estimated_weight"] or 0.0,
+                        "status": "COMPLETED",
+                        "timestamp": l["collection_timestamp"]
+                    })
+
+                conn.close()
+                return self._send_json({
+                    "success": True,
+                    "collector_id": cid,
+                    "name": emp["name"],
+                    "mode": emp["mode"],
+                    "successful_pickups_count": len(pickups_list),
+                    "successful_pickups": pickups_list
+                })
+
             else:
                 conn.close()
                 return self._send_json({"error": "Unknown API endpoint"}, status=404)
@@ -1294,6 +1337,99 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                 conn.commit()
                 conn.close()
                 return self._send_json({"success": True, "key": key, "value": val})
+
+            # Field Coordinator: Register & Verify Data for Collector (Minimal Terminal)
+            elif path == '/api/coordinator/register-verify-for-collector':
+                cid = body.get('collector_id', '').strip()
+                mat_name = (body.get('material') or body.get('material_name') or 'Mixed Recyclables').strip()
+                weight = float(body.get('verified_weight_kg') or body.get('weight_kg', 10.0))
+                rate = float(body.get('rate_per_kg', 25.0))
+                subtotal = round(weight * rate, 2)
+
+                cursor.execute("SELECT name, employee_id, service_zone FROM employees WHERE employee_id = ?", (cid,))
+                emp = cursor.fetchone()
+                if not emp:
+                    conn.close()
+                    return self._send_json({"error": "Collector not found"}, status=404)
+
+                import random
+                lot_num = random.randint(100000, 999999)
+                lot_id = f"LOT-2026-{lot_num}"
+                pickup_id = f"PR-2026-{lot_num}"
+
+                cursor.execute("""
+                    INSERT INTO pickup_requests (
+                        pickup_id, household_name, household_phone, address, service_zone,
+                        lat, lng, preferred_date, time_slot, preliminary_material, user_estimated_weight,
+                        indicative_rate, indicative_value, notes, status
+                    ) VALUES (?, 'Verified Household', '+91 98000 00000', 'Assigned Municipal Sector', ?,
+                              26.18, 91.75, CURRENT_DATE, 'Standard Shift', ?, ?, ?, ?, 'Coordinator Offline Physical Verification', 'COMPLETED')
+                """, (pickup_id, emp['service_zone'], mat_name, weight, rate, subtotal))
+
+                cursor.execute("""
+                    INSERT INTO waste_lots (
+                        lot_id, pickup_id, household_name, collector_id, storage_hub_id,
+                        collection_timestamp, preliminary_material, user_estimated_weight, qr_code, verification_status
+                    ) VALUES (?, ?, 'Verified Household', ?, 'HUB-001', CURRENT_TIMESTAMP, ?, ?, ?, 'COMPLETED')
+                """, (lot_id, pickup_id, cid, mat_name, weight, f"QR-{lot_id}"))
+
+                cursor.execute("""
+                    INSERT INTO lot_materials (lot_id, material_name, grade, verified_weight, rate_per_kg, subtotal)
+                    VALUES (?, ?, 'Grade A', ?, ?, ?)
+                """, (lot_id, mat_name, weight, rate, subtotal))
+
+                cursor.execute("""
+                    INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                    VALUES ('COORDINATOR_VERIFIED_FOR_COLLECTOR', 'Pending', ?, 'Field Coordinator', 'Coordinator', 'Physical verification recorded for non-smartphone collector')
+                """, (f"{lot_id} ({weight}kg {mat_name}) verified for {emp['name']} ({cid})",))
+
+                conn.commit()
+                conn.close()
+
+                return self._send_json({
+                    "success": True,
+                    "lot_id": lot_id,
+                    "collector_id": cid,
+                    "collector_name": emp['name'],
+                    "verified_weight": weight,
+                    "verified_weight_kg": weight,
+                    "material": mat_name,
+                    "rate_per_kg": rate,
+                    "settlement_amount_inr": subtotal,
+                    "status": "COMPLETED"
+                })
+
+            # Field Collector: Restore work on smartphone
+            elif path == '/api/collector/restore-smartphone':
+                cid = body.get('collector_id', '').strip()
+                cursor.execute("SELECT * FROM employees WHERE employee_id = ?", (cid,))
+                emp = cursor.fetchone()
+                if not emp:
+                    conn.close()
+                    return self._send_json({"error": "Collector ID not found"}, status=404)
+
+                cursor.execute("UPDATE employees SET mode = 'smartphone' WHERE employee_id = ?", (cid,))
+
+                cursor.execute("SELECT * FROM waste_lots WHERE collector_id = ? ORDER BY collection_timestamp DESC", (cid,))
+                lots = [dict(r) for r in cursor.fetchall()]
+
+                cursor.execute("""
+                    INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                    VALUES ('COLLECTOR_JOINED_SMARTPHONE', ?, 'smartphone', ?, 'Collector', 'Work restored on Smartphone app')
+                """, (emp['mode'], emp['name']))
+
+                conn.commit()
+                conn.close()
+
+                return self._send_json({
+                    "success": True,
+                    "collector_id": cid,
+                    "name": emp['name'],
+                    "mode": "smartphone",
+                    "restored_lots_count": len(lots),
+                    "restored_lots": lots,
+                    "lots": lots
+                })
 
             else:
                 conn.close()
