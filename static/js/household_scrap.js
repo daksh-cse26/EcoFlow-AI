@@ -57,15 +57,18 @@ function updateHouseholdGreeting() {
   let greetingWord = "Good Morning";
   let icon = "🌅";
 
+  // From 12:00 AM (midnight) to 11:59 AM: Good Morning
+  // From 12:00 PM to 4:59 PM: Good Afternoon
+  // From 5:00 PM to 11:59 PM: Good Evening (replaces Good Night up to 11:59 PM)
   if (hours >= 12 && hours < 17) {
     greetingWord = "Good Afternoon";
     icon = "☀️";
-  } else if (hours >= 17 && hours < 21) {
+  } else if (hours >= 17) {
     greetingWord = "Good Evening";
     icon = "🌆";
-  } else if (hours >= 21 || hours < 5) {
-    greetingWord = "Good Night";
-    icon = "🌙";
+  } else {
+    greetingWord = "Good Morning";
+    icon = "🌅";
   }
 
   // Get active user name from session
@@ -170,10 +173,25 @@ async function checkActiveHouseholdPickup() {
         postBtn.disabled = true;
         postBtn.classList.add("disabled");
       }
-      if (lockNotice) lockNotice.style.display = "flex";
-      if (progressCard) progressCard.style.display = "block";
+      if (lockNotice) {
+        lockNotice.style.display = "flex";
+        const msgEl = document.getElementById("post-scrap-disabled-msg");
+        if (msgEl) {
+          if (data.step === 1) {
+            msgEl.innerHTML = `<strong>Pickup Requested:</strong> Waiting for field collector acceptance. Progress bar will appear once accepted.`;
+          } else {
+            msgEl.innerHTML = `<strong>Active Scrap Pickup in Progress:</strong> Post Scrap is disabled until payment is received for active lot.`;
+          }
+        }
+      }
 
-      updateProgressBarUI(data.step, data.lot_id, data.pickup);
+      // The progress bar should ONLY appear once the pickup is accepted (step >= 2)
+      if (data.step >= 2) {
+        if (progressCard) progressCard.style.display = "block";
+        updateProgressBarUI(data.step, data.lot_id, data.pickup);
+      } else {
+        if (progressCard) progressCard.style.display = "none";
+      }
     } else {
       // Completed or no active pickup: Enable Post Scrap
       postScrapState.isLocked = false;
