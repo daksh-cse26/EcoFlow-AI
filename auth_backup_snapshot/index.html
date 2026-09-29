@@ -91,44 +91,12 @@
       <button class="voice-btn-top" onclick="voiceAssistant.openVoiceModal('pickup-notes', 'pickup')" title="Multilingual Speech Recognition">
         🎙️ <span data-i18n="voice.tap_to_speak">Voice Assistant</span>
       </button>
+    </div>
   </header>
 
   <!-- ==================================================
-       BYPASS DIRECT ACCESS INTERFACE SELECTOR
-       (Bypasses all login screens including Command Center)
-       ================================================== -->
-  <nav class="bypass-interface-nav" id="bypass-interface-nav" aria-label="Direct Interface Selector">
-    <div class="bypass-nav-container">
-      <div class="bypass-nav-badge">
-        <span class="bypass-pulse-dot"></span>
-        <span class="bypass-badge-text">⚡ Direct Access Mode</span>
-      </div>
-      <div class="bypass-role-buttons">
-        <button type="button" class="bypass-role-btn active" data-role="household" onclick="bypassSwitchRole('household')">
-          <span class="bypass-btn-icon">🏠</span> <span>Household App</span>
-        </button>
-        <button type="button" class="bypass-role-btn" data-role="coordinator" onclick="bypassSwitchRole('coordinator')">
-          <span class="bypass-btn-icon">📋</span> <span>Field Coordinator</span>
-        </button>
-        <button type="button" class="bypass-role-btn" data-role="collector" onclick="bypassSwitchRole('collector')">
-          <span class="bypass-btn-icon">🚚</span> <span>Field Collector</span>
-        </button>
-        <button type="button" class="bypass-role-btn" data-role="hub" onclick="bypassSwitchRole('hub')">
-          <span class="bypass-btn-icon">⚖️</span> <span>Storage Hub</span>
-        </button>
-        <button type="button" class="bypass-role-btn" data-role="recycler" onclick="bypassSwitchRole('recycler')">
-          <span class="bypass-btn-icon">🏭</span> <span>Recycler Portal</span>
-        </button>
-        <button type="button" class="bypass-role-btn btn-cmd-center" data-role="admin" onclick="bypassSwitchRole('admin')">
-          <span class="bypass-btn-icon">🗺️</span> <span>Command Center</span>
-        </button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ==================================================
        PORTAL GATEWAY & ONBOARDING AUTHENTICATION SCREEN
-       (Bypassed for now per user request)
+       (Active upon first load; locks to chosen interface after login)
        ================================================== -->
   <section class="portal-gateway-screen" id="portal-gateway-screen" style="display: none;">
     <div class="gateway-hero">

@@ -2831,4 +2831,119 @@ body {
   50% { transform: scale(1.05); }
 }
 
+/* ==================================================
+   BYPASS DIRECT ACCESS INTERFACE SELECTOR NAV
+   ================================================== */
+.bypass-interface-nav {
+  background: rgba(11, 19, 43, 0.92);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 8px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.bypass-nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bypass-nav-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.bypass-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #F59E0B;
+  box-shadow: 0 0 8px #F59E0B;
+  animation: pulseAmber 1.8s infinite;
+}
+
+@keyframes pulseAmber {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
+}
+
+.bypass-badge-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #FCD34D;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bypass-role-buttons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bypass-role-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #E2E8F0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bypass-role-btn:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.bypass-role-btn.active {
+  background: linear-gradient(135deg, #059669, #0284C7);
+  border-color: #34D399;
+  color: #FFFFFF;
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.4);
+  font-weight: 700;
+}
+
+.bypass-role-btn.btn-cmd-center {
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.bypass-role-btn.btn-cmd-center:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: #C084FC;
+}
+
+.bypass-role-btn.btn-cmd-center.active {
+  background: linear-gradient(135deg, #7C3AED, #2563EB);
+  border-color: #C084FC;
+  box-shadow: 0 0 16px rgba(192, 132, 252, 0.5);
+  color: #FFFFFF;
+}
+
+.bypass-btn-icon {
+  font-size: 14px;
+}
+
+
 

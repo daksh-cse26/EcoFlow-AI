@@ -8,76 +8,120 @@
 let activeGatewayRole = 'household';
 let pendingAdminEmail = '';
 
-// Bypass Mode Status (Can be fully restored on instruction)
-const IS_LOGIN_BYPASS_ACTIVE = true;
-
-// Initialize in Bypass Mode (Direct access to all interfaces)
+// Initialize Authentication and Gateway on Page Load
 function initAuth() {
+  const sessionStr = localStorage.getItem("ecoflow_user_session");
   const gatewayEl = document.getElementById("portal-gateway-screen");
-  if (gatewayEl) gatewayEl.style.display = "none";
-
   const badgeEl = document.getElementById("active-session-badge");
-  if (badgeEl) badgeEl.style.display = "none";
 
-  // In bypass mode, activate chosen role (saved or default to household)
-  const savedRole = localStorage.getItem("ecoflow_bypass_role") || "household";
-  bypassSwitchRole(savedRole);
+  if (sessionStr) {
+    try {
+      const session = JSON.parse(sessionStr);
+      if (session && session.role) {
+        applyActiveSession(session);
+        return;
+      }
+    } catch (e) {
+      localStorage.removeItem("ecoflow_user_session");
+    }
+  }
+
+  // No active session: Display Onboarding Portal Gateway Screen
+  if (gatewayEl) gatewayEl.style.display = "block";
+  if (badgeEl) badgeEl.style.display = "none";
+  document.querySelectorAll(".perspective-view").forEach(v => v.classList.remove("active"));
+  selectGatewayRole('household');
 }
 
-// Direct bypass role switcher
-function bypassSwitchRole(role) {
+// Select interface role in the gateway
+function selectGatewayRole(role) {
   activeGatewayRole = role;
-  localStorage.setItem("ecoflow_bypass_role", role);
 
-  // Update button active state in the bypass navigation bar
-  document.querySelectorAll(".bypass-role-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.role === role);
+  // Update card selections
+  document.querySelectorAll(".portal-role-card").forEach(card => {
+    card.classList.toggle("selected", card.dataset.role === role);
   });
 
-  // Mock sessions for direct full access
-  const mockSessions = {
-    household: { role: 'household', name: 'Rahul Sharma', email: 'rahul.sharma@example.com', address: 'House 42, Green Park Avenue, North Zone, Guwahati' },
-    coordinator: { role: 'coordinator', name: 'Vikram Baruah', employee_id: 'EMP-2026-101', email: 'vikram.coordinator@ecoflow.gov.in', address: 'Zonal Command Office, Sector 4' },
-    collector: { role: 'collector', name: 'Rameshwar Boro', collector_id: 'COL-2026-00142', email: 'collector@ecoflow.gov.in', address: 'North Zone Municipal Shed' },
-    hub: { role: 'hub', name: 'Central Municipal Hub', email: 'hub.central@ecoflow.gov.in', address: 'Municipal Weigh Station & Intake Hub' },
-    recycler: { role: 'recycler', name: 'GreenIndia Metal Recyclers Ltd.', email: 'procurement@greenindia.in', address: 'Industrial Estate, Phase II' },
-    admin: { role: 'admin', name: 'Daksh Singhi', email: 'dakssinghi@gmail.com', is_root: true }
-  };
-
-  const user = mockSessions[role] || { role: role, name: 'Active User' };
-  localStorage.setItem("ecoflow_user_session", JSON.stringify(user));
-
-  // Hide Gateway screen completely
-  const gatewayEl = document.getElementById("portal-gateway-screen");
-  if (gatewayEl) gatewayEl.style.display = "none";
-
-  // Switch perspective view
-  switchPerspective(role);
-
-  // Load role data immediately without restrictions
-  if (role === 'admin') {
-    if (typeof loadEncryptedRegistry === "function") loadEncryptedRegistry();
-    if (typeof loadWhitelist === "function") loadWhitelist();
-    if (typeof loadAdminCoordinators === "function") loadAdminCoordinators();
-    if (typeof loadAIModels === "function") loadAIModels();
-    if (typeof loadAuditLogs === "function") loadAuditLogs();
-  } else if (role === 'coordinator') {
-    if (typeof loadCoordinatorFleet === "function") loadCoordinatorFleet();
-    if (typeof loadCoordinatorQueue === "function") loadCoordinatorQueue();
-  } else if (role === 'collector') {
-    if (typeof loadCollectorTasks === "function") loadCollectorTasks();
-  } else if (role === 'hub') {
-    if (typeof loadHubPendingLots === "function") loadHubPendingLots();
-    if (typeof renderHubMaterialRows === "function") renderHubMaterialRows();
-  } else if (role === 'recycler') {
-    if (typeof loadRecyclerPortalData === "function") loadRecyclerPortalData();
-  }
-}
-
-// Select interface role in the gateway (clicking any card opens that role immediately)
-function selectGatewayRole(role) {
-  bypassSwitchRole(role);
+  // Role Metadata Titles
   updateGatewayRoleTitle(role);
+
+  // Configure field visibility
+  const nameField = document.getElementById("gf-name-container");
+  const phoneField = document.getElementById("gf-phone-container");
+  const emailField = document.getElementById("gf-email-container");
+  const addressField = document.getElementById("gf-address-container");
+  const empIdField = document.getElementById("gf-employee-id-container");
+  const passwordField = document.getElementById("gf-password-container");
+  const adminNotice = document.getElementById("gf-admin-notice");
+  const collectorNotice = document.getElementById("gf-collector-notice");
+
+  // Reset notices
+  if (adminNotice) adminNotice.style.display = (role === 'admin') ? "block" : "none";
+  if (collectorNotice) collectorNotice.style.display = (role === 'collector') ? "block" : "none";
+
+  const reqText = typeof t === 'function' ? t('gw.mandatory', '* Mandatory') : '* Mandatory';
+  const optText = typeof t === 'function' ? t('gw.optional', '(Optional / If any)') : '(Optional / If any)';
+
+  if (role === 'admin') {
+    if (nameField) nameField.style.display = "none";
+    if (phoneField) phoneField.style.display = "none";
+    if (emailField) emailField.style.display = "block";
+    if (addressField) addressField.style.display = "none";
+    if (empIdField) empIdField.style.display = "none";
+    if (passwordField) passwordField.style.display = "block";
+    
+    // Set default placeholder for root owner
+    const emailInput = document.getElementById("gw-email");
+    if (emailInput && !emailInput.value) emailInput.placeholder = "dakssinghi@gmail.com";
+  } else if (role === 'collector') {
+    if (nameField) nameField.style.display = "block";
+    if (phoneField) {
+      phoneField.style.display = "block";
+      const lbl = phoneField.querySelector(".field-tag");
+      if (lbl) { lbl.textContent = optText; lbl.className = "field-tag field-tag-opt"; }
+    }
+    if (emailField) {
+      emailField.style.display = "block";
+      const lbl = emailField.querySelector(".field-tag");
+      if (lbl) { lbl.textContent = optText; lbl.className = "field-tag field-tag-opt"; }
+    }
+    if (addressField) addressField.style.display = "block";
+    if (empIdField) empIdField.style.display = "none";
+    if (passwordField) passwordField.style.display = "none";
+  } else if (role === 'coordinator') {
+    if (nameField) nameField.style.display = "block";
+    if (phoneField) {
+      phoneField.style.display = "block";
+      const lbl = phoneField.querySelector(".field-tag");
+      if (lbl) { lbl.textContent = reqText; lbl.className = "field-tag field-tag-req"; }
+    }
+    if (emailField) {
+      emailField.style.display = "block";
+      const lbl = emailField.querySelector(".field-tag");
+      if (lbl) { lbl.textContent = reqText; lbl.className = "field-tag field-tag-req"; }
+    }
+    if (addressField) addressField.style.display = "block";
+    if (empIdField) empIdField.style.display = "block";
+    if (passwordField) passwordField.style.display = "none";
+  } else {
+    // household, hub, recycler
+    if (nameField) nameField.style.display = "block";
+    if (phoneField) {
+      phoneField.style.display = "block";
+      const lbl = phoneField.querySelector(".field-tag");
+      if (lbl) { lbl.textContent = reqText; lbl.className = "field-tag field-tag-req"; }
+    }
+    if (emailField) {
+      emailField.style.display = "block";
+      const lbl = emailField.querySelector(".field-tag");
+      if (lbl) { lbl.textContent = reqText; lbl.className = "field-tag field-tag-req"; }
+    }
+    if (addressField) addressField.style.display = "block";
+    if (empIdField) empIdField.style.display = "none";
+    if (passwordField) passwordField.style.display = "none";
+  }
+
+  validateGatewayInputs();
 }
 
 function updateGatewayRoleTitle(role = activeGatewayRole) {
@@ -95,15 +139,109 @@ function updateGatewayRoleTitle(role = activeGatewayRole) {
 
 // Live Validation: Reveal login button when all mandatory details are entered
 function validateGatewayInputs() {
+  const name = (document.getElementById("gw-name")?.value || "").trim();
+  const phone = (document.getElementById("gw-phone")?.value || "").trim();
+  const email = (document.getElementById("gw-email")?.value || "").trim();
+  const address = (document.getElementById("gw-address")?.value || "").trim();
+  const empId = (document.getElementById("gw-emp-id")?.value || "").trim();
+  const password = (document.getElementById("gw-password")?.value || "").trim();
+
+  let isValid = false;
+
+  if (activeGatewayRole === 'admin') {
+    // Email is required. Password can be checked or filled
+    isValid = (email.length > 3 && email.includes('@'));
+  } else if (activeGatewayRole === 'collector') {
+    // Name and address are mandatory. Phone and email optional.
+    isValid = (name.length >= 2 && address.length >= 4);
+  } else if (activeGatewayRole === 'coordinator') {
+    // Name, phone, email, address, and employee_id are all mandatory
+    isValid = (name.length >= 2 && phone.length >= 7 && email.includes('@') && address.length >= 4 && empId.length >= 2);
+  } else {
+    // household, hub, recycler: Name, phone, email, address mandatory
+    isValid = (name.length >= 2 && phone.length >= 7 && email.includes('@') && address.length >= 4);
+  }
+
   const submitContainer = document.getElementById("gateway-submit-container");
   if (submitContainer) {
-    submitContainer.style.display = "block";
+    submitContainer.style.display = isValid ? "block" : "none";
   }
 }
 
-// Submit Onboarding / Login Request (Bypass Mode Active)
+// Submit Onboarding / Login Request
 async function submitGatewayLogin() {
-  bypassSwitchRole(activeGatewayRole || 'household');
+  const name = (document.getElementById("gw-name")?.value || "").trim();
+  const phone = (document.getElementById("gw-phone")?.value || "").trim();
+  const email = (document.getElementById("gw-email")?.value || "").trim();
+  const address = (document.getElementById("gw-address")?.value || "").trim();
+  const empId = (document.getElementById("gw-emp-id")?.value || "").trim();
+  const password = (document.getElementById("gw-password")?.value || "").trim();
+
+  const payload = {
+    role: activeGatewayRole,
+    name: name,
+    phone: phone,
+    email: email,
+    address: address,
+    employee_id: empId,
+    password: password
+  };
+
+  const btn = document.getElementById("btn-gateway-submit");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-inline"></span> Encrypting & Authenticating...`;
+  }
+
+  try {
+    const res = await fetch("/api/auth/register-login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      alert("Authentication Error: " + (result.error || "Login failed. Please check credentials."));
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `✨ Authenticate & Enter Portal ▶`;
+      }
+      return;
+    }
+
+    // Handle First-Time Command Center Master Password Setup
+    if (activeGatewayRole === 'admin' && result.first_time_setup) {
+      pendingAdminEmail = email;
+      openAdminSetupPasswordModal(email);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `✨ Authenticate & Enter Portal ▶`;
+      }
+      return;
+    }
+
+    // Handle Field Collector Unique ID Announcement
+    if (activeGatewayRole === 'collector' && result.collector_id) {
+      saveSessionAndLock(result.user);
+      openCollectorCelebrationModal(result.collector_id, name);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `✨ Authenticate & Enter Portal ▶`;
+      }
+      return;
+    }
+
+    // Default Success: Save locally and lock chosen interface
+    saveSessionAndLock(result.user);
+  } catch (err) {
+    alert("Connection error: " + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `✨ Authenticate & Enter Portal ▶`;
+    }
+  }
 }
 
 // Store credentials in localStorage and lock the view
@@ -152,9 +290,12 @@ function applyActiveSession(session) {
   }
 }
 
-// Confirm Logout / Switch Portal (Bypass Mode Active)
+// Confirm Logout / Switch Portal
 function confirmSwitchPortal() {
-  bypassSwitchRole('household');
+  if (confirm("Do you wish to log out and switch to another interface? Your local session will be cleared.")) {
+    localStorage.removeItem("ecoflow_user_session");
+    window.location.reload();
+  }
 }
 
 // Collector Celebration Modal
@@ -177,9 +318,12 @@ function closeCollectorCelebrationModal() {
   }
 }
 
-// Command Center First-Time Master Password Setup Modal (Bypass Mode)
+// Command Center First-Time Master Password Setup Modal
 function openAdminSetupPasswordModal(email) {
-  bypassSwitchRole('admin');
+  const modal = document.getElementById("admin-setup-password-modal");
+  const emailEl = document.getElementById("admin-setup-email-display");
+  if (emailEl) emailEl.textContent = email;
+  if (modal) modal.classList.add("open");
 }
 
 function closeAdminSetupPasswordModal() {

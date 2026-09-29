@@ -347,37 +347,125 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
             conn = get_db()
             cursor = conn.cursor()
 
-            # 0. Auth: Unified Role Onboarding & Login (Bypass Mode Active)
+            # 0. Auth: Unified Role Onboarding & Login
             if path == '/api/auth/register-login':
-                role = body.get('role', 'household').strip() or 'household'
-                name = body.get('name', '').strip() or f"Active {role.capitalize()}"
-                phone = body.get('phone', '').strip() or "+91 98000 00000"
-                email = body.get('email', '').strip() or (f"dakssinghi@gmail.com" if role == 'admin' else f"{role}@ecoflow.gov.in")
-                address = body.get('address', '').strip() or "EcoFlow Operational Facility, Guwahati"
-                employee_id = body.get('employee_id', '').strip() or "EMP-2026-101"
-                collector_id = body.get('collector_id', '').strip() or f"COL-2026-{random.randint(10000, 99999)}"
+                role = body.get('role', 'household').strip()
+                name = body.get('name', '').strip()
+                phone = body.get('phone', '').strip()
+                email = body.get('email', '').strip()
+                address = body.get('address', '').strip()
+                employee_id = body.get('employee_id', '').strip()
+                password = body.get('password', '').strip()
+                is_first_setup = body.get('is_first_setup', False)
 
                 if role == 'admin':
-                    conn.close()
-                    return self._send_json({
-                        "success": True,
-                        "first_time_setup": False,
-                        "message": "Direct Command Center access granted (Bypass Mode).",
-                        "user": {
-                            "email": email or "dakssinghi@gmail.com",
-                            "name": name or "Daksh Singhi",
-                            "role": "admin",
-                            "is_root": True
-                        }
-                    })
+                    if not email:
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Email address is mandatory for Command Center access."}, status=400)
+                    
+                    cursor.execute("SELECT * FROM admin_whitelist WHERE LOWER(email) = LOWER(?)", (email,))
+                    admin = cursor.fetchone()
+                    if not admin:
+                        conn.close()
+                        return self._send_json({
+                            "success": False,
+                            "error": f"Access Denied: '{email}' is not permitted to access Command Center. Only dakssinghi@gmail.com and authorized administrators are allowed."
+                        }, status=403)
+                    
+                    # Check first-time setup
+                    if not admin["password_hash"]:
+                        if is_first_setup:
+                            if not password or len(password) < 6:
+                                conn.close()
+                                return self._send_json({"success": False, "error": "Password must be at least 6 characters."}, status=400)
+                            p_hash, p_salt = hash_password(password)
+                            cursor.execute("UPDATE admin_whitelist SET password_hash = ?, password_salt = ?, last_login = CURRENT_TIMESTAMP WHERE LOWER(email) = LOWER(?)", (p_hash, p_salt, email))
+                            cursor.execute("""
+                            INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                            VALUES ('ADMIN_PASSWORD_SET', 'NULL', 'PBKDF2-HMAC-SHA256 (600k iterations)', ?, 'Command Center Admin', 'Master security password configured')
+                            """, (email,))
+                            conn.commit()
+                            conn.close()
+                            return self._send_json({
+                                "success": True,
+                                "first_time_setup": False,
+                                "message": "Master password configured securely.",
+                                "user": {
+                                    "email": admin["email"],
+                                    "name": admin["name"],
+                                    "role": "admin",
+                                    "is_root": bool(admin["is_root"])
+                                }
+                            })
+                        else:
+                            conn.close()
+                            return self._send_json({
+                                "success": True,
+                                "first_time_setup": True,
+                                "message": "First-time setup detected. Please set up your master security password.",
+                                "user": {
+                                    "email": admin["email"],
+                                    "name": admin["name"],
+                                    "role": "admin",
+                                    "is_root": bool(admin["is_root"])
+                                }
+                            })
+                    else:
+                        # Existing password verification
+                        if not password:
+                            conn.close()
+                            return self._send_json({"success": False, "error": "Master password is required."}, status=400)
+                        if not verify_password(password, admin["password_hash"], admin["password_salt"]):
+                            conn.close()
+                            return self._send_json({"success": False, "error": "Incorrect Command Center master password."}, status=401)
+                        
+                        cursor.execute("UPDATE admin_whitelist SET last_login = CURRENT_TIMESTAMP WHERE LOWER(email) = LOWER(?)", (email,))
+                        conn.commit()
+                        conn.close()
+                        return self._send_json({
+                            "success": True,
+                            "user": {
+                                "email": admin["email"],
+                                "name": admin["name"],
+                                "role": "admin",
+                                "is_root": bool(admin["is_root"])
+                            }
+                        })
+
+                # Field Collector Login & Registration
                 elif role == 'collector':
+                    if not name or not address:
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Name and Address are mandatory for Field Collectors."}, status=400)
+                    
+                    collector_id = f"COL-2026-{random.randint(10000, 99999)}"
+                    user_id = f"USR-{random.randint(100000, 999999)}"
+                    
+                    name_enc = encrypt_field(name)
+                    phone_enc = encrypt_field(phone) if phone else None
+                    email_enc = encrypt_field(email) if email else None
+                    addr_enc = encrypt_field(address)
+                    col_id_enc = encrypt_field(collector_id)
+                    
+                    cursor.execute("""
+                    INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
+                    VALUES (?, 'collector', ?, ?, ?, ?, ?)
+                    """, (user_id, name_enc, phone_enc, email_enc, addr_enc, col_id_enc))
+                    
+                    # Register into employees table for operational simulation
+                    cursor.execute("""
+                    INSERT OR REPLACE INTO employees (employee_id, name, phone, service_zone, mode, availability, assigned_hub, workload, collection_history_count, current_lat, current_lng)
+                    VALUES (?, ?, ?, 'ZONE A', 'smartphone', 'AVAILABLE', 'HUB-001', 0, 1, 26.1850, 91.7500)
+                    """, (collector_id, name, phone or "+91 98000 00000"))
+                    
+                    conn.commit()
                     conn.close()
                     return self._send_json({
                         "success": True,
                         "collector_id": collector_id,
                         "user": {
-                            "user_id": f"USR-{random.randint(100000, 999999)}",
-                            "name": name or "Field Collector",
+                            "user_id": user_id,
+                            "name": name,
                             "role": "collector",
                             "collector_id": collector_id,
                             "address": address,
@@ -385,27 +473,75 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                             "email": email
                         }
                     })
+
+                # Field Coordinator Login & Registration
                 elif role == 'coordinator':
+                    if not name or not phone or not email or not address or not employee_id:
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Name, Mobile, Email, Address, and Employee ID are all mandatory for Field Coordinators."}, status=400)
+                    
+                    # Strict Verification against Command Center Authorized Coordinators
+                    emp_clean = employee_id.strip()
+                    cursor.execute("SELECT * FROM authorized_coordinators WHERE UPPER(employee_id) = UPPER(?) AND status = 'ACTIVE'", (emp_clean,))
+                    coord_auth = cursor.fetchone()
+                    if not coord_auth:
+                        conn.close()
+                        return self._send_json({
+                            "success": False,
+                            "error": f"Employee ID Verification Failed: '{emp_clean}' is not recognized in the Command Center coordinator directory. Access denied."
+                        }, status=403)
+                    
+                    user_id = f"USR-{random.randint(100000, 999999)}"
+                    name_enc = encrypt_field(name)
+                    phone_enc = encrypt_field(phone)
+                    email_enc = encrypt_field(email)
+                    addr_enc = encrypt_field(address)
+                    emp_enc = encrypt_field(emp_clean)
+                    
+                    cursor.execute("""
+                    INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
+                    VALUES (?, 'coordinator', ?, ?, ?, ?, ?)
+                    """, (user_id, name_enc, phone_enc, email_enc, addr_enc, emp_enc))
+                    
+                    conn.commit()
                     conn.close()
                     return self._send_json({
                         "success": True,
                         "user": {
-                            "user_id": f"USR-{random.randint(100000, 999999)}",
-                            "name": name or "Field Coordinator",
+                            "user_id": user_id,
+                            "name": name,
                             "role": "coordinator",
-                            "employee_id": employee_id,
-                            "service_zone": "ZONE A",
+                            "employee_id": emp_clean,
+                            "service_zone": coord_auth["service_zone"],
                             "address": address,
                             "phone": phone,
                             "email": email
                         }
                     })
+
+                # Household, Storage Hub, Recycler
                 else:
+                    if not name or not phone or not email or not address:
+                        conn.close()
+                        return self._send_json({"success": False, "error": "Name, Mobile Number, Email, and Address are all mandatory."}, status=400)
+                    
+                    user_id = f"USR-{random.randint(100000, 999999)}"
+                    name_enc = encrypt_field(name)
+                    phone_enc = encrypt_field(phone)
+                    email_enc = encrypt_field(email)
+                    addr_enc = encrypt_field(address)
+                    
+                    cursor.execute("""
+                    INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """, (user_id, role, name_enc, phone_enc, email_enc, addr_enc, None))
+                    
+                    conn.commit()
                     conn.close()
                     return self._send_json({
                         "success": True,
                         "user": {
-                            "user_id": f"USR-{random.randint(100000, 999999)}",
+                            "user_id": user_id,
                             "name": name,
                             "role": role,
                             "address": address,
