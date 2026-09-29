@@ -247,10 +247,6 @@ class SettlementEngine {
     link.href = certCanvas.toDataURL("image/png");
     link.click();
   }
-    if (this.confettiCtx && this.confettiCanvas) {
-      this.confettiCtx.clearRect(0, 0, this.confettiCanvas.width, this.confettiCanvas.height);
-    }
-  }
 
   renderSettlementReceipt(settlement) {
     const container = document.getElementById("settlement-receipt-view");

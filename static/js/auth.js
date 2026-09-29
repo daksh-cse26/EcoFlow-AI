@@ -5,6 +5,20 @@
  * and Command Center access control for Daksh Singhi (dakssinghi@gmail.com).
  */
 
+// Ensure global application state is initialized
+window.appState = window.appState || {
+  currentRole: 'household',
+  householdTab: 'home',
+  activeLotId: null,
+  adminTab: 'map',
+  collectorMode: 'online',
+  commandMap: null,
+  currentScanResult: null,
+  householdMap: null,
+  stats: {}
+};
+var appState = window.appState;
+
 let activeGatewayRole = 'household';
 let pendingAdminEmail = '';
 

@@ -1,3 +1,17 @@
+// Global Application State
+window.appState = window.appState || {
+  currentRole: 'household',
+  householdTab: 'home',
+  activeLotId: null,
+  adminTab: 'map',
+  collectorMode: 'online',
+  commandMap: null,
+  currentScanResult: null,
+  householdMap: null,
+  stats: {}
+};
+var appState = window.appState;
+
 // Offline-First Resilient API Client
 async function apiFetch(endpoint, options = {}) {
   let data = null;
