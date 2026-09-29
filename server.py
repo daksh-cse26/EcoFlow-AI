@@ -331,6 +331,82 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                 conn.close()
                 return self._send_json({"coordinators": coords, "count": len(coords)})
 
+            # 21. Live Scrap Market Rates for Household App
+            elif path == '/api/household/live-rates':
+                cursor.execute("SELECT material_code, category, subcategory, default_rate, unit, carbon_offset_per_kg FROM material_taxonomy")
+                raw = cursor.fetchall()
+                meta_map = {
+                    'IRON_STEEL': {'icon': '🔩', 'trend': '+3.2%', 'name': 'Iron & Steel Scrap'},
+                    'PET_BOTTLE': {'icon': '🧴', 'trend': '+1.5%', 'name': 'PET Plastic Containers'},
+                    'HDPE_PLASTIC': {'icon': '🛢️', 'trend': '+2.0%', 'name': 'HDPE Hard Plastics'},
+                    'COPPER_SCRAP': {'icon': '⚡', 'trend': '+4.8%', 'name': 'Copper Scrap & Wires'},
+                    'ALUMINIUM_SCRAP': {'icon': '🥫', 'trend': '+2.1%', 'name': 'Aluminium Cans & Frames'},
+                    'CARDBOARD': {'icon': '📦', 'trend': '-0.5%', 'name': 'Corrugated Cardboard'},
+                    'NEWSPAPER': {'icon': '📰', 'trend': '0.0%', 'name': 'Old Newspaper (Raddi)'},
+                    'EWASTE_PCB': {'icon': '💻', 'trend': '+5.5%', 'name': 'E-Waste (Circuit Boards)'},
+                    'BRASS_SCRAP': {'icon': '🔔', 'trend': '+1.8%', 'name': 'Brass & Metal Alloys'},
+                    'BATTERIES': {'icon': '🔋', 'trend': '+0.8%', 'name': 'Lead-Acid Batteries'}
+                }
+                rates = []
+                for r in raw:
+                    code = r['material_code']
+                    if code in meta_map:
+                        rates.append({
+                            'code': code,
+                            'name': meta_map[code]['name'],
+                            'category': r['category'],
+                            'rate': r['default_rate'],
+                            'unit': r['unit'],
+                            'icon': meta_map[code]['icon'],
+                            'trend': meta_map[code]['trend'],
+                            'carbon_offset': r['carbon_offset_per_kg']
+                        })
+                conn.close()
+                return self._send_json({"rates": rates, "last_updated": time.strftime("%H:%M:%S")})
+
+            # 22. Active Household Pickup Status & Progress Stepper
+            elif path == '/api/household/active-pickup':
+                cursor.execute("""
+                SELECT p.*, w.lot_id, w.verification_status, a.employee_id as assigned_collector,
+                       e.name as collector_name, e.mode as collector_mode, e.phone as collector_phone
+                FROM pickup_requests p
+                LEFT JOIN waste_lots w ON p.pickup_id = w.pickup_id
+                LEFT JOIN assignments a ON p.pickup_id = a.pickup_id
+                LEFT JOIN employees e ON a.employee_id = e.employee_id
+                WHERE p.status IN ('PENDING', 'ACCEPTED', 'ASSIGNED', 'COMMUNICATED', 'VERIFIED', 'PAYMENT_CONFIRMED')
+                  AND (w.verification_status IS NULL OR w.verification_status NOT IN ('SETTLED', 'COMPLETED'))
+                ORDER BY p.created_at DESC LIMIT 1
+                """)
+                active = cursor.fetchone()
+                if active:
+                    active_dict = dict(active)
+                    status = active_dict.get('status', 'PENDING')
+                    v_status = active_dict.get('verification_status', '')
+                    
+                    step = 1
+                    if status in ('ACCEPTED', 'ASSIGNED', 'COMMUNICATED'):
+                        step = 2
+                    if v_status in ('VERIFIED', 'IN_HUB') or status == 'VERIFIED':
+                        step = 3
+                    if status == 'PAYMENT_CONFIRMED':
+                        step = 4
+                    if status in ('COMPLETED', 'SETTLED', 'PAYMENT_RECEIVED') or v_status in ('SETTLED', 'COMPLETED'):
+                        step = 5
+
+                    is_locked = (step < 5)
+
+                    conn.close()
+                    return self._send_json({
+                        "has_active": is_locked,
+                        "pickup": active_dict,
+                        "step": step,
+                        "is_locked": is_locked,
+                        "lot_id": active_dict.get('lot_id') or f"LOT-{active_dict['pickup_id']}"
+                    })
+                else:
+                    conn.close()
+                    return self._send_json({"has_active": False, "step": 0, "is_locked": False})
+
             else:
                 conn.close()
                 return self._send_json({"error": "Unknown API endpoint"}, status=404)
@@ -678,6 +754,178 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                 result = local_ai.analyze_waste_input(preset_type=preset)
                 conn.close()
                 return self._send_json({"success": True, "test_result": result})
+
+            # 3b. Household: Post Scrap Request with Multi-Material Table, Photo, and Radius Distribution
+            elif path == '/api/household/post-scrap':
+                materials = body.get('materials', [])
+                total_weight = float(body.get('total_weight', 0.0))
+                total_value = float(body.get('total_value', 0.0))
+                household_name = body.get('household_name', 'Rahul Sharma')
+                household_phone = body.get('household_phone', '+91 98640 12345')
+                address = body.get('address', 'House 14, Peace Enclave, Paltan Bazaar, Guwahati')
+                zone = body.get('service_zone', 'ZONE B')
+                waste_img = body.get('waste_image', '')
+
+                # Generate unique Lot ID and Pickup ID
+                lot_num = random.randint(100000, 999999)
+                lot_id = f"LOT-2026-{lot_num}"
+                pickup_id = f"PR-2026-{lot_num}"
+
+                primary_material = materials[0]['name'] if materials else 'Mixed Recyclable Scrap'
+
+                # 1. Insert pickup request
+                cursor.execute("""
+                INSERT INTO pickup_requests (
+                    pickup_id, household_name, household_phone, address, landmark, service_zone,
+                    lat, lng, preferred_date, time_slot, preliminary_material, user_estimated_weight,
+                    indicative_rate, indicative_value, notes, waste_image, status
+                ) VALUES (?, ?, ?, ?, 'Near Municipal Station', ?, 26.1795, 91.7685, CURRENT_DATE, 'Immediate Dispatch', ?, ?, ?, ?, 'Post Scrap Direct Submission', ?, 'ACCEPTED')
+                """, (pickup_id, household_name, household_phone, address, zone, primary_material, total_weight, 
+                      round(total_value / max(total_weight, 1), 2), total_value, waste_img))
+
+                # 2. Insert waste lot with unique lot_id
+                cursor.execute("""
+                INSERT INTO waste_lots (
+                    lot_id, pickup_id, household_name, collector_id, storage_hub_id,
+                    collection_timestamp, preliminary_material, user_estimated_weight, qr_code, verification_status
+                ) VALUES (?, ?, ?, 'COL-00142', 'HUB-001', CURRENT_TIMESTAMP, ?, ?, ?, 'ACCEPTED')
+                """, (lot_id, pickup_id, household_name, primary_material, total_weight, f"ECOFLOW-QR-{lot_id}"))
+
+                # 3. Insert lot_materials breakdown
+                for m in materials:
+                    m_name = m.get('name', 'Mixed Scrap')
+                    m_weight = float(m.get('weight', 0.0))
+                    m_rate = float(m.get('rate', 0.0))
+                    if m_weight > 0:
+                        cursor.execute("""
+                        INSERT INTO lot_materials (lot_id, material_name, grade, verified_weight, rate_per_kg, subtotal)
+                        VALUES (?, ?, 'Grade A', ?, ?, ?)
+                        """, (lot_id, m_name, m_weight, m_rate, round(m_weight * m_rate, 2)))
+
+                # 4. Multi-stakeholder radius distribution logic:
+                cursor.execute("SELECT * FROM employees WHERE service_zone = ? OR service_zone = 'ZONE B'", (zone,))
+                emp_list = [dict(e) for e in cursor.fetchall()]
+                
+                dispatched_sms = []
+                dispatched_smartphone = []
+                assigned_emp = None
+
+                for emp in emp_list:
+                    mode = emp.get('mode', 'smartphone')
+                    emp_id = emp.get('employee_id', '')
+                    emp_name = emp.get('name', '')
+                    
+                    if mode in ('no_phone', 'basic_phone') or 'COL-NP' in emp_id or 'COL-NS' in emp_id:
+                        sms_text = f"SMS to {emp_name} ({emp_id}): New Scrap Pickup {lot_id} ({total_weight}kg) available in 10 km. Reply 1 to Accept, 2 to Decline."
+                        dispatched_sms.append({
+                            "employee_id": emp_id,
+                            "name": emp_name,
+                            "mode": mode,
+                            "phone": emp.get('phone', 'Simulated SMS Gateway'),
+                            "sms_content": sms_text
+                        })
+                    else:
+                        dispatched_smartphone.append({
+                            "employee_id": emp_id,
+                            "name": emp_name,
+                            "mode": "smartphone",
+                            "notification": f"🔔 New Pickup Alert: {total_weight}kg scrap at {address} (10 km radius)"
+                        })
+                        if not assigned_emp:
+                            assigned_emp = emp
+
+                if not assigned_emp and emp_list:
+                    assigned_emp = emp_list[0]
+
+                assigned_id = assigned_emp['employee_id'] if assigned_emp else 'COL-00142'
+                assigned_name = assigned_emp['name'] if assigned_emp else 'Rameshwar Boro'
+
+                # 5. Lock request with assigned collector
+                cursor.execute("""
+                INSERT OR REPLACE INTO assignments (
+                    assignment_id, pickup_id, employee_id, assigned_at, mode, acknowledged, status, notes
+                ) VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?, 1, 'ACCEPTED', 'Locked request assigned via radius search')
+                """, (f"ASN-{lot_num}", pickup_id, assigned_id, assigned_emp.get('mode', 'smartphone') if assigned_emp else 'smartphone'))
+
+                cursor.execute("""
+                INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                VALUES ('POST_SCRAP_REQUESTED_LOCKED', 'Unposted', ?, ?, 'Household', 'Scrap posted with AI weight estimate and locked to collector')
+                """, (f"{lot_id} ({total_weight}kg, est. ₹{total_value}) locked to {assigned_name} ({assigned_id})", household_name))
+
+                conn.commit()
+                conn.close()
+
+                return self._send_json({
+                    "success": True,
+                    "lot_id": lot_id,
+                    "pickup_id": pickup_id,
+                    "is_locked": True,
+                    "assigned_collector": {
+                        "employee_id": assigned_id,
+                        "name": assigned_name,
+                        "mode": assigned_emp.get('mode', 'smartphone') if assigned_emp else 'smartphone'
+                    },
+                    "radius_km": 10,
+                    "dispatched_sms": dispatched_sms,
+                    "dispatched_smartphone": dispatched_smartphone,
+                    "total_weight": total_weight,
+                    "total_value": total_value,
+                    "message": "Scrap posted successfully. Request locked and assigned."
+                })
+
+            # 3c. Household / Collector: Advance Real-time Progress Stepper
+            elif path == '/api/household/progress-step':
+                lot_id = body.get('lot_id', '').strip()
+                target_step = int(body.get('step', 2))
+                
+                cursor.execute("SELECT * FROM waste_lots WHERE lot_id = ?", (lot_id,))
+                lot = cursor.fetchone()
+                
+                step_status_map = {
+                    1: ('PENDING', 'REQUESTED'),
+                    2: ('ACCEPTED', 'ACCEPTED'),
+                    3: ('VERIFIED', 'VERIFIED'),
+                    4: ('PAYMENT_CONFIRMED', 'SETTLING'),
+                    5: ('COMPLETED', 'SETTLED')
+                }
+
+                p_status, w_status = step_status_map.get(target_step, ('ACCEPTED', 'ACCEPTED'))
+
+                if lot:
+                    pickup_id = lot['pickup_id']
+                    cursor.execute("UPDATE pickup_requests SET status = ? WHERE pickup_id = ?", (p_status, pickup_id))
+                    cursor.execute("UPDATE waste_lots SET verification_status = ? WHERE lot_id = ?", (w_status, lot_id))
+
+                    if target_step == 5:
+                        cursor.execute("SELECT SUM(subtotal) as total_val, SUM(verified_weight) as total_wt FROM lot_materials WHERE lot_id = ?", (lot_id,))
+                        m_totals = cursor.fetchone()
+                        fin_amount = float(m_totals['total_val'] or 1450.0) if m_totals and m_totals['total_val'] else 1450.0
+                        fin_weight = float(m_totals['total_wt'] or 12.5) if m_totals and m_totals['total_wt'] else 12.5
+                        
+                        receipt_no = f"REC-2026-{random.randint(100000, 999999)}"
+                        cursor.execute("""
+                        INSERT OR REPLACE INTO settlements (
+                            settlement_id, lot_id, pickup_id, household_name, verified_weight,
+                            final_amount, calculation_formula, settlement_date, status, receipt_number
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 'PAID', ?)
+                        """, (f"SET-{lot_id}", lot_id, pickup_id, lot['household_name'], fin_weight, fin_amount,
+                              f"Verified Weight ({fin_weight} kg) × Municipal Live Buying Rate", receipt_no))
+                        
+                        cursor.execute("""
+                        INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
+                        VALUES ('PAYMENT_RECEIVED_COMPLETED', 'PAYMENT_CONFIRMED', 'PAID', ?, 'System Gateway', 'Payment received by citizen. Lot lifecycle closed.')
+                        """, (lot['household_name'],))
+
+                    conn.commit()
+
+                conn.close()
+                return self._send_json({
+                    "success": True,
+                    "lot_id": lot_id,
+                    "current_step": target_step,
+                    "is_completed": (target_step == 5),
+                    "message": f"Progress step advanced to {target_step}"
+                })
 
             # 4. Create Pickup Request (Section 12)
             elif path == '/api/pickups/create':

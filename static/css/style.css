@@ -2945,5 +2945,1042 @@ body {
   font-size: 14px;
 }
 
+/* ----------------------------------------------------
+   HOUSEHOLD DYNAMIC GREETING & POST SCRAP HERO
+---------------------------------------------------- */
+.greeting-tz-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #34D399;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+
+.tz-pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: #10B981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10B981;
+  animation: pulse-dot 1.5s infinite;
+}
+
+.post-scrap-hero-container {
+  margin: 16px 0 20px;
+}
+
+.btn-main-post-scrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.35));
+  border: 2px solid #10B981;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  color: #FFFFFF;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2), inset 0 0 12px rgba(52, 211, 153, 0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.btn-main-post-scrap:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.5));
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.35), inset 0 0 18px rgba(52, 211, 153, 0.25);
+  transform: translateY(-2px);
+  border-color: #34D399;
+}
+
+.btn-main-post-scrap.disabled,
+.btn-main-post-scrap:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(30, 41, 59, 0.6);
+  box-shadow: none;
+}
+
+.scrap-btn-icon-circle {
+  width: 48px;
+  height: 48px;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+}
+
+.scrap-btn-info {
+  flex: 1;
+}
+
+.scrap-btn-main-title {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.3px;
+}
+
+.scrap-btn-sub-title {
+  display: block;
+  font-size: 12px;
+  color: #94A3B8;
+  margin-top: 2px;
+}
+
+.scrap-btn-arrow {
+  font-size: 20px;
+  color: #34D399;
+  transition: transform 0.2s ease;
+}
+
+.btn-main-post-scrap:hover:not(:disabled) .scrap-btn-arrow {
+  transform: translateX(4px);
+}
+
+.post-scrap-disabled-notice {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #FBBF24;
+  font-size: 12px;
+}
+
+/* ----------------------------------------------------
+   REAL-TIME 5-STEP LIFECYCLE PROGRESS BAR
+---------------------------------------------------- */
+.household-live-progress-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35), 0 0 15px rgba(16, 185, 129, 0.15);
+}
+
+.progress-card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.progress-lot-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #F8FAFC;
+}
+
+.pulse-dot-green {
+  width: 8px;
+  height: 8px;
+  background: #10B981;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #10B981;
+  animation: pulse-dot 1.5s infinite;
+}
+
+.progress-radius-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38BDF8;
+}
+
+.stepper-track-5 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin: 10px 0 18px;
+  gap: 4px;
+}
+
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+
+.stepper-step .step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1E293B;
+  border: 2px solid #64748B;
+  color: #94A3B8;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.stepper-step .step-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94A3B8;
+  margin-top: 6px;
+  line-height: 1.2;
+}
+
+.stepper-step .step-time {
+  font-size: 9px;
+  color: #64748B;
+  margin-top: 2px;
+}
+
+.stepper-step.active .step-circle {
+  border-color: #38BDF8;
+  background: rgba(56, 189, 248, 0.2);
+  color: #38BDF8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+  transform: scale(1.1);
+}
+
+.stepper-step.active .step-label {
+  color: #38BDF8;
+  font-weight: 700;
+}
+
+.stepper-step.completed .step-circle {
+  border-color: #10B981;
+  background: #10B981;
+  color: #FFFFFF;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.stepper-step.completed .step-label {
+  color: #10B981;
+}
+
+.stepper-connector {
+  flex: 1;
+  height: 2px;
+  background: #334155;
+  margin: -18px 4px 0;
+  position: relative;
+  z-index: 1;
+  transition: background 0.3s ease;
+}
+
+.stepper-connector.completed {
+  background: #10B981;
+  box-shadow: 0 0 6px #10B981;
+}
+
+.progress-actions-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.assigned-collector-info {
+  font-size: 12px;
+  color: #CBD5E1;
+}
+
+.btn-advance-step-demo {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38BDF8;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-advance-step-demo:hover {
+  background: rgba(56, 189, 248, 0.3);
+  color: #FFFFFF;
+}
+
+/* ----------------------------------------------------
+   LIVE MARKET SCRAP RATES SECTION
+---------------------------------------------------- */
+.live-market-price-section {
+  margin-bottom: 24px;
+}
+
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.live-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-ticker-pulse {
+  width: 8px;
+  height: 8px;
+  background: #10B981;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #10B981;
+  animation: pulse-dot 1.2s infinite;
+}
+
+.section-heading {
+  font-size: 17px;
+  font-weight: 800;
+  color: #F8FAFC;
+  margin: 0;
+}
+
+.market-refresh-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34D399;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.section-subtext {
+  font-size: 12px;
+  color: #94A3B8;
+  margin: 4px 0 14px;
+}
+
+.market-rates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.market-rate-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.market-rate-card:hover {
+  border-color: rgba(52, 211, 153, 0.4);
+  background: rgba(30, 41, 59, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.rate-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.rate-icon {
+  font-size: 20px;
+}
+
+.rate-trend {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.trend-up {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+}
+
+.trend-down {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+}
+
+.rate-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #E2E8F0;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rate-val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.rate-price {
+  font-size: 16px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.rate-unit {
+  font-size: 11px;
+  color: #94A3B8;
+}
+
+/* ----------------------------------------------------
+   DYNAMIC ENVIRONMENTAL TAGLINE CARD
+---------------------------------------------------- */
+.environment-tagline-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(13, 92, 58, 0.35), rgba(15, 23, 42, 0.7));
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.tagline-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.tagline-content {
+  flex: 1;
+}
+
+.tagline-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #34D399;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.tagline-text {
+  font-size: 13px;
+  color: #E2E8F0;
+  font-style: italic;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.btn-refresh-tagline {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94A3B8;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.btn-refresh-tagline:hover {
+  background: rgba(52, 211, 153, 0.2);
+  color: #34D399;
+  transform: rotate(180deg);
+}
+
+/* ----------------------------------------------------
+   POST SCRAP SCREEN & TABLE
+---------------------------------------------------- */
+.post-scrap-screen {
+  background: var(--bg-slate);
+  border-radius: var(--radius-lg);
+  margin-bottom: 40px;
+  animation: fadeIn 0.3s ease;
+}
+
+.post-scrap-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-glass);
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.post-scrap-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #F8FAFC;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.post-scrap-back-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+.back-arrow-icon {
+  font-size: 18px;
+}
+
+.post-scrap-screen-title h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0;
+  text-align: center;
+}
+
+.post-scrap-badge {
+  font-size: 11px;
+  color: #34D399;
+  display: block;
+  text-align: center;
+}
+
+.post-scrap-body {
+  padding: 20px;
+}
+
+.post-scrap-guide-tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  color: #BAE6FD;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.scrap-table-card,
+.scrap-photo-section-card,
+.ai-cost-estimation-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.table-card-header,
+.photo-card-header,
+.cost-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-card-header h3,
+.photo-card-header h3,
+.cost-header-row h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.table-auto-badge,
+.photo-rule-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34D399;
+}
+
+.scrap-materials-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.scrap-materials-table th {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #94A3B8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scrap-materials-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.category-name-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-icon {
+  font-size: 22px;
+}
+
+.weight-input-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+}
+
+.scrap-weight-input {
+  width: 70px;
+  background: transparent;
+  border: none;
+  color: #34D399;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: right;
+  outline: none;
+}
+
+.weight-unit {
+  font-size: 12px;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+.highlight-pulse {
+  animation: pulse-border 1.5s ease;
+}
+
+@keyframes pulse-border {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(52, 211, 153, 0); }
+  50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(52, 211, 153, 0.6); }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+/* Photo Section */
+.photo-upload-actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-upload-photo {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #FFFFFF;
+  border: none;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.btn-upload-photo:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+}
+
+.btn-sample-photo {
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38BDF8;
+}
+
+.scrap-photo-preview-container {
+  margin-top: 18px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.photo-frame {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.photo-frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ai-scan-laser-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #34D399;
+  box-shadow: 0 0 15px #34D399, 0 0 25px #10B981;
+  animation: scan-laser 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes scan-laser {
+  0% { top: 0%; }
+  100% { top: 96%; }
+}
+
+.photo-confirm-card {
+  margin-top: 14px;
+  padding: 14px;
+  background: rgba(30, 41, 59, 0.85);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.photo-confirm-question {
+  font-size: 14px;
+  color: #F8FAFC;
+  margin-bottom: 12px;
+}
+
+.photo-confirm-btn-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-photo-ok {
+  background: #10B981;
+  color: #FFFFFF;
+  border: none;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.btn-photo-retake {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #EF4444;
+  font-weight: 600;
+  padding: 10px 18px;
+}
+
+.photo-scanning-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+  color: #34D399;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* AI Cost Estimation Card */
+.total-cost-badge {
+  text-align: right;
+}
+
+.badge-sub {
+  display: block;
+  font-size: 10px;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+.badge-total {
+  font-size: 22px;
+  color: #34D399;
+  font-weight: 800;
+}
+
+.cost-breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+.cost-breakdown-table th {
+  font-size: 11px;
+  color: #94A3B8;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cost-breakdown-table td {
+  padding: 8px 10px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.cost-item-icon {
+  margin-right: 6px;
+}
+
+.cost-environmental-pill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-sm);
+  color: #34D399;
+  font-size: 12px;
+  margin-top: 12px;
+}
+
+/* Request Pickup Button */
+.post-scrap-submit-box {
+  margin-top: 24px;
+}
+
+.btn-request-pickup-submit {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #10B981, #0284C7);
+  color: #FFFFFF;
+  border: 2px solid #34D399;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+  transition: all 0.3s ease;
+}
+
+.btn-request-pickup-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #0369A1);
+  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-request-pickup-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.15);
+  background: #334155;
+  box-shadow: none;
+}
+
+.pickup-btn-icon {
+  font-size: 26px;
+  margin-bottom: 2px;
+}
+
+.pickup-btn-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 4px;
+}
+
+/* Modals */
+.post-scrap-exit-dialog {
+  max-width: 440px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);
+  text-align: center;
+  padding: 28px 24px;
+}
+
+.exit-dialog-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+/* Radius Search HUD */
+.radius-hud-card {
+  max-width: 500px;
+  text-align: center;
+  padding: 30px 24px;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
+}
+
+.radius-radar-wrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 16px;
+}
+
+.radar-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.radar-c1 { width: 50px; height: 50px; }
+.radar-c2 { width: 95px; height: 95px; }
+.radar-c3 { width: 140px; height: 140px; }
+
+.radar-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(56, 189, 248, 0.35) 90deg, transparent 91deg);
+  animation: radar-spin 2s linear infinite;
+}
+
+@keyframes radar-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.radar-center-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+}
+
+.hud-radius-badge {
+  display: inline-block;
+  font-size: 13px;
+  color: #38BDF8;
+  margin-top: 4px;
+}
+
+.hud-search-status-log {
+  margin-top: 18px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: left;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+/* 7-Second Confirmation Modal */
+.pickup-confirmed-modal {
+  max-width: 440px;
+  text-align: center;
+  padding: 30px 24px;
+  border: 2px solid #10B981;
+  box-shadow: 0 0 35px rgba(16, 185, 129, 0.35);
+  animation: zoomIn 0.3s ease;
+}
+
+.toast-conf-icon {
+  font-size: 50px;
+  margin-bottom: 12px;
+}
+
+.toast-conf-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 6px;
+}
+
+.toast-conf-sub {
+  font-size: 13px;
+  color: #CBD5E1;
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+.toast-lot-badge {
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #34D399;
+  margin-bottom: 18px;
+}
+
+.toast-countdown-wrapper {
+  font-size: 13px;
+  color: #94A3B8;
+}
+
+.countdown-num {
+  font-size: 18px;
+  color: #38BDF8;
+  font-weight: 800;
+}
+
 
 

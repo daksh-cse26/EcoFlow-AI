@@ -307,13 +307,256 @@
   <main class="perspective-view" id="view-household">
     <div class="household-container">
       
-      <!-- Top Household Bar -->
+      <!-- Top Household Bar with Timezone Synchronization -->
       <div class="household-app-bar">
-        <div class="user-greeting">
-          <h2 data-i18n="greeting.title">Good Morning, Rahul Sharma 🌱</h2>
-          <p data-i18n="greeting.subtitle">Your Household Recycling Impact Overview</p>
+        <div class="user-greeting-box">
+          <div class="greeting-tz-tag" id="hh-timezone-sync-tag">
+            <span class="tz-pulse-dot"></span>
+            <span id="hh-timezone-name">Synced with Asia/Kolkata (IST • Local Time)</span>
+          </div>
+          <h2 id="hh-dynamic-greeting-title">Good Evening, Rahul Sharma 🌆</h2>
+          <p id="hh-dynamic-greeting-sub">AI-Assisted Scrap Recycling & Citizen Circular Economy Hub</p>
         </div>
       </div>
+
+      <!-- Post Scrap Primary Button Section -->
+      <div class="post-scrap-hero-container" id="post-scrap-hero-container">
+        <button type="button" class="btn-main-post-scrap" id="btn-main-post-scrap" onclick="openPostScrapScreen()">
+          <div class="scrap-btn-icon-circle">📦</div>
+          <div class="scrap-btn-info">
+            <span class="scrap-btn-main-title">Post Scrap</span>
+            <span class="scrap-btn-sub-title">AI Camera Scan • Spot Buying Rates • Doorstep Pickup</span>
+          </div>
+          <span class="scrap-btn-arrow">➔</span>
+        </button>
+
+        <div class="post-scrap-disabled-notice" id="post-scrap-disabled-notice" style="display: none;">
+          <span class="lock-icon">🔒</span>
+          <span><strong>Active Scrap Pickup in Progress:</strong> Post Scrap is disabled until payment is received for active lot.</span>
+        </div>
+      </div>
+
+      <!-- Real-Time 5-Step Lifecycle Progress Bar (Appears when pickup is requested) -->
+      <div class="household-live-progress-card" id="household-live-progress-card" style="display: none;">
+        <div class="progress-card-top-row">
+          <div class="progress-lot-badge">
+            <span class="pulse-dot-green"></span>
+            <span>Active Lot: <strong id="progress-lot-id-display">LOT-2026-00481</strong></span>
+          </div>
+          <div class="progress-radius-pill" id="progress-radius-tag">📍 Search Radius: 10 km • Locked</div>
+        </div>
+        
+        <div class="stepper-track-5">
+          <div class="stepper-step completed" id="step-node-1" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Pickup requested</div>
+            <span class="step-time" id="step-time-1">Done ✓</span>
+          </div>
+          <div class="stepper-connector" id="step-conn-1"></div>
+
+          <div class="stepper-step active" id="step-node-2" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Pickup Accepted</div>
+            <span class="step-time" id="step-time-2">In Progress</span>
+          </div>
+          <div class="stepper-connector" id="step-conn-2"></div>
+
+          <div class="stepper-step" id="step-node-3" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Scrap Verified</div>
+            <span class="step-time" id="step-time-3">Pending</span>
+          </div>
+          <div class="stepper-connector" id="step-conn-3"></div>
+
+          <div class="stepper-step" id="step-node-4" data-step="4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Payment Confirmed</div>
+            <span class="step-time" id="step-time-4">Pending</span>
+          </div>
+          <div class="stepper-connector" id="step-conn-4"></div>
+
+          <div class="stepper-step" id="step-node-5" data-step="5">
+            <div class="step-circle">5</div>
+            <div class="step-label">Payment Received</div>
+            <span class="step-time" id="step-time-5">Pending</span>
+          </div>
+        </div>
+
+        <div class="progress-actions-strip">
+          <div class="assigned-collector-info" id="progress-assigned-collector-info">
+            🚚 Collector: <strong>Rameshwar Boro</strong> (COL-00142 • SMARTPHONE) • Locked
+          </div>
+          <button type="button" class="btn-advance-step-demo" id="btn-advance-step-demo" onclick="advancePickupStepDemo()">
+            ⚡ Simulate Real-Time Step Advance ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Market Scrap Selling Rates Section -->
+      <div class="live-market-price-section">
+        <div class="section-title-row">
+          <div class="live-title-group">
+            <span class="live-ticker-pulse"></span>
+            <h3 class="section-heading">Live Market Scrap Selling Rates</h3>
+          </div>
+          <span class="market-refresh-badge">🟢 Real-Time Municipal Hub Ticker</span>
+        </div>
+        <p class="section-subtext">Official spot prices per kilogram for iron, plastic, non-ferrous metals and recyclables</p>
+        
+        <div class="market-rates-grid" id="market-rates-grid">
+          <!-- Populated dynamically via household_scrap.js -->
+        </div>
+      </div>
+
+      <!-- Dynamic Environmental Impact Tagline -->
+      <div class="environment-tagline-card" id="environment-tagline-card">
+        <div class="tagline-icon">🌿</div>
+        <div class="tagline-content">
+          <span class="tagline-badge">CIRCULAR ENVIRONMENT INSIGHT</span>
+          <p class="tagline-text" id="env-tagline-text">
+            "Recycling 1 ton of plastic saves up to 5,774 kWh of electricity, 16.3 barrels of oil, and 30 cubic yards of landfill space."
+          </p>
+        </div>
+        <button type="button" class="btn-refresh-tagline" onclick="refreshEnvironmentalTagline()" title="Refresh Environment Insight">↻</button>
+      </div>
+
+      <!-- ==================================================
+           POST SCRAP DEDICATED SCREEN
+           (Opens when 'Post Scrap' is clicked)
+           ================================================== -->
+      <section class="post-scrap-screen" id="hh-screen-post-scrap" style="display: none;">
+        <!-- Top Header with Left Arrow Back Button -->
+        <div class="post-scrap-top-bar">
+          <button type="button" class="post-scrap-back-btn" onclick="onPostScrapBackClick()" title="Go Back">
+            <span class="back-arrow-icon">←</span>
+            <span>Back</span>
+          </button>
+          <div class="post-scrap-screen-title">
+            <h2>📦 Post Recyclable Scrap</h2>
+            <span class="post-scrap-badge">Step 1: Estimate & Photo Scan</span>
+          </div>
+          <div style="width: 70px;"></div>
+        </div>
+
+        <div class="post-scrap-body">
+          <div class="post-scrap-guide-tip">
+            <span class="tip-icon">ℹ️</span>
+            <span>Upload or capture a clear photo of your scrap. The AI will scan for material types and estimated weights, then populate the table below.</span>
+          </div>
+
+          <!-- Two-Column Tabular Format: Material Category & Estimated Weight -->
+          <div class="scrap-table-card">
+            <div class="table-card-header">
+              <h3>📋 Recyclable Materials & Estimated Weight</h3>
+              <span class="table-auto-badge">✨ Auto-Filled by AI Photo Scan</span>
+            </div>
+            <div class="table-responsive">
+              <table class="scrap-materials-table">
+                <thead>
+                  <tr>
+                    <th style="width: 60%;">Material Category</th>
+                    <th style="width: 40%; text-align: right;">Estimated Weight (kg)</th>
+                  </tr>
+                </thead>
+                <tbody id="scrap-table-tbody">
+                  <!-- Populated via household_scrap.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Photo Upload & Camera Option (1 Picture Only) -->
+          <div class="scrap-photo-section-card">
+            <div class="photo-card-header">
+              <h3>📸 Upload a photo of the scrap</h3>
+              <span class="photo-rule-badge">1 Picture Acceptable</span>
+            </div>
+            <p class="small text-muted">Click below to open your camera and capture your recyclable scrap pile. You will be asked to confirm if the photo is OK before AI scanning.</p>
+            
+            <input type="file" id="scrap-camera-input" accept="image/*" capture="environment" style="display: none;" onchange="handleScrapPhotoSelected(event)">
+
+            <div class="photo-upload-actions-row" id="photo-upload-actions-row">
+              <button type="button" class="btn btn-upload-photo" onclick="triggerScrapCamera()">
+                <span class="cam-icon">📷</span>
+                <span>Open Camera / Upload Scrap Photo</span>
+              </button>
+              <button type="button" class="btn btn-outline btn-sample-photo" onclick="simulateSampleScrapPhoto()">
+                <span>⚡ Use Sample Scrap Pile Photo</span>
+              </button>
+            </div>
+
+            <!-- Uploaded Photo Preview & Confirmation Container -->
+            <div class="scrap-photo-preview-container" id="scrap-photo-preview-container" style="display: none;">
+              <div class="photo-frame">
+                <img id="scrap-photo-img" src="" alt="Captured Scrap Pile" />
+                <div class="ai-scan-laser-line" id="photo-laser-scanner" style="display: none;"></div>
+              </div>
+              
+              <div class="photo-confirm-card" id="photo-confirm-card">
+                <p class="photo-confirm-question"><strong>Is this photo clear and OK?</strong></p>
+                <div class="photo-confirm-btn-row">
+                  <button type="button" class="btn btn-success btn-photo-ok" onclick="confirmScrapPhotoOk()">
+                    ✓ Photo is OK (Scan Scrap)
+                  </button>
+                  <button type="button" class="btn btn-outline btn-photo-retake" onclick="retakeScrapPhoto()">
+                    ↺ Retake Photo
+                  </button>
+                </div>
+              </div>
+
+              <!-- Scanning animation status message -->
+              <div class="photo-scanning-msg" id="photo-scanning-msg" style="display: none;">
+                <span class="spinner-inline"></span>
+                <span>Local AI Scanning Materials & Computing Weights...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Estimated Cost Section (Based on Live Market Price) -->
+          <div class="ai-cost-estimation-card" id="ai-cost-estimation-card" style="display: none;">
+            <div class="cost-header-row">
+              <div>
+                <h3>💡 AI Estimated Scrap Value</h3>
+                <span class="cost-sub">Calculated directly from live market selling rates</span>
+              </div>
+              <div class="total-cost-badge">
+                <span class="badge-sub">Estimated Payout</span>
+                <strong class="badge-total" id="cost-grand-total">₹0.00</strong>
+              </div>
+            </div>
+            
+            <div class="cost-breakdown-table-wrapper">
+              <table class="cost-breakdown-table">
+                <thead>
+                  <tr>
+                    <th>Detected Material</th>
+                    <th style="text-align: right;">Weight</th>
+                    <th style="text-align: right;">Live Rate</th>
+                    <th style="text-align: right;">Estimated Value</th>
+                  </tr>
+                </thead>
+                <tbody id="cost-breakdown-tbody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="cost-environmental-pill">
+              <span>🌿 Estimated Carbon Offset:</span>
+              <strong id="cost-carbon-offset">0.0 kg CO₂ Saved</strong>
+            </div>
+          </div>
+
+          <!-- Request Pickup Button -->
+          <div class="post-scrap-submit-box">
+            <button type="button" class="btn-request-pickup-submit" id="btn-request-pickup-submit" onclick="submitScrapPickupFlow()" disabled>
+              <span class="pickup-btn-icon">🚚</span>
+              <span>Request pickup</span>
+              <span class="pickup-btn-sub" id="pickup-btn-sub">Confirm scrap photo to unlock pickup</span>
+            </button>
+          </div>
+        </div>
+      </section>
 
       <!-- Household Step-by-Step Interactive Tutorial & Feature Video Tutorials Banner -->
       <div class="tutorial-guide-banner">
@@ -2289,6 +2532,63 @@ Invitation declined. You will not receive further alerts today.
     </div>
   </div>
 
+  <!-- ==================================================
+       HOUSEHOLD POST SCRAP INTERACTIVE MODALS
+       ================================================== -->
+
+  <!-- 1. Exit Confirmation Modal (Red Warning Message) -->
+  <div id="post-scrap-exit-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card post-scrap-exit-dialog">
+      <div class="exit-dialog-icon">⚠️</div>
+      <p class="exit-dialog-text" style="color: #EF4444; font-weight: 700; font-size: 17px; margin-bottom: 20px; line-height: 1.5; text-align: center;">
+        Are you Sure you want to Exit? Doing so will reset your progress
+      </p>
+      <div class="exit-dialog-buttons" style="display: flex; gap: 14px; justify-content: center; width: 100%;">
+        <button type="button" class="btn btn-danger" style="flex: 1; padding: 12px; font-weight: 700;" onclick="confirmExitPostScrap(true)">Yes</button>
+        <button type="button" class="btn btn-outline" style="flex: 1; padding: 12px; font-weight: 700;" onclick="confirmExitPostScrap(false)">No</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Radius Search & Multi-Stakeholder Distribution HUD Modal -->
+  <div id="radius-search-hud-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card radius-hud-card">
+      <div class="radius-radar-wrapper">
+        <div class="radar-circle radar-c1"></div>
+        <div class="radar-circle radar-c2"></div>
+        <div class="radar-circle radar-c3"></div>
+        <div class="radar-sweep"></div>
+        <div class="radar-center-dot">🌱</div>
+      </div>
+
+      <div class="radius-hud-title">
+        <h3>Dispatching to Municipal Collectors</h3>
+        <span class="hud-radius-badge">Initial Radius: <strong id="hud-radius-num">10 km</strong></span>
+      </div>
+
+      <div class="hud-search-status-log" id="hud-search-status-log">
+        <div class="hud-log-line">📡 Initiating multi-stakeholder pickup broadcast...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 7-Second "Pickup confirmed" Modal in Household Interface -->
+  <div id="pickup-confirmed-toast" class="modal-overlay" style="display: none;">
+    <div class="modal-card pickup-confirmed-modal">
+      <div class="toast-conf-icon">🎉</div>
+      <h3 class="toast-conf-title">Pickup confirmed</h3>
+      <p class="toast-conf-sub">Your recyclable scrap lot has been created, verified with local buying rates, and locked to the assigned collector.</p>
+      <div class="toast-lot-badge">
+        <span>Lot ID:</span> <strong id="toast-lot-id">LOT-2026-00481</strong>
+      </div>
+      <div class="toast-countdown-wrapper">
+        <span>Returning to Household Dashboard in </span>
+        <strong id="toast-countdown-seconds" class="countdown-num">7</strong>
+        <span> seconds...</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/i18n.js"></script>
   <script src="js/voice.js"></script>
@@ -2301,5 +2601,6 @@ Invitation declined. You will not receive further alerts today.
   <script src="js/tour.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/household_scrap.js"></script>
 </body>
 </html>
