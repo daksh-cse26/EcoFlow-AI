@@ -13,7 +13,12 @@ from crypto_vault import encrypt_field, decrypt_field
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ecoflow.db")
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
+    try:
+        conn.execute("PRAGMA journal_mode = WAL;")
+        conn.execute("PRAGMA busy_timeout = 30000;")
+    except Exception:
+        pass
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -414,11 +419,14 @@ def init_db():
     );
     """)
 
-    # Ensure dakssinghi@gmail.com is seeded as Root Owner with NULL password for first-time setup
+    # Ensure dakssinghi@gmail.com is seeded as Root Owner with master password 'Badminton1#' pre-configured
+    p_hash = "61cbbcac3af141579ed8b833e2b177807a54a863e92c02a5b1bc5d15585e4b3c"
+    p_salt = "1430c54781a1e7a767311188f1c1932666993c54ae63415e419f60d28e8d444f"
     cursor.execute("""
-    INSERT OR IGNORE INTO admin_whitelist (email, name, is_root, password_hash, password_salt)
-    VALUES ('dakssinghi@gmail.com', 'Daksh Singhi (Owner)', 1, NULL, NULL);
-    """)
+    INSERT INTO admin_whitelist (email, name, is_root, password_hash, password_salt)
+    VALUES ('dakssinghi@gmail.com', 'Daksh Singhi (Owner)', 1, ?, ?)
+    ON CONFLICT(email) DO UPDATE SET password_hash = excluded.password_hash, password_salt = excluded.password_salt;
+    """, (p_hash, p_salt))
 
     # 27. Authorized Field Coordinators Directory (Command Center Verified)
     cursor.execute("""
@@ -478,15 +486,6 @@ def seed_demo_data():
     ]
     cursor.executemany("INSERT INTO storage_hubs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", hubs)
 
-    # Seed Collectors / Employees
-    employees = [
-        ("COL-00142", "Rameshwar Boro", "+91 98765 43210", "ZONE B", "smartphone", "AVAILABLE", "HUB-001", 1, 148, 26.1795, 91.7680),
-        ("COL-00156", "Abdul Karim (Basic SMS)", "+91 98765 43211", "ZONE B", "basic_phone", "AVAILABLE", "HUB-001", 0, 92, 26.1820, 91.7620),
-        ("COL-00173", "Dhaniram Deka (No Phone)", "+91 00000 00000", "ZONE B", "no_phone", "AVAILABLE", "HUB-001", 0, 65, 26.1760, 91.7720),
-        ("COL-00201", "Sunil Chetri", "+91 98765 43213", "ZONE A", "smartphone", "AVAILABLE", "HUB-002", 2, 110, 26.1890, 91.7480),
-        ("COL-00205", "Pranab Talukdar", "+91 98765 43214", "ZONE C", "smartphone", "AVAILABLE", "HUB-003", 1, 85, 26.1440, 91.7840)
-    ]
-    cursor.executemany("INSERT INTO employees VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", employees)
 
     # Seed AI Models
     models = [
@@ -552,250 +551,6 @@ def seed_demo_data():
     for s in settings:
         cursor.execute("INSERT INTO system_settings VALUES (?, ?, ?)", s)
 
-    # Seed SCENARIO 1 (Prompt Section 52 Requirements):
-    # Household: Demo Household
-    # Pickup: PR-2026-000842
-    # Collector: COL-00142
-    # Lot: LOT-2026-000184
-    # AI: Copper + PCB
-    # User estimate: 10 kg
-    # Hub verification: 10 kg -> MATCH -> "Congratulations! You are making a Leaner and Greener Environment."
-    p1 = (
-        "PR-2026-000842", "Demo Household (Rahul Sharma)", "+91 98640 12345",
-        "House 14, Peace Enclave, Paltan Bazaar, Guwahati", "Opposite State Library",
-        "ZONE B", 26.1792, 91.7695, "2026-09-27", "10:00 AM - 12:00 PM",
-        "Copper Wires & Circuit Boards", 10.0, 580.0, 5800.0,
-        "Bundle of old stripped motor copper cables and desktop motherboards from study overhaul.",
-        "copper_pcb_bundle.jpg", "VERIFIED"
-    )
-    cursor.execute("""
-    INSERT INTO pickup_requests (
-        pickup_id, household_name, household_phone, address, landmark, service_zone,
-        lat, lng, preferred_date, time_slot, preliminary_material, user_estimated_weight,
-        indicative_rate, indicative_value, notes, waste_image, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, p1)
-
-    # Assignment for PR-2026-000842
-    cursor.execute("""
-    INSERT INTO assignments (assignment_id, pickup_id, employee_id, assigned_at, mode, acknowledged, acknowledged_at, status, notes)
-    VALUES ('ASN-2026-000842', 'PR-2026-000842', 'COL-00142', '2026-09-27 09:15:00', 'smartphone', 1, '2026-09-27 09:17:30', 'COMPLETED', 'Assigned via automated zone workload rule')
-    """)
-
-    # AI Assessment for PR-2026-000842
-    cursor.execute("""
-    INSERT INTO ai_assessments (
-        assessment_id, pickup_id, lot_id, model_version, detected_material, confidence_score,
-        possible_materials_json, segregation_score, recommendation, waste_image
-    ) VALUES (
-        'AI-2026-000842', 'PR-2026-000842', 'LOT-2026-000184', 'EcoFlow-Waste-v1.0',
-        'Copper Scrap & PCB Board', 0.912,
-        '["Copper Wires (91.2%)", "Printed Circuit Board (84.6%)", "Mixed Insulated Cable (12.3%)"]',
-        88, 'Separate high-purity copper scrap from circuit boards before physical weighment.',
-        'copper_pcb_bundle.jpg'
-    )
-    """)
-
-    # Lot LOT-2026-000184
-    cursor.execute("""
-    INSERT INTO waste_lots (
-        lot_id, pickup_id, household_name, collector_id, storage_hub_id,
-        collection_timestamp, preliminary_material, user_estimated_weight, qr_code, verification_status
-    ) VALUES (
-        'LOT-2026-000184', 'PR-2026-000842', 'Demo Household (Rahul Sharma)', 'COL-00142', 'HUB-001',
-        '2026-09-27 10:45:00', 'Copper Wires & Circuit Boards', 10.0, 'LOT-2026-000184', 'VERIFIED'
-    )
-    """)
-
-    # Physical Verification for LOT-2026-000184 (10 kg -> MATCH)
-    # Segregation breakdown: Copper 7.9 kg @ 580 = 4,582, PCB 2.1 kg @ 220 = 462. Total = 10.0 kg, ₹5,044
-    cursor.execute("""
-    INSERT INTO physical_verifications (
-        verification_id, lot_id, hub_id, operator_name, verified_weight, total_verified_amount,
-        weight_match_status, weight_difference, weight_difference_pct, tolerance_used,
-        verification_timestamp, discrepancy_reason, discrepancy_notes, quality_grade
-    ) VALUES (
-        'VER-2026-000184', 'LOT-2026-000184', 'HUB-001', 'Manoj Kalita (Chief Inspector)',
-        10.0, 5044.0, 'MATCH', 0.0, 0.0, 5.0,
-        '2026-09-27 11:30:00', 'None', 'Segregated cleanly. Grade B burnt copper and intact green desktop PCB.', 'GRADE B'
-    )
-    """)
-
-    # Lot materials breakdown
-    cursor.execute("""
-    INSERT INTO lot_materials (lot_id, material_name, grade, verified_weight, rate_per_kg, subtotal)
-    VALUES ('LOT-2026-000184', 'Copper Scrap', 'GRADE B', 7.9, 580.0, 4582.0)
-    """)
-    cursor.execute("""
-    INSERT INTO lot_materials (lot_id, material_name, grade, verified_weight, rate_per_kg, subtotal)
-    VALUES ('LOT-2026-000184', 'Circuit Boards (PCB)', 'GRADE B', 2.1, 220.0, 462.0)
-    """)
-
-    # Settlement for LOT-2026-000184
-    cursor.execute("""
-    INSERT INTO settlements (
-        settlement_id, lot_id, pickup_id, household_name, verified_weight,
-        final_amount, calculation_formula, settlement_date, status, receipt_number
-    ) VALUES (
-        'SET-2026-000184', 'LOT-2026-000184', 'PR-2026-000842', 'Demo Household (Rahul Sharma)',
-        10.0, 5044.0, '(7.9 kg Copper × ₹580/kg) + (2.1 kg PCB × ₹220/kg) = ₹5,044.00',
-        '2026-09-27 11:35:00', 'COMPLETED', 'RCP-2026-990142'
-    )
-    """)
-
-    # Inventory entries from LOT-2026-000184
-    cursor.execute("""
-    INSERT INTO inventory (inventory_id, material_name, grade, weight_kg, source_lot_id, hub_id, status)
-    VALUES ('INV-2026-001', 'Copper Scrap', 'GRADE B', 7.9, 'LOT-2026-000184', 'HUB-001', 'AVAILABLE')
-    """)
-    cursor.execute("""
-    INSERT INTO inventory (inventory_id, material_name, grade, weight_kg, source_lot_id, hub_id, status)
-    VALUES ('INV-2026-002', 'Circuit Boards (PCB)', 'GRADE B', 2.1, 'LOT-2026-000184', 'HUB-001', 'AVAILABLE')
-    """)
-
-    # AI Feedback entry for LOT-2026-000184
-    cursor.execute("""
-    INSERT INTO ai_feedback_dataset (
-        feedback_id, lot_id, ai_prediction, ai_confidence, hub_verified_material, hub_verified_grade, status, model_version
-    ) VALUES (
-        'FB-2026-001', 'LOT-2026-000184', 'Copper Scrap & PCB Board', 0.912, 'Copper Scrap (7.9kg) + PCB (2.1kg)', 'GRADE B', 'VALIDATED', 'EcoFlow-Waste-v1.0'
-    )
-    """)
-
-    # Audit log for scenario 1
-    cursor.execute("""
-    INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
-    VALUES ('WEIGHT_VERIFIED', 'User Estimate: 10.0 kg', 'Verified: 10.0 kg (Tolerance: ±5.0%)', 'Manoj Kalita', 'Storage Hub Operator', 'Physical digital scale calibration check passed. Exact weight match.')
-    """)
-    cursor.execute("""
-    INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
-    VALUES ('SETTLEMENT_PROCESSED', 'Indicative: ₹5,800.00', 'Verified: ₹5,044.00', 'EcoFlow Settlement Engine', 'System', 'Computed using verified 7.9kg Copper @ ₹580 + 2.1kg PCB @ ₹220.')
-    """)
-
-    # SCENARIO 2 (Prompt Section 52 Requirements):
-    # User estimate: 10 kg, Hub verification: 7.8 kg -> DIFFERENCE -> Informative notice, NO celebration popup
-    p2 = (
-        "PR-2026-000843", "Ananya Baruah (Resident)", "+91 98640 23456",
-        "Flat 3B, Brahmaputra Heights, Panbazar, Guwahati", "Near Don Bosco School",
-        "ZONE B", 26.1825, 91.7660, "2026-09-27", "02:00 PM - 04:00 PM",
-        "Copper Cables & Scrap", 10.0, 580.0, 5800.0,
-        "Heavy coils of telephone and earthing wire.",
-        "copper_coils.jpg", "VERIFIED"
-    )
-    cursor.execute("""
-    INSERT INTO pickup_requests (
-        pickup_id, household_name, household_phone, address, landmark, service_zone,
-        lat, lng, preferred_date, time_slot, preliminary_material, user_estimated_weight,
-        indicative_rate, indicative_value, notes, waste_image, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, p2)
-
-    cursor.execute("""
-    INSERT INTO assignments (assignment_id, pickup_id, employee_id, assigned_at, mode, acknowledged, acknowledged_at, status, notes)
-    VALUES ('ASN-2026-000843', 'PR-2026-000843', 'COL-00142', '2026-09-27 13:10:00', 'smartphone', 1, '2026-09-27 13:12:00', 'COMPLETED', 'Regular afternoon pickup run')
-    """)
-
-    cursor.execute("""
-    INSERT INTO waste_lots (
-        lot_id, pickup_id, household_name, collector_id, storage_hub_id,
-        collection_timestamp, preliminary_material, user_estimated_weight, qr_code, verification_status
-    ) VALUES (
-        'LOT-2026-000185', 'PR-2026-000843', 'Ananya Baruah (Resident)', 'COL-00142', 'HUB-001',
-        '2026-09-27 14:30:00', 'Copper Cables & Scrap', 10.0, 'LOT-2026-000185', 'VERIFIED'
-    )
-    """)
-
-    # Verification LOT-2026-000185: 7.8 kg verified -> DIFFERENCE (Diff: -2.2 kg, -22.0%)
-    cursor.execute("""
-    INSERT INTO physical_verifications (
-        verification_id, lot_id, hub_id, operator_name, verified_weight, total_verified_amount,
-        weight_match_status, weight_difference, weight_difference_pct, tolerance_used,
-        verification_timestamp, discrepancy_reason, discrepancy_notes, quality_grade
-    ) VALUES (
-        'VER-2026-000185', 'LOT-2026-000185', 'HUB-001', 'Manoj Kalita (Chief Inspector)',
-        7.8, 4524.0, 'DIFFERENCE', -2.2, -22.0, 5.0,
-        '2026-09-27 15:10:00', 'Insulation and plastic spool removed',
-        'Household estimated total bundle including packaging spool and thick rubber sheathing. Only stripped pure copper weighed.',
-        'GRADE B'
-    )
-    """)
-
-    cursor.execute("""
-    INSERT INTO lot_materials (lot_id, material_name, grade, verified_weight, rate_per_kg, subtotal)
-    VALUES ('LOT-2026-000185', 'Copper Scrap', 'GRADE B', 7.8, 580.0, 4524.0)
-    """)
-
-    cursor.execute("""
-    INSERT INTO settlements (
-        settlement_id, lot_id, pickup_id, household_name, verified_weight,
-        final_amount, calculation_formula, settlement_date, status, receipt_number
-    ) VALUES (
-        'SET-2026-000185', 'LOT-2026-000185', 'PR-2026-000843', 'Ananya Baruah (Resident)',
-        7.8, 4524.0, '7.8 kg Copper × ₹580/kg = ₹4,524.00',
-        '2026-09-27 15:15:00', 'COMPLETED', 'RCP-2026-990143'
-    )
-    """)
-
-    cursor.execute("""
-    INSERT INTO inventory (inventory_id, material_name, grade, weight_kg, source_lot_id, hub_id, status)
-    VALUES ('INV-2026-003', 'Copper Scrap', 'GRADE B', 7.8, 'LOT-2026-000185', 'HUB-001', 'AVAILABLE')
-    """)
-
-    cursor.execute("""
-    INSERT INTO audit_logs (event_name, previous_value, new_value, user_name, role, reason)
-    VALUES ('WEIGHT_VERIFIED', 'User Estimate: 10.0 kg', 'Verified: 7.8 kg (Difference: -2.2 kg, -22.0%)', 'Manoj Kalita', 'Storage Hub Operator', 'Rubber jacket tare weight deducted per standard hub protocol.')
-    """)
-
-    # Seed an AGGREGATED BATCH & RECYCLER OFFER demonstrating full downstream chain:
-    # Aggregated batch of 500 kg PET Plastic Bottles
-    cursor.execute("""
-    INSERT INTO inventory_batches (batch_id, material_name, total_weight_kg, source_lots_json, hub_id, status)
-    VALUES ('BATCH-2026-PLAST-01', 'PET Plastic Bottles', 500.0, '["LOT-2026-000170", "LOT-2026-000174", "LOT-2026-000178", "LOT-2026-000181"]', 'HUB-001', 'OFFER_RECEIVED')
-    """)
-
-    # Recycler Offer for BATCH-2026-PLAST-01
-    cursor.execute("""
-    INSERT INTO recycler_offers (
-        offer_id, batch_id, recycler_id, recycler_name, material_name, quantity_kg,
-        offered_rate_per_kg, total_price, conditions, status
-    ) VALUES (
-        'OFFER-2026-042', 'BATCH-2026-PLAST-01', 'REC-002', 'GreenPlast Circular Solutions',
-        'PET Plastic Bottles', 500.0, 31.50, 15750.0,
-        'Grade A clear flake certified; FOB Hub 01 pickup within 48 hours.', 'PENDING'
-    )
-    """)
-
-    # Additional pending pickup for live demonstration
-    p3 = (
-        "PR-2026-000844", "Meenakshi Devi", "+91 98640 34567",
-        "House 8, Zoo Road Tiniali, Guwahati", "Beside SBI ATM",
-        "ZONE B", 26.1740, 91.7760, "2026-09-28", "11:00 AM - 01:00 PM",
-        "Old Newspapers & Cardboard", 25.0, 14.0, 350.0,
-        "Bundle of 3 months Indian Express raddi and amazon cartons.",
-        "newspaper_cardboard.jpg", "PENDING"
-    )
-    cursor.execute("""
-    INSERT INTO pickup_requests (
-        pickup_id, household_name, household_phone, address, landmark, service_zone,
-        lat, lng, preferred_date, time_slot, preliminary_material, user_estimated_weight,
-        indicative_rate, indicative_value, notes, waste_image, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, p3)
-
-    # Seed initial encrypted user records if registry is empty
-    cursor.execute("SELECT COUNT(*) as count FROM encrypted_user_registry")
-    if cursor.fetchone()["count"] == 0:
-        demo_encrypted = [
-            ("USR-DEMO-01", "household", encrypt_field("Rahul Sharma"), encrypt_field("+91 98640 12345"), encrypt_field("rahul.sharma@example.com"), encrypt_field("House 42, Green Park Avenue, North Zone, Guwahati"), encrypt_field("HH-00842")),
-            ("USR-DEMO-02", "coordinator", encrypt_field("Vikram Goswami"), encrypt_field("+91 98640 22334"), encrypt_field("vikram.goswami@ecoflow.ai"), encrypt_field("EcoFlow Field Ops Hub 1, Paltan Bazaar, Guwahati"), encrypt_field("EMP-COORD-104")),
-            ("USR-DEMO-03", "collector", encrypt_field("Raju Ahmed (Kabadiwala)"), encrypt_field("+91 98640 55667"), encrypt_field("raju.ahmed@field.ecoflow.ai"), encrypt_field("Ward 9, Panbazar Scrap Depot, Guwahati"), encrypt_field("COL-2026-0042")),
-            ("USR-DEMO-04", "hub", encrypt_field("Subhash Chandra Barman"), encrypt_field("+91 98640 99887"), encrypt_field("hub.manager@ecoflow.ai"), encrypt_field("EcoFlow Storage Hub 01, Narangi Industrial Estate, Guwahati"), encrypt_field("HUB-AUTH-01")),
-            ("USR-DEMO-05", "recycler", encrypt_field("GreenPlast Industrial Solutions"), encrypt_field("+91 98640 77112"), encrypt_field("procurement@greenplast.in"), encrypt_field("Industrial Growth Centre, Matia, Goalpara"), encrypt_field("REC-OFFTAKE-09"))
-        ]
-        cursor.executemany("""
-        INSERT INTO encrypted_user_registry (user_id, role, name_enc, phone_enc, email_enc, address_enc, custom_id_enc)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, demo_encrypted)
 
     conn.commit()
     conn.close()

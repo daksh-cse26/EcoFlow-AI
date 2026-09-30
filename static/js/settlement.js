@@ -252,6 +252,19 @@ class SettlementEngine {
     const container = document.getElementById("settlement-receipt-view");
     if (!container) return;
 
+    if (!settlement || !settlement.lot_id) {
+      container.innerHTML = `
+        <div class="empty-state-notice" id="settlement-empty-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+          <div class="empty-state-icon" style="font-size: 40px; margin-bottom: 10px;">🧾</div>
+          <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Settlement Receipts Yet</h4>
+          <p class="small text-muted" style="margin: 0; max-width: 420px; margin-inline: auto;">
+            Digital receipts and transparent weighment calculations will appear here automatically after your scrap is physically verified and paid at the hub.
+          </p>
+        </div>
+      `;
+      return;
+    }
+
     const s = settlement;
     const itemsHtml = (s.items || []).map(i => `
       <tr>
@@ -259,7 +272,7 @@ class SettlementEngine {
         <td><span class="badge-grade">${i.grade}</span></td>
         <td>${i.verified_weight} kg</td>
         <td>₹${i.rate_per_kg}/kg</td>
-        <td class="text-right"><strong>₹${i.subtotal.toFixed(2)}</strong></td>
+        <td class="text-right"><strong>₹${i.subtotal ? i.subtotal.toFixed(2) : (i.verified_weight * i.rate_per_kg).toFixed(2)}</strong></td>
       </tr>
     `).join("");
 
@@ -275,7 +288,7 @@ class SettlementEngine {
           </div>
           <div class="receipt-meta">
             <div class="receipt-no">Receipt #${s.receipt_number || 'RCP-2026-990142'}</div>
-            <div class="receipt-date">${s.settlement_date || '2026-09-27 11:35:00'}</div>
+            <div class="receipt-date">${s.settlement_date || new Date().toISOString()}</div>
           </div>
         </div>
 
@@ -285,8 +298,8 @@ class SettlementEngine {
         </div>
 
         <div class="receipt-details-grid">
-          <div><span class="lbl">Citizen / Household:</span> <strong>${s.household_name}</strong></div>
-          <div><span class="lbl">Pickup ID:</span> <strong>${s.pickup_id}</strong></div>
+          <div><span class="lbl">Citizen / Household:</span> <strong>${s.household_name || 'Citizen'}</strong></div>
+          <div><span class="lbl">Pickup ID:</span> <strong>${s.pickup_id || '—'}</strong></div>
           <div><span class="lbl">Digital Lot ID:</span> <strong>${s.lot_id}</strong></div>
           <div><span class="lbl">Hub Station:</span> <strong>HUB-001 (Central Sorting Hub)</strong></div>
         </div>
@@ -304,18 +317,7 @@ class SettlementEngine {
           <tbody>
             ${itemsHtml || `
               <tr>
-                <td>Copper Scrap</td>
-                <td>GRADE B</td>
-                <td>7.9 kg</td>
-                <td>₹580.00/kg</td>
-                <td class="text-right">₹4,582.00</td>
-              </tr>
-              <tr>
-                <td>Circuit Boards (PCB)</td>
-                <td>GRADE B</td>
-                <td>2.1 kg</td>
-                <td>₹220.00/kg</td>
-                <td class="text-right">₹462.00</td>
+                <td colspan="5" class="text-center text-muted" style="padding: 14px;">No itemized materials logged.</td>
               </tr>
             `}
           </tbody>

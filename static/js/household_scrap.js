@@ -138,19 +138,37 @@ async function loadLiveMarketPrices() {
 // 4. CHECK ACTIVE PICKUP & PROGRESS BAR STATE
 // ----------------------------------------------------
 async function checkActiveHouseholdPickup() {
+  const postBtn = document.getElementById("btn-main-post-scrap");
+  const lockNotice = document.getElementById("post-scrap-disabled-notice");
+  const progressCard = document.getElementById("household-live-progress-card");
+
+  const storedPickupId = localStorage.getItem("ecoflow_active_household_pickup_id");
+  if (!storedPickupId) {
+    // Initially active with NO progress bar
+    postScrapState.isLocked = false;
+    postScrapState.currentStep = 0;
+    postScrapState.activeLotId = null;
+    postScrapState.activePickupId = null;
+
+    if (postBtn) {
+      postBtn.disabled = false;
+      postBtn.classList.remove("disabled");
+    }
+    if (lockNotice) lockNotice.style.display = "none";
+    if (progressCard) progressCard.style.display = "none";
+    return;
+  }
+
   try {
-    const res = await fetch("/api/household/active-pickup");
+    const res = await fetch(`/api/household/active-pickup?pickup_id=${encodeURIComponent(storedPickupId)}`);
     const data = await res.json();
 
-    const postBtn = document.getElementById("btn-main-post-scrap");
-    const lockNotice = document.getElementById("post-scrap-disabled-notice");
-    const progressCard = document.getElementById("household-live-progress-card");
-
-    if (data.has_active && data.step >= 1 && data.step < 5) {
-      // Pickup active and NOT yet payment received: Lock Post Scrap
+    if (data.has_active && data.step >= 2 && data.step < 5) {
+      // Pickup accepted: Disable Post Scrap and show progress bar
       postScrapState.isLocked = true;
       postScrapState.currentStep = data.step;
       postScrapState.activeLotId = data.lot_id;
+      postScrapState.activePickupId = storedPickupId;
       
       if (postBtn) {
         postBtn.disabled = true;
@@ -160,26 +178,67 @@ async function checkActiveHouseholdPickup() {
         lockNotice.style.display = "flex";
         const msgEl = document.getElementById("post-scrap-disabled-msg");
         if (msgEl) {
-          if (data.step === 1) {
-            msgEl.innerHTML = `<strong>Pickup Requested:</strong> Waiting for field collector acceptance. Progress bar will appear once accepted.`;
-          } else {
-            msgEl.innerHTML = `<strong>Active Scrap Pickup in Progress:</strong> Post Scrap is disabled until payment is received for active lot.`;
-          }
+          msgEl.innerHTML = `<strong>Active Scrap Pickup in Progress:</strong> Post Scrap is disabled until payment is received for active lot.`;
         }
       }
 
-      // The progress bar should ONLY appear once the pickup is accepted (step >= 2)
-      if (data.step >= 2) {
-        if (progressCard) progressCard.style.display = "block";
-        updateProgressBarUI(data.step, data.lot_id, data.pickup);
-      } else {
-        if (progressCard) progressCard.style.display = "none";
+      // The progress bar appears once pickup is accepted (step >= 2)
+      if (progressCard) progressCard.style.display = "block";
+      updateProgressBarUI(data.step, data.lot_id, data.pickup);
+
+    } else if (data.has_active && data.step === 1) {
+      // Step 1: Requested but not yet accepted by collector -> Active with NO progress bar
+      postScrapState.isLocked = false;
+      postScrapState.currentStep = 1;
+      postScrapState.activeLotId = data.lot_id;
+      
+      if (postBtn) {
+        postBtn.disabled = false;
+        postBtn.classList.remove("disabled");
       }
+      if (lockNotice) lockNotice.style.display = "none";
+      if (progressCard) progressCard.style.display = "none";
+
+    } else if (data.step === 5) {
+      // Step 5: Payment received! Progress bar 100% full
+      postScrapState.currentStep = 5;
+      postScrapState.activeLotId = data.lot_id;
+      if (progressCard) progressCard.style.display = "block";
+      updateProgressBarUI(5, data.lot_id, data.pickup);
+
+      if (lockNotice) {
+        lockNotice.style.display = "flex";
+        const msgEl = document.getElementById("post-scrap-disabled-msg");
+        if (msgEl) {
+          msgEl.innerHTML = `🎉 <strong>Payment Received!</strong> Scrap pickup lifecycle complete. "Post Scrap" will unlock shortly.`;
+        }
+      }
+
+      setTimeout(() => {
+        localStorage.removeItem("ecoflow_active_household_pickup_id");
+        localStorage.removeItem("ecoflow_active_household_lot_id");
+        postScrapState.isLocked = false;
+        postScrapState.currentStep = 0;
+        postScrapState.activeLotId = null;
+        postScrapState.activePickupId = null;
+
+        if (postBtn) {
+          postBtn.disabled = false;
+          postBtn.classList.remove("disabled");
+        }
+        if (lockNotice) lockNotice.style.display = "none";
+        if (progressCard) progressCard.style.display = "none";
+      }, 6000);
+
     } else {
-      // Completed or no active pickup: Enable Post Scrap
+      // Completed or inactive: Unlock Post Scrap & clear active pickup
+      localStorage.removeItem("ecoflow_active_household_pickup_id");
+      localStorage.removeItem("ecoflow_active_household_lot_id");
       postScrapState.isLocked = false;
       postScrapState.currentStep = 0;
-      
+      postScrapState.activeLotId = null;
+      postScrapState.activePickupId = null;
+
       if (postBtn) {
         postBtn.disabled = false;
         postBtn.classList.remove("disabled");
@@ -222,10 +281,11 @@ function updateProgressBarUI(step, lotId, pickupData = {}) {
 
     if (node) {
       node.classList.remove("completed", "active");
-      if (i < step) {
+      // When collector is assigned (step >= 2), Pickup Accepted option gets checked!
+      if (i <= step) {
         node.classList.add("completed");
         if (timeEl) timeEl.textContent = "Done ✓";
-      } else if (i === step) {
+      } else if (i === step + 1 && step < 5) {
         node.classList.add("active");
         if (timeEl) timeEl.textContent = "In Progress ⏳";
       } else {
@@ -237,44 +297,21 @@ function updateProgressBarUI(step, lotId, pickupData = {}) {
       conn.classList.toggle("completed", i < step);
     }
   }
-}
 
-// Advance Step (Demo/Testing function)
-async function advancePickupStepDemo() {
-  if (!postScrapState.activeLotId) return;
-
-  const nextStep = (postScrapState.currentStep || 1) + 1;
-  if (nextStep > 5) {
-    alert("Pickup lifecycle completed! Payment has been received.");
-    checkActiveHouseholdPickup();
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/household/progress-step", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        lot_id: postScrapState.activeLotId,
-        step: nextStep
-      })
-    });
-    const data = await res.json();
-    if (data.success) {
-      postScrapState.currentStep = nextStep;
-      if (nextStep === 5) {
-        // Payment received!
-        updateProgressBarUI(5, postScrapState.activeLotId);
-        setTimeout(() => {
-          alert(`🎉 Payment Received! Verified scrap payment settled for ${postScrapState.activeLotId}.\n\n"Post Scrap" is now unlocked!`);
-          checkActiveHouseholdPickup();
-        }, 600);
-      } else {
-        updateProgressBarUI(nextStep, postScrapState.activeLotId);
-      }
+  // Update dynamic live status indicator text
+  const syncTextEl = document.getElementById("progress-live-sync-text");
+  if (syncTextEl) {
+    if (step === 2) {
+      syncTextEl.textContent = "Collector Assigned • Awaiting Doorstep Scrap Verification";
+    } else if (step === 3) {
+      syncTextEl.textContent = "Scrap Verified • In Transit to Storage Hub";
+    } else if (step === 4) {
+      syncTextEl.textContent = "Storage Hub Verified • Awaiting Payment Settlement";
+    } else if (step >= 5) {
+      syncTextEl.textContent = "🎉 Payment Received & Lifecycle Complete!";
+    } else {
+      syncTextEl.textContent = "Live Dynamic Sync Active";
     }
-  } catch (err) {
-    alert("Error updating step: " + err.message);
   }
 }
 
@@ -287,8 +324,8 @@ function openPostScrapScreen() {
     return;
   }
 
-  // Hide household dashboard, show post scrap screen
-  const dashboard = document.getElementById("hh-tab-home");
+  // Hide household main dashboard completely, reveal dedicated Post Scrap screen
+  const dashboard = document.getElementById("household-dashboard-view") || document.getElementById("hh-tab-home");
   const postScreen = document.getElementById("hh-screen-post-scrap");
   
   if (dashboard) dashboard.style.display = "none";
@@ -345,14 +382,16 @@ function confirmExitPostScrap(yes) {
   if (modal) modal.style.display = "none";
 
   if (yes) {
-    // Reset progress and open household interface
+    // Reset progress and restore household main dashboard
     resetPostScrapForm();
-    const dashboard = document.getElementById("hh-tab-home");
+    const dashboard = document.getElementById("household-dashboard-view") || document.getElementById("hh-tab-home");
     const postScreen = document.getElementById("hh-screen-post-scrap");
     
     if (postScreen) postScreen.style.display = "none";
-    if (dashboard) dashboard.style.display = "block";
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (dashboard) {
+      dashboard.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 }
 
@@ -585,6 +624,28 @@ async function submitScrapPickupFlow() {
       return;
     }
 
+    localStorage.setItem("ecoflow_active_household_pickup_id", result.pickup_id);
+    localStorage.setItem("ecoflow_active_household_lot_id", result.lot_id);
+    localStorage.setItem("ecoflow_active_accepted_lot_id", result.lot_id);
+    localStorage.setItem("ecoflow_active_accepted_pickup_id", result.pickup_id);
+    localStorage.setItem("ecoflow_active_household_address", payload.address);
+    localStorage.setItem("ecoflow_active_household_name", payload.household_name);
+    localStorage.setItem("ecoflow_active_household_phone", payload.household_phone);
+    localStorage.setItem("ecoflow_active_household_zone", payload.service_zone);
+    localStorage.setItem("ecoflow_active_household_material", (postScrapState.detectedMaterials || []).map(m => m.name).join(", ") || "Mixed Scrap");
+    localStorage.setItem("ecoflow_active_household_weight", postScrapState.totalWeight || 15);
+    localStorage.setItem("ecoflow_active_household_value", postScrapState.totalValue || 450);
+
+    if (result.assigned_collector) {
+      localStorage.setItem("ecoflow_active_accepted_collector_id", result.assigned_collector.employee_id);
+      localStorage.setItem("ecoflow_active_accepted_collector_name", result.assigned_collector.name);
+    }
+    if (typeof syncCollectorActiveAssignment === "function") {
+      syncCollectorActiveAssignment();
+    }
+    if (typeof loadCoordinatorQueue === "function") {
+      loadCoordinatorQueue(true);
+    }
     postScrapState.activeLotId = result.lot_id;
     postScrapState.activePickupId = result.pickup_id;
     postScrapState.isLocked = true;
@@ -674,13 +735,15 @@ function triggerPickupConfirmedToast(lotId) {
       clearInterval(timerInterval);
       if (toast) toast.style.display = "none";
 
-      // Automatically exit post scrap screen and return to household interface
-      const dashboard = document.getElementById("hh-tab-home");
+      // Automatically exit post scrap screen and return to household main dashboard
+      const dashboard = document.getElementById("household-dashboard-view") || document.getElementById("hh-tab-home");
       const postScreen = document.getElementById("hh-screen-post-scrap");
       
       if (postScreen) postScreen.style.display = "none";
-      if (dashboard) dashboard.style.display = "block";
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (dashboard) {
+        dashboard.style.display = "block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
 
       // Refresh active pickup to show the real-time 5-step progress bar
       checkActiveHouseholdPickup();
@@ -696,6 +759,9 @@ document.addEventListener("DOMContentLoaded", () => {
   refreshEnvironmentalTagline();
   loadLiveMarketPrices();
   checkActiveHouseholdPickup();
+
+  // Periodically refresh active pickup progress dynamically (every 2.5s)
+  setInterval(checkActiveHouseholdPickup, 2500);
 
   // Periodically refresh greeting (every minute) & tagline (every 2 minutes)
   setInterval(updateHouseholdGreeting, 60000);

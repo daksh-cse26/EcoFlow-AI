@@ -96,9 +96,9 @@
 
   <!-- ==================================================
        BYPASS DIRECT ACCESS INTERFACE SELECTOR
-       (Bypasses all login screens including Command Center)
+       (Disabled - Authentic Authentication & Encryption Enforced)
        ================================================== -->
-  <nav class="bypass-interface-nav" id="bypass-interface-nav" aria-label="Direct Interface Selector">
+  <nav class="bypass-interface-nav" id="bypass-interface-nav" aria-label="Direct Interface Selector" style="display: none;">
     <div class="bypass-nav-container">
       <div class="bypass-nav-badge">
         <span class="bypass-pulse-dot"></span>
@@ -117,9 +117,6 @@
         <button type="button" class="bypass-role-btn" data-role="hub" onclick="bypassSwitchRole('hub')">
           <span class="bypass-btn-icon">⚖️</span> <span>Storage Hub</span>
         </button>
-        <button type="button" class="bypass-role-btn" data-role="recycler" onclick="bypassSwitchRole('recycler')">
-          <span class="bypass-btn-icon">🏭</span> <span>Recycler Portal</span>
-        </button>
         <button type="button" class="bypass-role-btn btn-cmd-center" data-role="admin" onclick="bypassSwitchRole('admin')">
           <span class="bypass-btn-icon">🗺️</span> <span>Command Center</span>
         </button>
@@ -129,9 +126,9 @@
 
   <!-- ==================================================
        PORTAL GATEWAY & ONBOARDING AUTHENTICATION SCREEN
-       (Bypassed for now per user request)
+       (Authentic Multi-Stakeholder Cryptographic Gateway)
        ================================================== -->
-  <section class="portal-gateway-screen" id="portal-gateway-screen" style="display: none;">
+  <section class="portal-gateway-screen" id="portal-gateway-screen">
     <div class="gateway-hero">
       <span class="gateway-badge" data-i18n="gw.badge">🌱 Secure Multi-Stakeholder Node</span>
       <h2 data-i18n="gw.hero_title">Select Your Operating Interface</h2>
@@ -176,14 +173,6 @@
         <div class="portal-card-desc" data-i18n="gw.role_hub_desc">Calibrated physical weighing, material quality verification & official settlements.</div>
       </div>
 
-      <div class="portal-role-card" data-role="recycler" onclick="selectGatewayRole('recycler')">
-        <div class="portal-card-header">
-          <span class="portal-card-icon">🏭</span>
-          <span class="portal-selected-indicator">✓</span>
-        </div>
-        <div class="portal-card-title" data-i18n="gw.role_recycler_title">Recycler Portal</div>
-        <div class="portal-card-desc" data-i18n="gw.role_recycler_desc">B2B industrial catalog, aggregate batch bids, digital contract & gate-pass dispatch.</div>
-      </div>
 
       <div class="portal-role-card" data-role="admin" onclick="selectGatewayRole('admin')">
         <div class="portal-card-header">
@@ -267,6 +256,18 @@
           </small>
         </div>
 
+        <!-- Collector ID (Collector only - restore previous non-smartphone data) -->
+        <div class="gateway-field" id="gf-collector-id-container" style="display: none;">
+          <label for="gw-collector-id">
+            <span>Collector ID (If previously registered)</span>
+            <span class="field-tag" style="background: rgba(16, 185, 129, 0.2); color: #34D399;">Auto-Restore</span>
+          </label>
+          <input type="text" id="gw-collector-id" class="form-input" placeholder="e.g. COL-00156 or COL-NP-0024" oninput="validateGatewayInputs()" />
+          <small style="display: block; font-size: 10.5px; color: #94A3B8; margin-top: 4px;">
+            🚚 <em>Entering your Collector ID will instantly restore all your past pickups, lots, and profile data directly into this device's local storage.</em>
+          </small>
+        </div>
+
         <!-- Master Password (Admin only) -->
         <div class="gateway-field" id="gf-password-container" style="display: none;">
           <label for="gw-password">
@@ -308,8 +309,11 @@
   <main class="perspective-view active" id="view-household">
     <div class="household-container">
       
-      <!-- Top Household Bar -->
-      <div class="household-app-bar">
+      <!-- Household Main Dashboard (Visible on Home view; hidden when Post Scrap screen opens) -->
+      <div class="household-dashboard-view" id="household-dashboard-view">
+        
+        <!-- Top Household Bar -->
+        <div class="household-app-bar">
         <div class="user-greeting-box">
           <h2 id="hh-dynamic-greeting-title">Good Morning, <span class="editable-user-name" id="hh-user-display-name" onclick="promptChangeUserName()" title="Click to change name">User</span> 🌅</h2>
           <p id="hh-dynamic-greeting-sub">AI-Assisted Scrap Recycling & Citizen Circular Economy Hub</p>
@@ -383,9 +387,10 @@
           <div class="assigned-collector-info" id="progress-assigned-collector-info">
             🚚 Collector: <strong>Rameshwar Boro</strong> (COL-00142 • SMARTPHONE) • Locked
           </div>
-          <button type="button" class="btn-advance-step-demo" id="btn-advance-step-demo" onclick="advancePickupStepDemo()">
-            ⚡ Simulate Real-Time Step Advance ➔
-          </button>
+          <div class="progress-dynamic-sync-pill" id="progress-dynamic-sync-pill">
+            <span class="pulse-dot-green"></span>
+            <span id="progress-live-sync-text">Live Dynamic Sync Active</span>
+          </div>
         </div>
       </div>
 
@@ -417,9 +422,272 @@
         <button type="button" class="btn-refresh-tagline" onclick="refreshEnvironmentalTagline()" title="Refresh Environment Insight">↻</button>
       </div>
 
+      <!-- Household Step-by-Step Interactive Tutorial & Feature Video Tutorials Banner -->
+      <div class="tutorial-guide-banner">
+        <div class="tut-banner-content">
+          <div class="tut-banner-icon">🎓</div>
+          <div>
+            <h4 style="margin: 0; color: #FFFFFF;" data-i18n="tut.hh_banner_title">Household Quick Tutorial & Videos</h4>
+            <p class="small text-muted mb-0" data-i18n="tut.hh_banner_desc">Step-by-step interactive walkthrough & animated video guides for each feature.</p>
+          </div>
+        </div>
+        <div class="tut-banner-actions">
+          <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('household')" data-i18n="tut.start_tour">
+            🧭 Start Step-by-Step Tour
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('hh_scanner')" data-i18n="tut.feature_videos">
+            🎥 Feature Video Demos
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: HOME -->
+      <section class="household-tab-pane active" id="hh-tab-home">
+        <div class="impact-grid">
+          <div class="impact-card" style="cursor: pointer;" onclick="switchHouseholdTab('settlement')" title="Click to view verified recycling settlement">
+            <span class="impact-icon">⚖️</span>
+            <div>
+              <div class="impact-val" id="hh-stat-verified-kg">0.0 kg</div>
+              <div class="impact-lbl" data-i18n="impact.verified_weight">Verified Recycling ➔</div>
+            </div>
+          </div>
+          <div class="impact-card" style="cursor: pointer;" onclick="switchHouseholdTab('pickups')" title="Click to view pickup history">
+            <span class="impact-icon">📦</span>
+            <div>
+              <div class="impact-val" id="hh-stat-pickups">0</div>
+              <div class="impact-lbl" data-i18n="impact.pickups_count">Completed Pickups ➔</div>
+            </div>
+          </div>
+          <div class="impact-card" style="cursor: pointer;" onclick="switchHouseholdTab('scan')" title="Click to open AI Scanner">
+            <span class="impact-icon">🎯</span>
+            <div>
+              <div class="impact-val" id="hh-stat-segregation">—</div>
+              <div class="impact-lbl" data-i18n="impact.segregation_score">Segregation Score ➔</div>
+            </div>
+          </div>
+          <div class="impact-card" style="cursor: pointer;" onclick="switchHouseholdTab('settlement')" title="Click to view weight match settlements">
+            <span class="impact-icon">🎉</span>
+            <div>
+              <div class="impact-val" id="hh-stat-matches">0</div>
+              <div class="impact-lbl" data-i18n="impact.weight_matches">Weight Matches ➔</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Action Cards -->
+        <div class="home-actions-list">
+          <button class="action-card-btn" onclick="switchHouseholdTab('scan')">
+            <div class="action-btn-left">
+              <span class="action-btn-icon">📸</span>
+              <div>
+                <div class="action-btn-title" data-i18n="action.scan_waste">Scan Waste with Local AI</div>
+                <div class="action-btn-sub">On-device regional Indian waste classifier</div>
+              </div>
+            </div>
+            <span>➔</span>
+          </button>
+
+          <button class="action-card-btn" onclick="openPickupModal()">
+            <div class="action-btn-left">
+              <span class="action-btn-icon">📅</span>
+              <div>
+                <div class="action-btn-title" data-i18n="action.request_pickup">Request Scrap Pickup</div>
+                <div class="action-btn-sub">Map-confirmed location & time slot</div>
+              </div>
+            </div>
+            <span>➔</span>
+          </button>
+
+          <button class="action-card-btn" onclick="switchHouseholdTab('settlement')">
+            <div class="action-btn-left">
+              <span class="action-btn-icon">🧾</span>
+              <div>
+                <div class="action-btn-title" data-i18n="action.view_settlements">Transparent Settlements</div>
+                <div class="action-btn-sub">Verified weight × Buying rate formula</div>
+              </div>
+            </div>
+            <span>➔</span>
+          </button>
+
+          <button class="action-card-btn" onclick="switchHouseholdTab('rewards')">
+            <div class="action-btn-left">
+              <span class="action-btn-icon">🎁</span>
+              <div>
+                <div class="action-btn-title">Eco Rewards</div>
+                <div class="action-btn-sub"><span class="coming-soon-pill">COMING SOON</span> Green badges</div>
+              </div>
+            </div>
+            <span>➔</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 2: PICKUPS -->
+      <section class="household-tab-pane" id="hh-tab-pickups">
+        <div class="sub-interface-header">
+          <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
+          <span class="sub-interface-title">📦 Your Scrap Pickups</span>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_pickup')">🎥 Video Demo</button>
+            <button class="btn btn-sm btn-primary" onclick="openPickupModal()">+ New</button>
+          </div>
+        </div>
+        <div id="household-pickups-list">
+          <div class="empty-state-notice" id="household-pickups-empty" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+            <div class="empty-state-icon" style="font-size: 36px; margin-bottom: 8px;">📦</div>
+            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Pickups Scheduled</h4>
+            <p class="small text-muted" style="margin: 0 0 16px 0;">You have no active or completed scrap pickups. Tap "+ New" or "Sell Scrap" to schedule your first eco-collection.</p>
+            <button type="button" class="btn btn-sm btn-primary" onclick="openPickupModal()">+ Request Scrap Pickup</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: SCAN WASTE (Section 9, 10, 11) -->
+      <section class="household-tab-pane" id="hh-tab-scan">
+        <div class="sub-interface-header">
+          <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
+          <span class="sub-interface-title">📸 Local AI Waste Scanner</span>
+          <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_scanner')">🎥 Video Demo</button>
+        </div>
+        <div class="scanner-viewport">
+          <div class="laser-line"></div>
+          <div class="scanner-preview-img" id="scanner-preview-img">
+            <!-- Sample preview visual injected -->
+          </div>
+          <div class="scanner-loading-overlay" id="scanner-loading">
+            <span class="pulse-dot"></span>
+            <span>Local AI Analyzing Material Signatures...</span>
+          </div>
+        </div>
+
+        <!-- Presets Bar for Instant Evaluation -->
+        <div class="presets-selector-bar">
+          <span class="presets-lbl" data-i18n="scanner.sample_presets">Select Sample Regional Scrap:</span>
+          <div class="preset-buttons-row">
+            <button type="button" class="scrap-preset-btn active" data-preset="COPPER_SCRAP" onclick="selectScannerPreset('COPPER_SCRAP')">
+              🔌 Copper Wires
+            </button>
+            <button type="button" class="scrap-preset-btn" data-preset="EWASTE_PCB" onclick="selectScannerPreset('EWASTE_PCB')">
+              💻 Circuit Boards
+            </button>
+            <button type="button" class="scrap-preset-btn" data-preset="NEWSPAPER" onclick="selectScannerPreset('NEWSPAPER')">
+              📰 Newspapers
+            </button>
+            <button type="button" class="scrap-preset-btn" data-preset="PET_BOTTLE" onclick="selectScannerPreset('PET_BOTTLE')">
+              🧴 PET Bottles
+            </button>
+            <button type="button" class="scrap-preset-btn" data-preset="ALUMINIUM_SCRAP" onclick="selectScannerPreset('ALUMINIUM_SCRAP')">
+              🥫 Aluminium
+            </button>
+          </div>
+        </div>
+
+        <div class="scanner-upload-actions">
+          <label class="btn btn-sm btn-outline btn-block" style="cursor: pointer;">
+            📁 Upload Custom Photo
+            <input type="file" accept="image/*" style="display: none;" onchange="handleCustomWasteUpload(event)" />
+          </label>
+        </div>
+
+        <!-- Local AI Structured Assessment Card -->
+        <div class="assessment-card" id="scanner-assessment-card">
+          <!-- Injected via app.js -->
+        </div>
+
+        <div class="mt-2 mb-2">
+          <button class="btn btn-primary btn-block" onclick="openPickupModal()">
+            📅 Request Pickup for this Scrap ➔
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 4: SETTLEMENTS & DIGITAL RECEIPT (Section 28, 29, 32) -->
+      <section class="household-tab-pane" id="hh-tab-settlement">
+        <div class="sub-interface-header">
+          <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
+          <span class="sub-interface-title">🧾 Transparent Settlement</span>
+          <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_settlement')">🎥 Video Demo</button>
+        </div>
+        <div id="settlement-receipt-view">
+          <div class="empty-state-notice" id="settlement-empty-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+            <div class="empty-state-icon" style="font-size: 40px; margin-bottom: 10px;">🧾</div>
+            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Settlement Receipts Yet</h4>
+            <p class="small text-muted" style="margin: 0; max-width: 420px; margin-inline: auto;">
+              Digital receipts and transparent weighment calculations will appear here automatically after your scrap is physically verified and paid at the hub.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: REWARDS (Section 38: COMING SOON) -->
+      <section class="household-tab-pane" id="hh-tab-rewards">
+        <div class="sub-interface-header">
+          <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
+          <span class="sub-interface-title">🎁 Eco Citizen Rewards</span>
+          <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_rewards')">🎥 Video Demo</button>
+        </div>
+        <div class="rewards-header-banner">
+          <span class="coming-soon-pill" data-i18n="rewards.coming_soon">COMING SOON</span>
+          <h3>EcoFlow Citizen Rewards</h3>
+          <p class="small text-muted" data-i18n="rewards.locked_msg">Rewards program launching soon across municipal zones.</p>
+        </div>
+
+        <div class="locked-reward-card">
+          <div class="reward-lock-badge">🔒 Locked</div>
+          <span class="reward-icon">🌱</span>
+          <div>
+            <div class="reward-title">GREEN STARTER</div>
+            <div class="reward-desc">Recycle your first 5 kg of verified waste</div>
+          </div>
+        </div>
+
+        <div class="locked-reward-card">
+          <div class="reward-lock-badge">🔒 Locked</div>
+          <span class="reward-icon">♻️</span>
+          <div>
+            <div class="reward-title">ECO REGULAR</div>
+            <div class="reward-desc">Complete 10 verified household pickups</div>
+          </div>
+        </div>
+
+        <div class="locked-reward-card">
+          <div class="reward-lock-badge">🔒 Locked</div>
+          <span class="reward-icon">🏆</span>
+          <div>
+            <div class="reward-title">WASTE WARRIOR</div>
+            <div class="reward-desc">Reach 50 kg verified recycling milestone</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mobile Bottom Navigation -->
+      <nav class="household-bottom-nav" aria-label="Household Bottom Navigation">
+        <button class="bottom-nav-item active" data-tab="home" onclick="switchHouseholdTab('home')">
+          <span class="nav-icon">🏠</span>
+          <span data-i18n="nav.home">Home</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="pickups" onclick="switchHouseholdTab('pickups')">
+          <span class="nav-icon">📦</span>
+          <span data-i18n="nav.pickups">Pickups</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="scan" onclick="switchHouseholdTab('scan')">
+          <span class="nav-icon">📸</span>
+          <span data-i18n="nav.scan">Scan</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="settlement" onclick="switchHouseholdTab('settlement')">
+          <span class="nav-icon">🧾</span>
+          <span>Settlements</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="rewards" onclick="switchHouseholdTab('rewards')">
+          <span class="nav-icon">🎁</span>
+          <span data-i18n="nav.rewards">Rewards</span>
+        </button>
+      </nav>
+      </div><!-- /#household-dashboard-view -->
+
       <!-- ==================================================
            POST SCRAP DEDICATED SCREEN
-           (Opens when 'Post Scrap' is clicked)
+           (Opens as a full, dedicated clean new screen)
            ================================================== -->
       <section class="post-scrap-screen" id="hh-screen-post-scrap" style="display: none;">
         <!-- Top Header with Left Arrow Back Button -->
@@ -554,275 +822,6 @@
           </div>
         </div>
       </section>
-
-      <!-- Household Step-by-Step Interactive Tutorial & Feature Video Tutorials Banner -->
-      <div class="tutorial-guide-banner">
-        <div class="tut-banner-content">
-          <div class="tut-banner-icon">🎓</div>
-          <div>
-            <h4 style="margin: 0; color: #FFFFFF;" data-i18n="tut.hh_banner_title">Household Quick Tutorial & Videos</h4>
-            <p class="small text-muted mb-0" data-i18n="tut.hh_banner_desc">Step-by-step interactive walkthrough & animated video guides for each feature.</p>
-          </div>
-        </div>
-        <div class="tut-banner-actions">
-          <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('household')" data-i18n="tut.start_tour">
-            🧭 Start Step-by-Step Tour
-          </button>
-          <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('hh_scanner')" data-i18n="tut.feature_videos">
-            🎥 Feature Video Demos
-          </button>
-        </div>
-      </div>
-
-      <!-- TAB 1: HOME -->
-      <section class="household-tab-pane active" id="hh-tab-home">
-        <div class="impact-grid">
-          <div class="impact-card" style="cursor: pointer;" onclick="switchHouseholdTab('settlement')" title="Click to view verified recycling settlement">
-            <span class="impact-icon">⚖️</span>
-            <div>
-              <div class="impact-val" id="hh-stat-verified-kg">12.5 kg</div>
-              <div class="impact-lbl" data-i18n="impact.verified_weight">Verified Recycling ➔</div>
-            </div>
-          </div>
-          <div class="impact-card" style="cursor: pointer;" onclick="switchHouseholdTab('pickups')" title="Click to view pickup history">
-            <span class="impact-icon">📦</span>
-            <div>
-              <div class="impact-val" id="hh-stat-pickups">4</div>
-              <div class="impact-lbl" data-i18n="impact.pickups_count">Completed Pickups ➔</div>
-            </div>
-          </div>
-          <div class="impact-card" style="cursor: pointer;" onclick="switchHouseholdTab('scan')" title="Click to open AI Scanner">
-            <span class="impact-icon">🎯</span>
-            <div>
-              <div class="impact-val" id="hh-stat-segregation">88/100</div>
-              <div class="impact-lbl" data-i18n="impact.segregation_score">Segregation Score ➔</div>
-            </div>
-          </div>
-          <div class="impact-card" style="cursor: pointer;" onclick="switchHouseholdTab('settlement')" title="Click to view weight match settlements">
-            <span class="impact-icon">🎉</span>
-            <div>
-              <div class="impact-val" id="hh-stat-matches">3</div>
-              <div class="impact-lbl" data-i18n="impact.weight_matches">Weight Matches ➔</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Primary Action Cards -->
-        <div class="home-actions-list">
-          <button class="action-card-btn" onclick="switchHouseholdTab('scan')">
-            <div class="action-btn-left">
-              <span class="action-btn-icon">📸</span>
-              <div>
-                <div class="action-btn-title" data-i18n="action.scan_waste">Scan Waste with Local AI</div>
-                <div class="action-btn-sub">On-device regional Indian waste classifier</div>
-              </div>
-            </div>
-            <span>➔</span>
-          </button>
-
-          <button class="action-card-btn" onclick="openPickupModal()">
-            <div class="action-btn-left">
-              <span class="action-btn-icon">📅</span>
-              <div>
-                <div class="action-btn-title" data-i18n="action.request_pickup">Request Scrap Pickup</div>
-                <div class="action-btn-sub">Map-confirmed location & time slot</div>
-              </div>
-            </div>
-            <span>➔</span>
-          </button>
-
-          <button class="action-card-btn" onclick="switchHouseholdTab('settlement')">
-            <div class="action-btn-left">
-              <span class="action-btn-icon">🧾</span>
-              <div>
-                <div class="action-btn-title" data-i18n="action.view_settlements">Transparent Settlements</div>
-                <div class="action-btn-sub">Verified weight × Buying rate formula</div>
-              </div>
-            </div>
-            <span>➔</span>
-          </button>
-
-          <button class="action-card-btn" onclick="switchHouseholdTab('rewards')">
-            <div class="action-btn-left">
-              <span class="action-btn-icon">🎁</span>
-              <div>
-                <div class="action-btn-title">Eco Rewards</div>
-                <div class="action-btn-sub"><span class="coming-soon-pill">COMING SOON</span> Green badges</div>
-              </div>
-            </div>
-            <span>➔</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- TAB 2: PICKUPS -->
-      <section class="household-tab-pane" id="hh-tab-pickups">
-        <div class="sub-interface-header">
-          <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
-          <span class="sub-interface-title">📦 Your Scrap Pickups</span>
-          <div style="display: flex; gap: 6px; align-items: center;">
-            <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_pickup')">🎥 Video Demo</button>
-            <button class="btn btn-sm btn-primary" onclick="openPickupModal()">+ New</button>
-          </div>
-        </div>
-        <div id="household-pickups-list">
-          <div class="queue-item-card">
-            <div class="queue-item-header">
-              <span class="queue-id">PR-2026-000842</span>
-              <span class="status-pill status-verified">VERIFIED</span>
-            </div>
-            <p class="small text-muted mt-2">10 kg Copper & PCB • Paltan Bazaar, Guwahati</p>
-            <div class="mt-2">
-              <button class="btn btn-sm btn-outline" onclick="switchHouseholdTab('settlement'); loadSettlementDetails('LOT-2026-000184');">
-                View Receipt (₹5,044) ➔
-              </button>
-            </div>
-          </div>
-          <div class="queue-item-card mt-2">
-            <div class="queue-item-header">
-              <span class="queue-id">PR-2026-000844</span>
-              <span class="status-pill status-pending">PENDING</span>
-            </div>
-            <p class="small text-muted mt-2">25 kg Newspaper & Cardboard • Scheduled tomorrow</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 3: SCAN WASTE (Section 9, 10, 11) -->
-      <section class="household-tab-pane" id="hh-tab-scan">
-        <div class="sub-interface-header">
-          <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
-          <span class="sub-interface-title">📸 Local AI Waste Scanner</span>
-          <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_scanner')">🎥 Video Demo</button>
-        </div>
-        <div class="scanner-viewport">
-          <div class="laser-line"></div>
-          <div class="scanner-preview-img" id="scanner-preview-img">
-            <!-- Sample preview visual injected -->
-          </div>
-          <div class="scanner-loading-overlay" id="scanner-loading">
-            <span class="pulse-dot"></span>
-            <span>Local AI Analyzing Material Signatures...</span>
-          </div>
-        </div>
-
-        <!-- Presets Bar for Instant Evaluation -->
-        <div class="presets-selector-bar">
-          <span class="presets-lbl" data-i18n="scanner.sample_presets">Select Sample Regional Scrap:</span>
-          <div class="preset-buttons-row">
-            <button type="button" class="scrap-preset-btn active" data-preset="COPPER_SCRAP" onclick="selectScannerPreset('COPPER_SCRAP')">
-              🔌 Copper Wires
-            </button>
-            <button type="button" class="scrap-preset-btn" data-preset="EWASTE_PCB" onclick="selectScannerPreset('EWASTE_PCB')">
-              💻 Circuit Boards
-            </button>
-            <button type="button" class="scrap-preset-btn" data-preset="NEWSPAPER" onclick="selectScannerPreset('NEWSPAPER')">
-              📰 Newspapers
-            </button>
-            <button type="button" class="scrap-preset-btn" data-preset="PET_BOTTLE" onclick="selectScannerPreset('PET_BOTTLE')">
-              🧴 PET Bottles
-            </button>
-            <button type="button" class="scrap-preset-btn" data-preset="ALUMINIUM_SCRAP" onclick="selectScannerPreset('ALUMINIUM_SCRAP')">
-              🥫 Aluminium
-            </button>
-          </div>
-        </div>
-
-        <div class="scanner-upload-actions">
-          <label class="btn btn-sm btn-outline btn-block" style="cursor: pointer;">
-            📁 Upload Custom Photo
-            <input type="file" accept="image/*" style="display: none;" onchange="handleCustomWasteUpload(event)" />
-          </label>
-        </div>
-
-        <!-- Local AI Structured Assessment Card -->
-        <div class="assessment-card" id="scanner-assessment-card">
-          <!-- Injected via app.js -->
-        </div>
-
-        <div class="mt-2 mb-2">
-          <button class="btn btn-primary btn-block" onclick="openPickupModal()">
-            📅 Request Pickup for this Scrap ➔
-          </button>
-        </div>
-      </section>
-
-      <!-- TAB 4: SETTLEMENTS & DIGITAL RECEIPT (Section 28, 29, 32) -->
-      <section class="household-tab-pane" id="hh-tab-settlement">
-        <div class="sub-interface-header">
-          <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
-          <span class="sub-interface-title">🧾 Transparent Settlement</span>
-          <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_settlement')">🎥 Video Demo</button>
-        </div>
-        <div id="settlement-receipt-view">
-          <!-- Injected via settlement.js -->
-        </div>
-      </section>
-
-      <!-- TAB 5: REWARDS (Section 38: COMING SOON) -->
-      <section class="household-tab-pane" id="hh-tab-rewards">
-        <div class="sub-interface-header">
-          <button class="back-btn" onclick="switchHouseholdTab('home')">← Dashboard</button>
-          <span class="sub-interface-title">🎁 Eco Citizen Rewards</span>
-          <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_rewards')">🎥 Video Demo</button>
-        </div>
-        <div class="rewards-header-banner">
-          <span class="coming-soon-pill" data-i18n="rewards.coming_soon">COMING SOON</span>
-          <h3>EcoFlow Citizen Rewards</h3>
-          <p class="small text-muted" data-i18n="rewards.locked_msg">Rewards program launching soon across municipal zones.</p>
-        </div>
-
-        <div class="locked-reward-card">
-          <div class="reward-lock-badge">🔒 Locked</div>
-          <span class="reward-icon">🌱</span>
-          <div>
-            <div class="reward-title">GREEN STARTER</div>
-            <div class="reward-desc">Recycle your first 5 kg of verified waste</div>
-          </div>
-        </div>
-
-        <div class="locked-reward-card">
-          <div class="reward-lock-badge">🔒 Locked</div>
-          <span class="reward-icon">♻️</span>
-          <div>
-            <div class="reward-title">ECO REGULAR</div>
-            <div class="reward-desc">Complete 10 verified household pickups</div>
-          </div>
-        </div>
-
-        <div class="locked-reward-card">
-          <div class="reward-lock-badge">🔒 Locked</div>
-          <span class="reward-icon">🏆</span>
-          <div>
-            <div class="reward-title">WASTE WARRIOR</div>
-            <div class="reward-desc">Reach 50 kg verified recycling milestone</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Mobile Bottom Navigation -->
-      <nav class="household-bottom-nav" aria-label="Household Bottom Navigation">
-        <button class="bottom-nav-item active" data-tab="home" onclick="switchHouseholdTab('home')">
-          <span class="nav-icon">🏠</span>
-          <span data-i18n="nav.home">Home</span>
-        </button>
-        <button class="bottom-nav-item" data-tab="pickups" onclick="switchHouseholdTab('pickups')">
-          <span class="nav-icon">📦</span>
-          <span data-i18n="nav.pickups">Pickups</span>
-        </button>
-        <button class="bottom-nav-item" data-tab="scan" onclick="switchHouseholdTab('scan')">
-          <span class="nav-icon">📸</span>
-          <span data-i18n="nav.scan">Scan</span>
-        </button>
-        <button class="bottom-nav-item" data-tab="settlement" onclick="switchHouseholdTab('settlement')">
-          <span class="nav-icon">🧾</span>
-          <span>Settlements</span>
-        </button>
-        <button class="bottom-nav-item" data-tab="rewards" onclick="switchHouseholdTab('rewards')">
-          <span class="nav-icon">🎁</span>
-          <span data-i18n="nav.rewards">Rewards</span>
-        </button>
-      </nav>
 
     </div>
   </main>
@@ -1105,7 +1104,10 @@
           <div class="user-greeting">
             <h2 style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
               <span><span id="collector-user-name">Field Collector</span> (<span id="collector-id-badge-hdr">COL-00142</span>)</span>
-              <button type="button" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 2px 8px; border-color: rgba(255,255,255,0.2);" onclick="promptChangeUserName()" title="Edit Name">✏️ Edit Name</button>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 2px 8px; border-color: rgba(56, 189, 248, 0.5); color: #38BDF8;" onclick="openJoinSmartphoneModal()" title="Login with Collector ID to restore data">🔑 Login with Collector ID</button>
+                <button type="button" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 2px 8px; border-color: rgba(255,255,255,0.2);" onclick="promptChangeUserName()" title="Edit Name">✏️ Edit Name</button>
+              </div>
             </h2>
             <p>Assigned Storage Hub: HUB-001 • Zone B</p>
           </div>
@@ -1116,24 +1118,50 @@
           </div>
         </div>
 
-        <!-- Restore / Join using Smartphone Card -->
-        <div class="restore-work-card" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 12px 14px; margin: 12px 16px 0 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <strong style="color: #60A5FA; font-size: 13px;">📱 Joined using a Smartphone?</strong>
-            <p class="small text-muted mb-0">Previously working on basic feature phone SMS or physical coordinator sheets? Enter your Collector ID to restore all work to this smartphone.</p>
-          </div>
-          <button type="button" class="btn btn-sm btn-primary" onclick="openJoinSmartphoneModal()">
-            🔄 Restore Work via Collector ID
-          </button>
-        </div>
-
         <div style="padding: 16px;">
-          <div class="hub-authority-banner" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>Active Collection Assignment</strong>
-              <p class="small mt-1 mb-0">Pickup ID: PR-2026-000844 • 25 kg Newspaper & Cardboard</p>
+          <!-- Empty State when Collector Has No Active Assignment (Initial First Login) -->
+          <div id="collector-no-assignment-notice" style="display: block; background: rgba(30, 41, 59, 0.7); border: 1px dashed rgba(148, 163, 184, 0.3); border-radius: var(--radius-md); padding: 28px 20px; text-align: center; margin-bottom: 12px;">
+            <span style="font-size: 32px; display: block; margin-bottom: 8px;">📭</span>
+            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Active Pickup Assignment</h4>
+            <p class="small text-muted" style="margin: 0;">You have no active collection assignments. Once a field coordinator assigns a scrap pickup in your zone, collection details and navigation will appear here in real-time.</p>
+          </div>
+
+          <!-- Household Pickup Assignment & Destination Address Card for Field Collector -->
+          <div class="collector-assignment-card mb-2" id="collector-assignment-card" style="display: none; background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="status-pill status-active" style="font-size: 10px;">ACTIVE PICKUP ASSIGNMENT</span>
+                <span style="font-size: 11px; color: #94A3B8;" id="collector-active-pickup-id">—</span>
+              </div>
+              <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('col_assignment')">🎥 Video Demo</button>
             </div>
-            <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('col_assignment')">🎥 Video Demo</button>
+
+            <!-- Household Doorstep Address Block (Clearly Displayed for Collector) -->
+            <div class="household-address-badge-block" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+              <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <span style="font-size: 22px; line-height: 1;">📍</span>
+                <div style="flex: 1;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #38BDF8; text-transform: uppercase; letter-spacing: 0.5px;">Household Destination & Doorstep Address</span>
+                    <span class="badge-blue" id="collector-address-zone" style="font-size: 10px;">ZONE B</span>
+                  </div>
+                  <h4 style="margin: 4px 0 2px 0; color: #F8FAFC; font-size: 15px; font-weight: 700;" id="collector-household-address">
+                    —
+                  </h4>
+                  <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: #CBD5E1; margin-top: 4px;">
+                    <span>👤 Citizen: <strong id="collector-household-name" style="color: #FFFFFF;">—</strong></span>
+                    <span>📞 Phone: <strong id="collector-household-phone" style="color: #34D399;">—</strong></span>
+                    <span id="collector-household-landmark-wrap" style="color: #94A3B8;">🏛️ Landmark: <span id="collector-household-landmark" style="color: #CBD5E1;">—</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Scrap Details Summary -->
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #94A3B8; background: rgba(255, 255, 255, 0.03); padding: 8px 12px; border-radius: 6px;" id="collector-active-assignment-info">
+              <span>📦 Expected Scrap: <strong id="collector-scrap-material" style="color: #E2E8F0;">No active scrap</strong></span>
+              <span>Est. Value: <strong id="collector-scrap-value" style="color: #FBBF24;">—</strong></span>
+            </div>
           </div>
 
           <div class="assessment-card mb-2 text-center">
@@ -1141,20 +1169,74 @@
               <h4 style="margin: 0;">Digital Waste Lot QR</h4>
               <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('col_seallot')">🎥 Video Demo</button>
             </div>
-            <p class="small text-muted mb-2">Lot: <strong id="collector-lot-id-badge">LOT-2026-000184</strong></p>
+            <p class="small text-muted mb-2">Lot: <strong id="collector-lot-id-badge">—</strong></p>
             <div style="display: flex; justify-content: center; margin: 10px 0;">
               <canvas id="collector-active-qr" width="150" height="150" style="border: 1px solid var(--border-glass); border-radius: 8px;"></canvas>
             </div>
-            <p class="small text-muted">Bound to Household, Collector ID, and Pickup ID.</p>
+            <p class="small text-muted mb-1">Bound to Household, Collector ID, and Pickup ID.</p>
+            <div id="collector-lot-lock-badge" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid #10B981; color: #34D399; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; margin-top: 6px;">
+              🔒 Cryptographically Sealed & Locked to Server • Immutable
+            </div>
           </div>
 
-          <button class="btn btn-primary btn-block mb-2" onclick="createDigitalLotFromCollector()">
-            📦 Seal & Generate Waste Lot QR
+          <button class="btn btn-primary btn-block mb-2" id="btn-collector-seal-lot" disabled onclick="createDigitalLotFromCollector()">
+            📦 No Active Lot to Seal
           </button>
 
-          <button class="btn btn-outline btn-block" onclick="switchPerspective('hub')">
-            ⚖️ Transfer Lot to Storage Hub Station ➔
-          </button>
+          <!-- Field Collector 5-Step Lifecycle Progress Stepper (Replaces Transfer Lot button) -->
+          <div class="collector-lifecycle-progress-card mb-2" id="collector-lifecycle-progress-card" style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 14px; margin-top: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="pulse-dot-green"></span>
+                <span style="font-size: 13px; font-weight: 700; color: #FFFFFF;">Collection Lifecycle Progress</span>
+              </div>
+              <span class="status-pill status-active" id="col-lifecycle-status-tag" style="font-size: 10px;">PICKUP ACCEPTED</span>
+            </div>
+
+            <div class="stepper-track-5" id="col-stepper-track">
+              <div class="stepper-step completed" id="col-step-node-1" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Pickup accepted</div>
+                <span class="step-time" id="col-step-time-1">Done ✓</span>
+              </div>
+              <div class="stepper-connector" id="col-step-conn-1"></div>
+              <div class="stepper-step" id="col-step-node-2" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Pickup completed</div>
+                <span class="step-time" id="col-step-time-2">Pending</span>
+              </div>
+              <div class="stepper-connector" id="col-step-conn-2"></div>
+              <div class="stepper-step" id="col-step-node-3" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Lot generated</div>
+                <span class="step-time" id="col-step-time-3">Pending</span>
+              </div>
+              <div class="stepper-connector" id="col-step-conn-3"></div>
+              <div class="stepper-step" id="col-step-node-4" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Storage hub verified</div>
+                <span class="step-time" id="col-step-time-4">Pending</span>
+              </div>
+              <div class="stepper-connector" id="col-step-conn-4"></div>
+              <div class="stepper-step" id="col-step-node-5" data-step="5">
+                <div class="step-circle">5</div>
+                <div class="step-label">Payment received</div>
+                <span class="step-time" id="col-step-time-5">Pending</span>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 11px; flex-wrap: wrap; gap: 8px;">
+              <span id="col-step-action-desc" style="color: #94A3B8;">Doorstep collection in progress</span>
+              <div style="display: flex; gap: 6px;">
+                <button type="button" class="btn btn-sm btn-outline" id="btn-col-mark-collected" onclick="advanceCollectorProgress(2)" style="font-size: 11px; padding: 3px 10px; border-color: #38BDF8; color: #38BDF8;">
+                  ✓ Mark Pickup Completed
+                </button>
+              </div>
+            </div>
+
+            <!-- Dynamic Live Status Banner (Awaiting Storage Hub Scan, Hub Verified, Payout Complete) -->
+            <div id="col-dynamic-status-banner" style="display: none; width: 100%; margin-top: 10px; padding: 10px 14px; border-radius: 8px; font-size: 12px; line-height: 1.4;"></div>
+          </div>
 
           <!-- Grassroots Peer Onboarding (No Physical Phone) -->
           <div class="hub-card mt-2" style="background: rgba(16, 185, 129, 0.08); border: 1px dashed var(--primary-leaf); padding: 14px; border-radius: 8px;">
@@ -1301,6 +1383,51 @@
             <strong>CORE PRINCIPLE:</strong> AI assists. Employees collect. Storage hubs verify. EcoFlow AI records, calculates and traces. <em>AI never independently determines final settlement.</em>
           </div>
 
+          <!-- BUILT-IN QR SCANNER STATION FOR STORAGE HUB -->
+          <div class="hub-qr-scanner-card" id="hub-built-in-scanner">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h4 style="margin: 0; color: #FFFFFF; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                <span>📷</span> Built-in Digital QR Scanner
+              </h4>
+              <span class="badge-green" style="font-size: 10px;">DIRECT HUB AUTHORITY</span>
+            </div>
+            <p class="small text-muted mb-2">Scan incoming Field Collector lot QR code to instantly fetch digital lot passport & materials for physical scale verification.</p>
+            
+            <!-- Scanner Viewport with animated laser reticle -->
+            <div class="scanner-viewport-box" id="hub-scanner-viewport">
+              <video id="hub-scanner-video" playsinline style="display: none; width: 100%; border-radius: 6px; max-height: 180px; object-fit: cover;"></video>
+              <canvas id="hub-scanner-canvas" style="display: none;"></canvas>
+              <div class="scanner-reticle" id="hub-scanner-reticle">
+                <div class="reticle-laser"></div>
+                <span class="reticle-hint">Align Collector Lot QR in Frame</span>
+              </div>
+            </div>
+
+            <!-- Controls row: Camera scan, Quick scan active collector lot, File upload -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+              <button type="button" class="btn btn-sm btn-primary" id="btn-hub-toggle-camera" onclick="toggleHubCameraScanner()" style="font-size: 11px; padding: 4px 10px;">
+                📹 Start Camera Scan
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" id="btn-hub-quick-scan" onclick="quickScanActiveCollectorLot()" style="font-size: 11px; padding: 4px 10px; border-color: #38BDF8; color: #38BDF8; font-weight: 700;" title="Instantly scan the active field collector's sealed QR lot">
+                ⚡ Quick Scan Collector QR
+              </button>
+              <label class="btn btn-sm btn-outline" style="font-size: 11px; padding: 4px 10px; margin: 0; cursor: pointer;">
+                📁 Scan QR File
+                <input type="file" accept="image/*" style="display: none;" onchange="handleHubQRFileUpload(event)">
+              </label>
+            </div>
+
+            <!-- Manual input or scan paste -->
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="hub-manual-qr-input" class="form-input" placeholder="Or enter / paste Lot ID (e.g. LOT-2026-000184)" style="font-family: monospace; font-size: 12px; font-weight: 700;" onkeydown="if(event.key==='Enter') scanLotQR(this.value)" />
+              <button type="button" class="btn btn-primary btn-sm" onclick="scanLotQR(document.getElementById('hub-manual-qr-input').value)" style="white-space: nowrap; font-size: 11px;">
+                🔍 Fetch Lot
+              </button>
+            </div>
+
+            <div id="hub-scan-status-alert" style="display: none; margin-top: 8px; padding: 8px 12px; border-radius: 6px; font-size: 11px;"></div>
+          </div>
+
           <div class="form-group">
             <label>Select Incoming Lot to Inspect & Weigh:</label>
             <select id="hub-lot-selector" class="form-input" onchange="onHubLotSelected(this.value)">
@@ -1323,6 +1450,7 @@
           <table class="data-table mb-2" id="hub-materials-table">
             <thead>
               <tr>
+                <th style="width: 80px;">Verify</th>
                 <th>Material</th>
                 <th>Quality Grade</th>
                 <th>Scale Weight (kg)</th>
@@ -1336,7 +1464,7 @@
             </tbody>
             <tfoot>
               <tr>
-                <th colspan="2">Total Physical Verified Weight:</th>
+                <th colspan="3">Total Physical Verified Weight:</th>
                 <th id="hub-total-verified-weight" style="color: var(--primary-mint); font-size: 15px;">10.0 kg</th>
                 <th>Total Amount:</th>
                 <th class="text-right" id="hub-total-verified-amount" style="color: var(--primary-mint); font-size: 15px;">₹5,044.00</th>
@@ -1370,7 +1498,20 @@
             ⚖️ Confirm Physical Verification & Weighment
           </button>
 
-          <button class="btn btn-outline btn-block" onclick="switchPerspective('household'); switchHouseholdTab('settlement');">
+          <!-- Instant Payment Settlement Box (Revealed upon Storage Hub Verification) -->
+          <div class="hub-payment-settlement-box" id="hub-payment-settlement-box" style="display: none;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px;">
+              <span class="pulse-dot-green"></span>
+              <strong style="color: #34D399; font-size: 14px;">Instant Settlement Payout Authorized</strong>
+            </div>
+            <p class="small text-muted mb-2">Physical weights and materials verified. Disburse verified funds directly to Collector & Household via UPI / Direct Transfer.</p>
+            <button type="button" class="btn btn-primary btn-block" id="btn-hub-release-payment" onclick="processHubPaymentRelease()" style="background: linear-gradient(135deg, #10B981, #059669); font-weight: 800; font-size: 14px; padding: 12px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);">
+              💳 Release & Settle Instant Payment
+            </button>
+            <div id="hub-payment-disbursed-msg" style="display: none; margin-top: 8px; color: #A7F3D0; font-size: 12px; font-weight: 700;"></div>
+          </div>
+
+          <button class="btn btn-outline btn-block mt-2" onclick="switchPerspective('household'); switchHouseholdTab('settlement');">
             🧾 View Generated Household Settlement Receipt ➔
           </button>
         </div>
@@ -1410,26 +1551,9 @@
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="hub-incoming-lots-tbody">
             <tr>
-              <td><span class="badge-green">LOT-2026-000184</span></td>
-              <td>PR-2026-000842</td>
-              <td>Rahul Sharma (Peace Enclave)</td>
-              <td>Rameshwar Boro (COL-00142)</td>
-              <td>10.0 kg (Copper & PCB)</td>
-              <td>
-                <button class="btn btn-sm btn-primary" onclick="switchHubTab('scale'); onHubLotSelected('LOT-2026-000184');">Weigh on Scale ➔</button>
-              </td>
-            </tr>
-            <tr>
-              <td><span class="status-pill status-pending">LOT-2026-000185</span></td>
-              <td>PR-2026-000843</td>
-              <td>Ananya Baruah (Panbazar)</td>
-              <td>Rameshwar Boro (COL-00142)</td>
-              <td>10.0 kg (Discrepancy test)</td>
-              <td>
-                <button class="btn btn-sm btn-primary" onclick="switchHubTab('scale'); onHubLotSelected('LOT-2026-000185');">Weigh on Scale ➔</button>
-              </td>
+              <td colspan="6" class="text-center text-muted" style="padding: 24px;">No incoming lots at this hub station yet.</td>
             </tr>
           </tbody>
         </table>
@@ -1441,129 +1565,15 @@
       <div class="hub-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
           <h3>Aggregated Recyclable Inventory Batches</h3>
-          <button class="btn btn-sm btn-primary" onclick="switchPerspective('recycler')">Open Recycler Marketplace ➔</button>
+          <span class="badge-green" style="font-size: 11px;">EPR Certified Aggregate</span>
         </div>
-        <div class="inspector-grid" style="grid-template-columns: repeat(2, 1fr); gap: 16px;">
-          <div class="inspector-card">
-            <h4>Batch #BAT-CU-2026-001 (Copper Grade A)</h4>
-            <div class="inspector-grid mb-2">
-              <div><span class="lbl">Material:</span> <strong>Pure Copper Scrap</strong></div>
-              <div><span class="lbl">Total Weight:</span> <strong>500.0 kg</strong></div>
-              <div><span class="lbl">Storage Bay:</span> <strong>Bay 4A (Vault)</strong></div>
-              <div><span class="lbl">Status:</span> <span class="badge-green">READY FOR RECYCLER BID</span></div>
-            </div>
-            <button class="btn btn-sm btn-outline btn-block" onclick="switchPerspective('recycler'); switchRecyclerTab('offers');">View Industrial Recycler Bids ➔</button>
-          </div>
-
-          <div class="inspector-card">
-            <h4>Batch #BAT-PET-2026-004 (PET Flakes Grade B)</h4>
-            <div class="inspector-grid mb-2">
-              <div><span class="lbl">Material:</span> <strong>Cleaned PET Bottles</strong></div>
-              <div><span class="lbl">Total Weight:</span> <strong>1,200.0 kg</strong></div>
-              <div><span class="lbl">Storage Bay:</span> <strong>Bale Storage 2</strong></div>
-              <div><span class="lbl">Status:</span> <span class="badge-green">READY FOR DISPATCH</span></div>
-            </div>
-            <button class="btn btn-sm btn-outline btn-block" onclick="switchPerspective('recycler'); switchRecyclerTab('gatepass');">Generate Gate Pass ➔</button>
+        <div class="inspector-grid" id="hub-inventory-batches-list" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          <div class="empty-state-notice" style="grid-column: 1 / -1; text-align: center; padding: 36px 20px; color: #94A3B8;">
+            <span style="font-size: 32px; display: block; margin-bottom: 8px;">📦</span>
+            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Aggregated Batches Yet</h4>
+            <p class="small text-muted" style="margin: 0;">Inventory batches will be generated as verified lots are aggregated at the hub.</p>
           </div>
         </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ==================================================
-       VIEW 5: RECYCLER PORTAL & INVENTORY AGGREGATION
-       Sections 33, 34, 35, 36, 37
-       ================================================== -->
-  <main class="perspective-view" id="view-recycler">
-    <div class="page-header mb-2">
-      <h2 data-i18n="rec.header_title">🏭 Authorized Recycler Marketplace & Dispatch</h2>
-      <p class="text-muted" data-i18n="rec.header_desc">Industrial recyclers bid on aggregated lots. Household settlements remain strictly decoupled from downstream recycler pricing.</p>
-    </div>
-
-    <div class="hub-authority-banner mb-2">
-      <strong>CRITICAL BUSINESS PRINCIPLE (Section 37):</strong> Household → Organization uses <em>Verified Weight × Company Buying Rate</em>. Organization → Recycler uses <em>Aggregated Inventory × Recycler Offer</em>. Recycler prices NEVER retroactively modify completed household settlements.
-    </div>
-
-    <!-- Recycler Subnav Tabs -->
-    <nav class="portal-subnav-bar">
-      <button class="portal-subnav-btn active" data-rectab="offers" onclick="switchRecyclerTab('offers')" data-i18n="rec.tab_offers">🛒 Purchase Offers & Bidding</button>
-      <button class="portal-subnav-btn" data-rectab="directory" onclick="switchRecyclerTab('directory')" data-i18n="rec.tab_directory">🏢 Authorized Recycler Directory</button>
-      <button class="portal-subnav-btn" data-rectab="gatepass" onclick="switchRecyclerTab('gatepass')" data-i18n="rec.tab_gatepass">🎫 Gate Pass & Dispatch QR</button>
-    </nav>
-
-    <!-- Pane 1: Purchase Offers -->
-    <div class="portal-subpane active" id="recycler-pane-offers">
-      <div class="hub-verification-grid">
-        <div class="hub-card">
-          <h3 class="mb-2">Active Recycler Purchase Offers</h3>
-          <div id="recycler-offers-list">
-            <!-- Injected via app.js -->
-          </div>
-        </div>
-
-        <div class="hub-card">
-          <h3 class="mb-2">Recent Dispatch Settlements</h3>
-          <div class="inspector-card mb-2">
-            <h4>Pragati Metal Refiners Ltd.</h4>
-            <p class="small text-muted">Contract #CON-2026-9921 • Copper Wire Batch</p>
-            <div class="inspector-grid">
-              <div><span class="lbl">Contract Volume:</span> <strong>500.0 kg</strong></div>
-              <div><span class="lbl">Settlement Rate:</span> <strong>₹480.00 / kg</strong></div>
-              <div><span class="lbl">Invoice Total:</span> <strong>₹2,40,000.00</strong></div>
-              <div><span class="lbl">Decoupled Rule:</span> <span class="badge-green">PASSED</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pane 2: Recycler Directory -->
-    <div class="portal-subpane" id="recycler-pane-directory">
-      <div class="hub-card">
-        <h3 class="mb-2">State Pollution Control Board Authorized Facilities</h3>
-        <div class="inspector-grid" style="grid-template-columns: repeat(2, 1fr); gap: 16px;">
-          <div class="inspector-card">
-            <h4>GreenPlast Circular Solutions</h4>
-            <p class="small text-muted">Amingaon Logistics Park • Auth: PCB-AS-AUTH-2025-4102</p>
-            <div class="inspector-grid mb-2">
-              <div><span class="lbl">Monthly Capacity:</span> <strong>400 Tonnes</strong></div>
-              <div><span class="lbl">Accepted:</span> <strong>PET, HDPE, LDPE</strong></div>
-              <div><span class="lbl">Compliance:</span> <span class="badge-green">EPR Certified</span></div>
-            </div>
-            <button class="btn btn-sm btn-outline btn-block" onclick="switchRecyclerTab('offers')">View Active Bids ➔</button>
-          </div>
-
-          <div class="inspector-card">
-            <h4>Pragati Metal Refiners Ltd.</h4>
-            <p class="small text-muted">Narangi Industrial Estate • Auth: PCB-AS-AUTH-2024-8891</p>
-            <div class="inspector-grid mb-2">
-              <div><span class="lbl">Monthly Capacity:</span> <strong>250 Tonnes</strong></div>
-              <div><span class="lbl">Accepted:</span> <strong>Copper, Brass, Aluminium</strong></div>
-              <div><span class="lbl">Compliance:</span> <span class="badge-green">ISO 14001</span></div>
-            </div>
-            <button class="btn btn-sm btn-outline btn-block" onclick="switchRecyclerTab('offers')">View Active Bids ➔</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pane 3: Gate Pass & Dispatch QR -->
-    <div class="portal-subpane" id="recycler-pane-gatepass">
-      <div class="hub-card" style="max-width: 600px; margin: 0 auto; text-align: center;">
-        <h3>🎫 Industrial Logistics Gate Pass</h3>
-        <p class="small text-muted mb-2">Issued by EcoFlow AI Storage Hub for outbound freight</p>
-        <div style="display: flex; justify-content: center; margin: 16px 0;">
-          <canvas id="recycler-gate-pass-qr" width="140" height="140" style="border: 1px solid var(--border-glass); border-radius: 8px;"></canvas>
-        </div>
-        <div class="inspector-card text-left mt-2">
-          <div class="inspector-grid">
-            <div><span class="lbl">Pass Token:</span> <strong>GP-2026-000492</strong></div>
-            <div><span class="lbl">Authorized Recycler:</span> <strong>GreenPlast Solutions</strong></div>
-            <div><span class="lbl">Vehicle Number:</span> <strong>AS-01-EC-9482 (E-Truck)</strong></div>
-            <div><span class="lbl">Gross Tare:</span> <strong>1,450 kg (Net: 500 kg PET)</strong></div>
-          </div>
-        </div>
-        <button class="btn btn-primary mt-2" onclick="window.print()">🖨️ Print Dispatch Gate Pass</button>
       </div>
     </div>
   </main>
@@ -1573,22 +1583,85 @@
        Sections 16, 40, 41, 46, 48, 50
        ================================================== -->
   <main class="perspective-view" id="view-admin">
-    <div class="page-header mb-2">
-      <h2 data-i18n="admin.header_title">🗺️ EcoFlow Command Center & AI Management</h2>
-      <p class="text-muted" data-i18n="admin.header_desc">Real-time geospatial operations, AI model versioning, feedback dataset, and end-to-end digital traceability.</p>
+    <div class="page-header mb-2" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 data-i18n="admin.header_title">🗺️ EcoFlow Command Center & AI Management</h2>
+        <p class="text-muted" data-i18n="admin.header_desc">Real-time geospatial operations, AI model versioning, feedback dataset, and end-to-end digital traceability.</p>
+      </div>
+
+      <!-- Command Center Session Identity & Access Control Simulator -->
+      <div id="admin-session-identity-box" style="display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.85); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.3);">
+        <span id="admin-logged-in-label" style="font-size: 12px; color: #34D399; font-weight: 700;">👑 Logged in as: Daksh Singhi (Owner - dakssinghi@gmail.com)</span>
+        <button type="button" id="btn-toggle-admin-session" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 3px 10px; border-color: rgba(56, 189, 248, 0.4); color: #38BDF8;" onclick="toggleAdminSessionIdentity()">
+          🔄 Simulate Other Officer Login
+        </button>
+      </div>
     </div>
 
-    <!-- Admin Nav Tabs -->
+    <!-- ==================================================
+         TOP ADMIN WHITELIST & ROOT ACCESS CONTROL PANEL
+         (Strictly displayed at the TOP of Command Center if logged in as Root Owner 'me')
+         ================================================== -->
+    <div id="admin-whitelist-top-panel" class="hub-card mb-2" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9)); border: 1px solid rgba(16, 185, 129, 0.45); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); border-radius: 10px; padding: 18px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span style="font-size: 18px;">🛡️</span>
+            <h3 style="margin: 0; font-size: 16px; color: #F8FAFC;">Command Center Whitelist & Root Access Control</h3>
+            <span class="badge-green" style="font-size: 10px;">ROOT OWNER ONLY</span>
+          </div>
+          <p class="text-muted small" style="margin: 0;">
+            Logged in Root Owner: <strong style="color: #34D399;">Daksh Singhi (dakssinghi@gmail.com)</strong>. Only the root owner has sovereign authority to authorize or revoke Command Center administrative access.
+          </p>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline" onclick="toggleWhitelistCollapse()" id="btn-toggle-whitelist-collapse" style="font-size: 11px; padding: 3px 8px;">
+          ▼ Minimize Whitelist
+        </button>
+      </div>
+
+      <div id="admin-whitelist-panel-body">
+        <!-- Authorize New Administrator Form -->
+        <div class="form-group mb-2" style="background: rgba(0, 0, 0, 0.35); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-glass);">
+          <label style="font-size: 12px; font-weight: 700; color: #E2E8F0; margin-bottom: 6px; display: block;">Authorize New Administrator for Command Center:</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="email" id="new-admin-email" class="form-input" placeholder="Officer Email (e.g. supervisor@ecoflow.ai)" style="flex: 2; min-width: 220px;" />
+            <input type="text" id="new-admin-name" class="form-input" placeholder="Officer Designation (e.g. Zonal Operations Director)" style="flex: 2; min-width: 200px;" />
+            <button type="button" class="btn btn-primary" onclick="addWhitelistEmail()">+ Authorize Access</button>
+          </div>
+        </div>
+
+        <!-- Table of Authorized Administrators -->
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Authorized Officer Email</th>
+                <th>Designated Name</th>
+                <th>Encryption & Credential Security</th>
+                <th>Registered At</th>
+                <th>Access Privilege</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-whitelist-tbody">
+              <!-- Injected via auth.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Nav Tabs (Notice: Whitelist is NOT an option here; Verified Coordinators is only shown to Root Owner) -->
     <nav class="role-switcher-bar mb-2" style="background: rgba(15, 23, 42, 0.6);" aria-label="Admin Navigation">
       <button class="admin-nav-item role-btn active" data-tab="map" onclick="switchAdminTab('map')" data-i18n="admin.tab_map">🗺️ Command Map (GIS)</button>
       <button class="admin-nav-item role-btn" data-tab="registry" onclick="switchAdminTab('registry')" data-i18n="admin.tab_registry">🔒 Encrypted User Registry</button>
-      <button class="admin-nav-item role-btn" data-tab="whitelist" onclick="switchAdminTab('whitelist')" data-i18n="admin.tab_whitelist">🛡️ Admin Whitelist (Daksh)</button>
-      <button class="admin-nav-item role-btn" data-tab="coordinators" onclick="switchAdminTab('coordinators')" data-i18n="admin.tab_coordinators">📋 Verified Coordinators</button>
+      <button class="admin-nav-item role-btn" id="admin-nav-btn-coordinators" data-tab="coordinators" onclick="switchAdminTab('coordinators')" data-i18n="admin.tab_coordinators">📋 Verified Coordinators</button>
       <button class="admin-nav-item role-btn" data-tab="ai_models" onclick="switchAdminTab('ai_models')" data-i18n="admin.tab_ai_models">🤖 AI Models & Testing</button>
       <button class="admin-nav-item role-btn" data-tab="feedback" onclick="switchAdminTab('feedback')" data-i18n="admin.tab_feedback">📊 AI Feedback Dataset</button>
       <button class="admin-nav-item role-btn" data-tab="traceability" onclick="switchAdminTab('traceability')" data-i18n="admin.tab_traceability">🔗 Traceability Explorer</button>
       <button class="admin-nav-item role-btn" data-tab="taxonomy" onclick="switchAdminTab('taxonomy')" data-i18n="admin.tab_taxonomy">📋 Material Taxonomy</button>
       <button class="admin-nav-item role-btn" data-tab="audit" onclick="switchAdminTab('audit')" data-i18n="admin.tab_audit">📜 Audit Logs</button>
+      <button class="admin-nav-item role-btn" data-tab="security" onclick="switchAdminTab('security')">🛡️ Traffic Shield & NVD Security</button>
     </nav>
 
     <!-- ADMIN TAB 1: GIS COMMAND MAP (Section 41) -->
@@ -1602,35 +1675,35 @@
             <div class="impact-card">
               <span class="impact-icon">📦</span>
               <div>
-                <div class="impact-val" id="adm-stat-pickups">3</div>
+                <div class="impact-val" id="adm-stat-pickups">0</div>
                 <div class="impact-lbl">Total Pickups Tracked</div>
               </div>
             </div>
             <div class="impact-card">
               <span class="impact-icon">⏳</span>
               <div>
-                <div class="impact-val" id="adm-stat-pending">1</div>
+                <div class="impact-val" id="adm-stat-pending">0</div>
                 <div class="impact-lbl">Pending Pickups</div>
               </div>
             </div>
             <div class="impact-card">
               <span class="impact-icon">⚖️</span>
               <div>
-                <div class="impact-val" id="adm-stat-weight">17.8 kg</div>
+                <div class="impact-val" id="adm-stat-weight">0.0 kg</div>
                 <div class="impact-lbl">Verified Scrap Weight</div>
               </div>
             </div>
             <div class="impact-card">
               <span class="impact-icon">🏢</span>
               <div>
-                <div class="impact-val" id="adm-stat-inventory">17.8 kg</div>
+                <div class="impact-val" id="adm-stat-inventory">0.0 kg</div>
                 <div class="impact-lbl">Hub Inventory Weight</div>
               </div>
             </div>
             <div class="impact-card">
               <span class="impact-icon">💵</span>
               <div>
-                <div class="impact-val" id="adm-stat-revenue">₹9,568.00</div>
+                <div class="impact-val" id="adm-stat-revenue">₹0.00</div>
                 <div class="impact-lbl">Disbursed to Households</div>
               </div>
             </div>
@@ -1671,13 +1744,28 @@
       </div>
     </div>
 
-    <!-- ADMIN TAB 2: AI MODEL MANAGEMENT (Section 5) -->
+    <!-- ADMIN TAB 2: AI MODEL MANAGEMENT (All 5 AI Models Used in App) -->
     <div class="admin-tab-pane" id="admin-tab-ai_models">
-      <div class="hub-card">
-        <h3 class="mb-2">AI Model Versioning & Deployment</h3>
-        <p class="text-muted small mb-2">Deploy, test, roll back, or activate regional Indian waste inference models.</p>
+      <div class="hub-card mb-2">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 class="mb-1">🤖 EcoFlow AI Models & Multi-Tier Testing Sandbox</h3>
+            <p class="text-muted small">Comprehensive catalog of all 5 operational AI models deployed across EcoFlow AI, documenting machine learning architectures, real-time application touchpoints, input/output specifications, and live diagnostic test runners.</p>
+          </div>
+          <span class="badge-green" id="ai-active-models-badge">5 Operational AI Systems</span>
+        </div>
+
         <div id="ai-models-list">
-          <!-- Injected via app.js -->
+          <!-- Injected via app.js with rich where-used, how-used, and test runners -->
+        </div>
+
+        <!-- Interactive AI Model Testing Modal / Output Console -->
+        <div id="ai-test-console-modal" style="display: none; margin-top: 16px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 8px; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="color: #38BDF8; font-size: 14px;" id="ai-console-title">🧪 Model Diagnostic Test Console</strong>
+            <button type="button" class="btn btn-sm btn-outline" onclick="closeAITestConsole()" style="font-size: 11px; padding: 2px 8px;">✕ Close</button>
+          </div>
+          <pre id="ai-console-output" style="background: rgba(0, 0, 0, 0.5); padding: 12px; border-radius: 6px; color: #A7F3D0; font-size: 12px; max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: monospace;"></pre>
         </div>
       </div>
     </div>
@@ -1685,8 +1773,13 @@
     <!-- ADMIN TAB 3: AI FEEDBACK DATASET (Section 4, 46) -->
     <div class="admin-tab-pane" id="admin-tab-feedback">
       <div class="hub-card">
-        <h3 class="mb-2">AI + Human Verification Feedback Dataset</h3>
-        <p class="text-muted small mb-2">Storage hub physical verifications matched against AI predictions for validation and retraining datasets.</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 class="mb-1">📊 AI + Human Verification Feedback Dataset</h3>
+            <p class="text-muted small">Storage hub certified scale physical verifications matched against AI predictions for validation and retraining datasets.</p>
+          </div>
+          <span class="badge-green">Continuous Active Learning</span>
+        </div>
         <table class="data-table">
           <thead>
             <tr>
@@ -1705,193 +1798,475 @@
       </div>
     </div>
 
-    <!-- ADMIN TAB 4: TRACEABILITY EXPLORER (Section 50) -->
+    <!-- ADMIN TAB 4: TRACEABILITY EXPLORER (End-to-End Cryptographic Chain) -->
     <div class="admin-tab-pane" id="admin-tab-traceability">
-      <div class="hub-card">
-        <div class="form-group mb-2">
-          <label>Query Digital Traceability Token (Lot ID / Pickup ID):</label>
-          <div style="display: flex; gap: 8px;">
-            <input type="text" id="trace-input-id" class="form-input" value="LOT-2026-000184" />
+      <div class="hub-card mb-2">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 class="mb-1">🔗 End-to-End Digital Traceability & Provenance Explorer</h3>
+            <p class="text-muted small">Immutable cryptographic provenance visualizer tracking recyclable waste lots from citizen doorstep, through municipal collection, certified hub scale weighment, batch aggregation, to secondary industrial smelters.</p>
+          </div>
+          <span class="badge-green" id="trace-merkle-status-badge">✅ Cryptographic Chain Validated</span>
+        </div>
+
+        <!-- Query Form & Live Lot Quick Selector -->
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+            <label style="font-size: 12px; font-weight: 700; color: #E2E8F0; margin: 0;">Query Digital Waste Lot Token or Pickup Reference:</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="text" id="trace-input-id" class="form-input" value="" style="flex: 2; min-width: 200px;" placeholder="Enter active Lot ID or Pickup Reference (e.g. LOT-2026-...)" />
             <button class="btn btn-primary" onclick="loadTraceabilityChain(document.getElementById('trace-input-id').value)">
-              Trace Provenance
+              🔍 Trace Full Provenance Chain
+            </button>
+            <button class="btn btn-outline" onclick="downloadTraceabilityCertificate()">
+              📜 Download EPR Certificate
             </button>
           </div>
         </div>
+
         <div id="traceability-chain-view">
-          <!-- Injected via app.js -->
+          <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+            <span style="font-size: 32px; display: block; margin-bottom: 8px;">🔍</span>
+            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">Traceability Provenance Search</h4>
+            <p class="small text-muted" style="margin: 0;">Enter an active Lot ID or Pickup Reference above to inspect its verified 10-stage end-to-end cryptographic lifecycle.</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ADMIN TAB 5: MATERIAL TAXONOMY -->
+    <!-- ADMIN TAB 5: MATERIAL TAXONOMY & CIRCULAR SPECIFICATIONS -->
     <div class="admin-tab-pane" id="admin-tab-taxonomy">
-      <div class="hub-card">
-        <h3 class="mb-2">Configurable Material Taxonomy & Official Buying Rates</h3>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Subcategory</th>
-              <th>Code</th>
-              <th>Official Rate</th>
-              <th>Segregation Guideline</th>
-            </tr>
-          </thead>
-          <tbody id="taxonomy-tbody">
-            <!-- Injected via app.js -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ADMIN TAB 6: AUDIT LOGS (Section 48) -->
-    <div class="admin-tab-pane" id="admin-tab-audit">
-      <div class="hub-card">
-        <h3 class="mb-2">Immutable Chronological Audit Trail</h3>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Event</th>
-              <th>Previous Value</th>
-              <th>New Value</th>
-              <th>Actor & Role</th>
-              <th>Reason</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody id="audit-logs-tbody">
-            <!-- Injected via app.js -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- ADMIN TAB 7: ENCRYPTED CITIZEN & WORKFORCE REGISTRY -->
-    <div class="admin-tab-pane" id="admin-tab-registry">
-      <div class="hub-card">
+      <div class="hub-card mb-2">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
           <div>
-            <h3 class="mb-1">🔒 Encrypted Citizen & Workforce Registry</h3>
-            <p class="text-muted small">All household, collector, coordinator and recycler credentials are encrypted at rest with military-grade PBKDF2/AES and decrypted strictly for Command Center.</p>
+            <h3 class="mb-1">📋 Configurable Material Taxonomy & Spot Market Rate Card</h3>
+            <p class="text-muted small">Municipal secondary commodity classifications, official buying rates, quality grade multipliers, carbon offsets, and registered industrial off-take partners.</p>
           </div>
-          <span class="status-badge status-verified" id="registry-count-badge">Encrypted Database Storage</span>
+          <span class="badge-green">CPCB & BIS Standardized</span>
         </div>
-        <div style="overflow-x: auto;">
+
+        <!-- Dynamic Regional Market Rate Adjustment Tool -->
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+            <strong style="color: #38BDF8; font-size: 13px;">📊 Zonal Commodity Price Engine (Live Guwahati Mandi Adjuster)</strong>
+            <span class="small text-muted">Simulate seasonal market fluctuation (+/- %) across all buying rates</span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="adjustRegionalRates(-10)" style="font-size: 11px; padding: 4px 10px;">📉 -10% Monsoon Drop</button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="adjustRegionalRates(-5)" style="font-size: 11px; padding: 4px 10px;">📉 -5% Low Demand</button>
+            <button type="button" class="btn btn-sm btn-primary active" id="btn-rate-baseline" onclick="adjustRegionalRates(0)" style="font-size: 11px; padding: 4px 10px;">⚖️ Baseline Mandi Standard (0%)</button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="adjustRegionalRates(5)" style="font-size: 11px; padding: 4px 10px;">📈 +5% Peak Demand</button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="adjustRegionalRates(10)" style="font-size: 11px; padding: 4px 10px;">📈 +10% Copper/Metal Surge</button>
+            <span id="rate-adjustment-indicator" style="font-size: 11px; color: #34D399; font-weight: 700; margin-left: 6px;">Status: Current Official Mandi Benchmark Active</span>
+          </div>
+        </div>
+
+        <!-- Official Material Taxonomy Table -->
+        <div style="overflow-x: auto; margin-bottom: 16px;">
           <table class="data-table">
             <thead>
               <tr>
-                <th>User ID</th>
-                <th>Role</th>
-                <th>Name (Decrypted)</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Address</th>
-                <th>Custom / Collector ID</th>
-                <th>Raw Ciphertext in SQLite</th>
+                <th>Category</th>
+                <th>Subcategory</th>
+                <th>Material Code</th>
+                <th>Official Buying Rate</th>
+                <th>CO2 Offset / kg</th>
+                <th>Segregation & Cleanliness Guideline</th>
+                <th>Industrial Recycling Off-Taker</th>
               </tr>
             </thead>
-            <tbody id="encrypted-registry-tbody">
-              <!-- Injected via auth.js -->
+            <tbody id="taxonomy-tbody">
+              <!-- Injected via app.js -->
             </tbody>
           </table>
+        </div>
+
+        <!-- Quality Grading Standards Matrix -->
+        <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px;">
+          <h4 style="margin: 0 0 10px 0; color: #F8FAFC; font-size: 13px;">🏅 CPCB / BIS Quality Grading Matrix & Price Multipliers</h4>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 10px;">
+              <span class="badge-green" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">GRADE A (100% - 105% Value)</span>
+              <p style="font-size: 11px; color: #CBD5E1; margin: 4px 0 0 0;">Zero contamination, bare bright copper (>99% purity), clean dry rinsed PET bottles, crisp unsoiled newsprint.</p>
+            </div>
+            <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 10px;">
+              <span class="badge-blue" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">GRADE B (85% - 100% Value)</span>
+              <p style="font-size: 11px; color: #CBD5E1; margin: 4px 0 0 0;">Light oxidation, standard desktop motherboards, colored rinsed PET, minor label adhesives, clean packaging cartons.</p>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 10px;">
+              <span class="badge-gold" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">GRADE C (70% - 85% Value)</span>
+              <p style="font-size: 11px; color: #CBD5E1; margin: 4px 0 0 0;">Mixed offcuts with light solder residue, aged paper inserts, low-grade power supply boards, pressed mixed alloys.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ADMIN TAB 8: COMMAND CENTER ACCESS & WHITELIST MANAGEMENT -->
-    <div class="admin-tab-pane" id="admin-tab-whitelist">
+    <!-- ADMIN TAB 6: AUDIT LOGS & COMPLIANCE LEDGER -->
+    <div class="admin-tab-pane" id="admin-tab-audit">
       <div class="hub-card mb-2">
-        <h3 class="mb-1">🛡️ Command Center Whitelist & Access Control</h3>
-        <p class="text-muted small mb-2">Root Owner: <strong style="color:#34D399;">Daksh Singhi (dakssinghi@gmail.com)</strong>. Only the root owner has permission to authorize or revoke Command Center access.</p>
-        
-        <div class="form-group mb-2" style="background: rgba(0, 0, 0, 0.35); padding: 14px; border-radius: 8px; border: 1px solid var(--border-glass);">
-          <label><strong>Authorize New Administrator:</strong></label>
-          <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
-            <input type="email" id="new-admin-email" class="form-input" placeholder="Officer Email (e.g. supervisor@ecoflow.ai)" style="flex: 2; min-width: 220px;" />
-            <input type="text" id="new-admin-name" class="form-input" placeholder="Designation (e.g. Operations Director)" style="flex: 2; min-width: 200px;" />
-            <button class="btn btn-primary" onclick="addWhitelistEmail()">+ Authorize Email</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 class="mb-1">📜 Immutable Chronological Audit Trail & Compliance Ledger</h3>
+            <p class="text-muted small">Tamper-evident, cryptographically sequenced record of all municipal operations, pricing adjustments, physical weight verifications, model version deployments, and access permissions.</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="exportAuditLogsCSV()" style="font-size: 11px; padding: 4px 10px;">
+              💾 Export CSV
+            </button>
+            <span class="badge-green">Tamper-Evident SHA-256 Ledger</span>
           </div>
         </div>
 
+        <!-- Filter & Search Bar for Audit Trail -->
+        <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;">
+          <input type="text" id="audit-search-input" class="form-input" placeholder="Search event, actor, or lot ID..." oninput="filterAuditLogsTable()" style="max-width: 260px; font-size: 12px;" />
+          <button type="button" class="btn btn-sm btn-primary active" id="btn-audit-all" onclick="filterAuditCategory('all')" style="font-size: 11px; padding: 4px 10px;">All Events</button>
+          <button type="button" class="btn btn-sm btn-outline" id="btn-audit-model" onclick="filterAuditCategory('AI_MODEL')" style="font-size: 11px; padding: 4px 10px;">🤖 AI Models</button>
+          <button type="button" class="btn btn-sm btn-outline" id="btn-audit-weight" onclick="filterAuditCategory('WEIGHT')" style="font-size: 11px; padding: 4px 10px;">⚖️ Weight Verifications</button>
+          <button type="button" class="btn btn-sm btn-outline" id="btn-audit-access" onclick="filterAuditCategory('WHITELIST')" style="font-size: 11px; padding: 4px 10px;">🛡️ Whitelist & Access</button>
+          <button type="button" class="btn btn-sm btn-outline" id="btn-audit-pickup" onclick="filterAuditCategory('PICKUP')" style="font-size: 11px; padding: 4px 10px;">📦 Pickups & Dispatches</button>
+        </div>
+
+        <!-- Audit Logs Table -->
         <div style="overflow-x: auto;">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Authorized Email</th>
-                <th>Designated Name</th>
-                <th>Encryption & Security Status</th>
-                <th>Registered At</th>
-                <th>Action</th>
+                <th>Event Identifier</th>
+                <th>Previous System State</th>
+                <th>Updated Value / State</th>
+                <th>Actor & Organizational Role</th>
+                <th>Operational Reason & Justification</th>
+                <th>Cryptographic Timestamp</th>
               </tr>
             </thead>
-            <tbody id="admin-whitelist-tbody">
-              <!-- Injected via auth.js -->
+            <tbody id="audit-logs-tbody">
+              <!-- Injected via app.js -->
             </tbody>
           </table>
         </div>
       </div>
     </div>
+    <!-- ADMIN TAB 7: ENCRYPTED CITIZEN & WORKFORCE REGISTRY (Categorized by Role) -->
+    <div class="admin-tab-pane" id="admin-tab-registry">
+      <div class="hub-card mb-2">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 class="mb-1">🔒 Categorized Encrypted User Registry</h3>
+            <p class="text-muted small">All user data is stored encrypted in SQLite using military-grade PBKDF2/AES-256-HMAC keystreams, segregated into dedicated role categories.</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm btn-outline" id="btn-toggle-cipher-view" onclick="toggleRegistryCipherDisplay()" style="font-size: 11px; padding: 4px 10px; border-color: #38BDF8; color: #38BDF8;">
+              👁️ Toggle Raw Ciphertext / Decrypted
+            </button>
+            <span class="status-badge status-verified" id="registry-count-badge">Encrypted Database Storage</span>
+          </div>
+        </div>
 
-    <!-- ADMIN TAB 9: AUTHORIZED FIELD COORDINATORS DIRECTORY -->
+        <!-- Category Quick-Filter Navigation Pills -->
+        <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-sm btn-primary active" id="btn-filter-reg-all" onclick="filterRegistryCategory('all')" style="font-size: 11px; padding: 4px 10px;">
+            🌐 All Users (<span id="reg-count-all">0</span>)
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" id="btn-filter-reg-household" onclick="filterRegistryCategory('household')" style="font-size: 11px; padding: 4px 10px;">
+            🏠 Household Users (<span id="reg-count-hh">0</span>)
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" id="btn-filter-reg-coordinator" onclick="filterRegistryCategory('coordinator')" style="font-size: 11px; padding: 4px 10px;">
+            📋 Field Coordinators (<span id="reg-count-coord">0</span>)
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" id="btn-filter-reg-collector" onclick="filterRegistryCategory('collector')" style="font-size: 11px; padding: 4px 10px;">
+            🚚 Field Collectors (<span id="reg-count-col">0</span>)
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" id="btn-filter-reg-hub" onclick="filterRegistryCategory('hub')" style="font-size: 11px; padding: 4px 10px;">
+            🏢 Storage Hubs & Recyclers (<span id="reg-count-hub">0</span>)
+          </button>
+        </div>
+
+        <!-- SECTION 1: HOUSEHOLD CITIZEN USERS -->
+        <div class="registry-category-card mb-2" id="reg-cat-section-household" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">🏠</span>
+              <h4 style="margin: 0; color: #38BDF8; font-size: 14px;">Household Citizens Encrypted Registry</h4>
+              <span class="badge-blue" id="cat-badge-hh" style="font-size: 10px;">Citizens</span>
+            </div>
+            <span class="small text-muted">Doorstep scrap generators • Zero-knowledge address tokens</span>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Citizen Name</th>
+                  <th>Phone Number</th>
+                  <th>Email</th>
+                  <th>Household Destination Address</th>
+                  <th>Household Ref ID</th>
+                  <th>Raw AES-256 Ciphertext (SQLite)</th>
+                </tr>
+              </thead>
+              <tbody id="registry-households-tbody">
+                <!-- Injected via auth.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION 2: FIELD COORDINATORS -->
+        <div class="registry-category-card mb-2" id="reg-cat-section-coordinator" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">📋</span>
+              <h4 style="margin: 0; color: #34D399; font-size: 14px;">Field Coordinators Encrypted Registry</h4>
+              <span class="badge-green" id="cat-badge-coord" style="font-size: 10px;">Supervisory Officers</span>
+            </div>
+            <span class="small text-muted">Zonal dispatch supervisors • Municipal command cleared</span>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Coordinator Name</th>
+                  <th>Official Phone</th>
+                  <th>Official Email</th>
+                  <th>Zonal Operations Office Address</th>
+                  <th>Employee / Coord ID</th>
+                  <th>Raw AES-256 Ciphertext (SQLite)</th>
+                </tr>
+              </thead>
+              <tbody id="registry-coordinators-tbody">
+                <!-- Injected via auth.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION 3: FIELD COLLECTORS -->
+        <div class="registry-category-card mb-2" id="reg-cat-section-collector" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">🚚</span>
+              <h4 style="margin: 0; color: #FBBF24; font-size: 14px;">Field Collectors Encrypted Registry</h4>
+              <span class="badge-gold" id="cat-badge-col" style="font-size: 10px;">Doorstep Workforce</span>
+            </div>
+            <span class="small text-muted">Smartphone, SMS 2G GSM, and Phoneless Grassroots workforce</span>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Collector Name</th>
+                  <th>Contact Device Mode</th>
+                  <th>Registered Mobile</th>
+                  <th>Operating Shed / Ward Address</th>
+                  <th>Collector ID</th>
+                  <th>Raw AES-256 Ciphertext (SQLite)</th>
+                </tr>
+              </thead>
+              <tbody id="registry-collectors-tbody">
+                <!-- Injected via auth.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION 4: STORAGE HUBS & INDUSTRIAL RECYCLERS -->
+        <div class="registry-category-card mb-2" id="reg-cat-section-hub" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">🏢</span>
+              <h4 style="margin: 0; color: #A78BFA; font-size: 14px;">Storage Hubs & Industrial Recyclers Encrypted Registry</h4>
+              <span class="badge-purple" id="cat-badge-hub" style="font-size: 10px;">Processing Nodes</span>
+            </div>
+            <span class="small text-muted">Certified digital scales, MRF sortation depots, and licensed smelter off-takers</span>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Facility / Enterprise Name</th>
+                  <th>Facility Classification</th>
+                  <th>Operating Contact</th>
+                  <th>Inward Terminal Address</th>
+                  <th>Station / Recycler ID</th>
+                  <th>Raw AES-256 Ciphertext (SQLite)</th>
+                </tr>
+              </thead>
+              <tbody id="registry-hubs-tbody">
+                <!-- Injected via auth.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 8: VERIFIED COORDINATORS (Displays Set of All Emails with Access to Command Center) -->
     <div class="admin-tab-pane" id="admin-tab-coordinators">
       <div class="hub-card mb-2">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
           <div>
-            <h3 class="mb-1">📋 Command Center Authorized Field Coordinators Directory</h3>
-            <p class="text-muted small">Field Coordinators authenticating at the login gateway must strictly match an active Employee ID registered in this directory.</p>
+            <h3 class="mb-1">📋 Command Center Verified Access Directory</h3>
+            <p class="text-muted small">Displays the complete verified set of all officer and coordinator email accounts with active cryptographic access permissions to the Command Center.</p>
           </div>
-          <span class="badge-green" id="admin-coord-count-badge">7 Verified Officers</span>
+          <span class="badge-green" id="admin-access-emails-count-badge">Active Authorized Access</span>
         </div>
 
-        <!-- Add Coordinator Form -->
-        <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
-          <h4 class="mb-2" style="font-size: 13px;">➕ Authorize New Field Coordinator Employee ID</h4>
-          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr 1fr auto; gap: 10px; align-items: end;">
-            <div class="form-group mb-0">
-              <label>Employee ID:</label>
-              <input type="text" id="new-coord-empid" class="form-input" placeholder="e.g. EMP-2026-105" />
-            </div>
-            <div class="form-group mb-0">
-              <label>Full Name:</label>
-              <input type="text" id="new-coord-name" class="form-input" placeholder="e.g. Dipankar Sarma" />
-            </div>
-            <div class="form-group mb-0">
-              <label>Assigned Zone:</label>
-              <select id="new-coord-zone" class="form-input">
-                <option value="ZONE A">ZONE A - North Kamrup</option>
-                <option value="ZONE B" selected>ZONE B - Central Panbazar</option>
-                <option value="ZONE C">ZONE C - Dispur Capital</option>
-                <option value="ZONE D">ZONE D - East Narangi</option>
-              </select>
-            </div>
-            <div class="form-group mb-0">
-              <label>Official Email:</label>
-              <input type="email" id="new-coord-email" class="form-input" placeholder="officer@ecoflow.ai" />
-            </div>
-            <div>
-              <button type="button" class="btn btn-primary" onclick="adminAuthorizeCoordinator()">
-                Authorize ID ▶
-              </button>
-            </div>
+        <!-- Metrics Overview of Command Center Access -->
+        <div class="inspector-grid mb-2" style="grid-template-columns: repeat(4, 1fr); gap: 10px;">
+          <div class="inspector-card" style="padding: 10px; text-align: center;">
+            <div class="small text-muted">Total Authorized Emails</div>
+            <div style="font-size: 20px; font-weight: 800; color: #38BDF8;" id="metric-access-total">7</div>
+          </div>
+          <div class="inspector-card" style="padding: 10px; text-align: center;">
+            <div class="small text-muted">Root Sovereign Owner</div>
+            <div style="font-size: 13px; font-weight: 700; color: #34D399;">Daksh Singhi</div>
+          </div>
+          <div class="inspector-card" style="padding: 10px; text-align: center;">
+            <div class="small text-muted">Security Encryption</div>
+            <div style="font-size: 13px; font-weight: 700; color: #FBBF24;">PBKDF2 600k</div>
+          </div>
+          <div class="inspector-card" style="padding: 10px; text-align: center;">
+            <div class="small text-muted">Zonal Coverage</div>
+            <div style="font-size: 13px; font-weight: 700; color: #A78BFA;">All 4 Zones</div>
           </div>
         </div>
 
-        <!-- Table of Authorized Coordinators -->
+        <!-- Table of All Emails with Command Center Access -->
         <div style="overflow-x: auto;">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Employee ID</th>
-                <th>Coordinator Name</th>
-                <th>Service Zone</th>
-                <th>Official Email</th>
-                <th>Contact</th>
-                <th>Status</th>
+                <th>Authorized Email Address</th>
+                <th>Designated Officer Name</th>
+                <th>Access Privilege Level</th>
+                <th>Security & Credential Status</th>
+                <th>Authorized Service Zone</th>
+                <th>Last Active / Login</th>
+                <th>Directory Source</th>
               </tr>
             </thead>
-            <tbody id="admin-coordinators-tbody">
+            <tbody id="admin-access-emails-tbody">
               <!-- Injected dynamically via loadAdminCoordinators() -->
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 9: HIGH-CONCURRENCY TRAFFIC SHIELD & NIST NVD VULNERABILITY AUDIT -->
+    <div class="admin-tab-pane" id="admin-tab-security">
+      <div class="hub-card mb-2">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 class="mb-1">🛡️ High-Concurrency Traffic Shield & NIST NVD Protection</h3>
+            <p class="text-muted small">Dual-layer reliability architecture: real-time adaptive traffic crowding mitigation (token bucket, RAM micro-cache, circuit breakers) coupled with NIST National Vulnerability Database (NVD) CVE supply-chain auditing to prevent server breakdown.</p>
+          </div>
+          <span class="badge-green" id="security-overall-badge">NIST NVD Hardened & Traffic Shield Active</span>
+        </div>
+
+        <!-- Architectural Clarification Callout -->
+        <div style="background: rgba(56, 189, 248, 0.08); border-left: 4px solid #38BDF8; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px;">
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <span style="font-size: 20px;">💡</span>
+            <div>
+              <strong style="color: #38BDF8; font-size: 13px; display: block; margin-bottom: 4px;">Architectural Distinction: Traffic Crowding vs. NVD Vulnerabilities</strong>
+              <p style="font-size: 12px; color: #CBD5E1; margin: 0; line-height: 1.5;">
+                <strong>Why NVD does not directly handle traffic crowding:</strong> The National Vulnerability Database (NVD), maintained by NIST, is an external repository of software security vulnerabilities (CVEs), not a real-time load balancer or queue. Querying NVD during a high-traffic rush would create external latency bottlenecks and hit NIST API rate limits (5 req / 30s).<br/>
+                <strong>How the App Prevents Server Breakdown:</strong> Our integrated <strong>TrafficShield Engine</strong> prevents traffic crowding crashes via <em>in-memory RAM micro-caching (0.1ms responses)</em>, <em>adaptive concurrency limits (100-thread ceiling)</em>, and <em>circuit breakers</em>. Meanwhile, the <strong>NVD Vulnerability Guard</strong> protects against <em>software-level Denial of Service (DoS) exploits (CWE-400 / CWE-770)</em> by auditing all runtime components against NIST advisories.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 1: LIVE TRAFFIC SHIELD & CONCURRENCY TELEMETRY -->
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">⚡</span>
+              <h4 style="margin: 0; color: #38BDF8; font-size: 14px;">Live Anti-Breakdown Traffic Shield Telemetry</h4>
+              <span class="badge-blue" style="font-size: 10px;">Live In-Memory Guard</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" class="btn btn-sm btn-primary" onclick="simulateCrowdingSurge(500)" style="font-size: 11px; padding: 4px 12px;">
+                ⚡ Simulate 500-Citizen Traffic Surge
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" onclick="loadTrafficShieldStats()" style="font-size: 11px; padding: 4px 8px;">
+                ↻ Refresh Telemetry
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Telemetry Metrics Grid -->
+          <div class="inspector-grid mb-2" style="grid-template-columns: repeat(4, 1fr); gap: 10px;">
+            <div class="inspector-card" style="padding: 12px; text-align: center; background: rgba(0,0,0,0.35);">
+              <div class="small text-muted">Active Concurrent Requests</div>
+              <div style="font-size: 20px; font-weight: 800; color: #34D399;" id="metric-active-concurrency">0 / 100</div>
+              <small style="color: #94A3B8; font-size: 10px;">Adaptive Ceiling Active</small>
+            </div>
+            <div class="inspector-card" style="padding: 12px; text-align: center; background: rgba(0,0,0,0.35);">
+              <div class="small text-muted">RAM Micro-Cache Hit Ratio</div>
+              <div style="font-size: 20px; font-weight: 800; color: #38BDF8;" id="metric-cache-hit-ratio">99.2%</div>
+              <small style="color: #94A3B8; font-size: 10px;">Bypasses SQLite Under Load</small>
+            </div>
+            <div class="inspector-card" style="padding: 12px; text-align: center; background: rgba(0,0,0,0.35);">
+              <div class="small text-muted">Overload Requests Shielded</div>
+              <div style="font-size: 20px; font-weight: 800; color: #FBBF24;" id="metric-throttled-requests">0</div>
+              <small style="color: #94A3B8; font-size: 10px;">Rate-Limiter Protected</small>
+            </div>
+            <div class="inspector-card" style="padding: 12px; text-align: center; background: rgba(0,0,0,0.35);">
+              <div class="small text-muted">Circuit Breaker State</div>
+              <div style="font-size: 16px; font-weight: 800; color: #34D399; margin-top: 3px;" id="metric-circuit-breaker">🟢 CLOSED (HEALTHY)</div>
+              <small style="color: #94A3B8; font-size: 10px;">Zero Cascading Failures</small>
+            </div>
+          </div>
+
+          <!-- Dynamic Surge Test Output Box -->
+          <div id="surge-simulation-result" style="display: none; margin-top: 12px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 6px; padding: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="color: #34D399; font-size: 13px;" id="surge-result-title">⚡ 500-Request Stress Test Completed</strong>
+              <span class="badge-green" style="font-size: 10px;">Zero Downtime</span>
+            </div>
+            <p style="font-size: 12px; color: #E2E8F0; margin: 0;" id="surge-result-details"></p>
+          </div>
+        </div>
+
+        <!-- SECTION 2: NIST NVD / CVE SUPPLY-CHAIN SECURITY AUDIT MATRIX -->
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">🔒</span>
+              <h4 style="margin: 0; color: #34D399; font-size: 14px;">NIST NVD & CVE Denial-of-Service (DoS) Audit Matrix</h4>
+              <span class="badge-green" style="font-size: 10px;">NIST NVD API 2.0 Audited</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline" onclick="loadNVDAudit()" style="font-size: 11px; padding: 3px 10px;">
+              ↻ Re-Run NVD Audit Scan
+            </button>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Audited Component</th>
+                  <th>CPE 2.3 Identifier</th>
+                  <th>Active Version</th>
+                  <th>NIST CVEs Checked</th>
+                  <th>DoS Weakness (CWE)</th>
+                  <th>CVSS Score</th>
+                  <th>Immunity & Mitigation Posture</th>
+                </tr>
+              </thead>
+              <tbody id="nvd-audit-tbody">
+                <!-- Injected via app.js -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

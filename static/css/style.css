@@ -464,6 +464,16 @@ body {
   animation: interface-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Command Center Admin Tab Panes: Map is strictly displayed only in command map option */
+.admin-tab-pane {
+  display: none;
+}
+
+.admin-tab-pane.active {
+  display: block;
+  animation: interface-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* SMS Mobile Terminal Simulator (Mode 2) */
 .sms-terminal-container {
   max-width: 480px;
@@ -3215,21 +3225,17 @@ body {
   color: #CBD5E1;
 }
 
-.btn-advance-step-demo {
-  background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  color: #38BDF8;
+.progress-dynamic-sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
-  font-weight: 700;
-  padding: 5px 12px;
+  font-weight: 600;
+  color: #38BDF8;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 4px 12px;
   border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-advance-step-demo:hover {
-  background: rgba(56, 189, 248, 0.3);
-  color: #FFFFFF;
 }
 
 /* ----------------------------------------------------
@@ -3433,16 +3439,23 @@ body {
   background: var(--bg-slate);
   border-radius: var(--radius-lg);
   margin-bottom: 40px;
-  animation: fadeIn 0.3s ease;
+  min-height: 85vh;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .post-scrap-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 18px 24px;
   border-bottom: 1px solid var(--border-glass);
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
@@ -3842,18 +3855,103 @@ body {
   margin-top: 4px;
 }
 
-/* Modals */
+/* ==================================================
+   UNIVERSAL MODAL OVERLAYS (Fixed, centered, blurred backdrop)
+   ================================================== */
+.modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(3, 7, 18, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  z-index: 999999 !important;
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
+.modal-overlay .modal-card {
+  position: relative;
+  margin: auto;
+  box-sizing: border-box;
+}
+
+/* Post Scrap Exit Confirmation Dialog Centered */
 .post-scrap-exit-dialog {
-  max-width: 440px;
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);
-  text-align: center;
-  padding: 28px 24px;
+  max-width: 460px !important;
+  width: 90% !important;
+  background: linear-gradient(165deg, #1C1929 0%, #0F172A 100%) !important;
+  border: 1.5px solid rgba(239, 68, 68, 0.6) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 45px rgba(239, 68, 68, 0.35) !important;
+  text-align: center !important;
+  padding: 34px 26px !important;
+  margin: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .exit-dialog-icon {
-  font-size: 40px;
-  margin-bottom: 12px;
+  font-size: 48px !important;
+  margin-bottom: 14px !important;
+  display: inline-block !important;
+  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.5));
+}
+
+.exit-dialog-text {
+  color: #EF4444 !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  line-height: 1.5 !important;
+  margin-bottom: 24px !important;
+  text-align: center !important;
+}
+
+.exit-dialog-buttons {
+  display: flex !important;
+  gap: 14px !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.exit-dialog-buttons .btn {
+  border-radius: 12px !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.exit-dialog-buttons .btn-danger {
+  background: #EF4444 !important;
+  border: 1px solid #DC2626 !important;
+  color: #FFFFFF !important;
+}
+
+.exit-dialog-buttons .btn-danger:hover {
+  background: #DC2626 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.5) !important;
+}
+
+.exit-dialog-buttons .btn-outline {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #E2E8F0 !important;
+}
+
+.exit-dialog-buttons .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(-2px);
 }
 
 /* Radius Search HUD */
@@ -4017,5 +4115,122 @@ body {
   gap: 10px;
 }
 
+.collector-lifecycle-progress-card {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
 
+.collector-lifecycle-progress-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.btn-locked {
+  background: #065F46 !important;
+  border-color: #10B981 !important;
+  color: #A7F3D0 !important;
+  cursor: not-allowed !important;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Storage Hub Built-in Digital QR Scanner Station */
+.hub-qr-scanner-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.scanner-viewport-box {
+  position: relative;
+  background: #000000;
+  border: 1px dashed rgba(56, 189, 248, 0.4);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+  margin-bottom: 10px;
+}
+
+.scanner-reticle {
+  position: absolute;
+  inset: 10px;
+  border: 2px solid rgba(56, 189, 248, 0.5);
+  border-radius: 6px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(56, 189, 248, 0.03);
+}
+
+.reticle-laser {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #38BDF8, #34D399, transparent);
+  box-shadow: 0 0 10px #38BDF8, 0 0 16px #34D399;
+  animation: scanLaserAnim 2.2s infinite ease-in-out;
+}
+
+@keyframes scanLaserAnim {
+  0% { top: 10%; opacity: 0.2; }
+  50% { top: 88%; opacity: 1; }
+  100% { top: 10%; opacity: 0.2; }
+}
+
+.reticle-hint {
+  font-size: 11px;
+  color: #94A3B8;
+  letter-spacing: 0.3px;
+  background: rgba(15, 23, 42, 0.85);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hub-payment-settlement-box {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid #10B981;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  margin-top: 14px;
+  animation: fadeInGlow 0.4s ease-out;
+}
+
+@keyframes fadeInGlow {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.material-verify-btn {
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.material-verify-btn.verified {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid #10B981;
+  color: #34D399;
+}
+
+.material-verify-btn.unverified {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid #F59E0B;
+  color: #FCD34D;
+}
 
