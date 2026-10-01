@@ -316,6 +316,9 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
 
+        if path in ('/healthz', '/api/health'):
+            return self._send_json({"status": "healthy", "service": "EcoFlow AI", "version": "1.0.0"})
+
         if not path.startswith('/api/'):
             # Serve static files
             return super().do_GET()
