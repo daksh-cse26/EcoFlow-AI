@@ -22,7 +22,11 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
+
+      - name: Setup Gradle 8.5
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.5'
 
       - name: Accept Android SDK Licenses
         run: |
@@ -32,8 +36,7 @@ jobs:
       - name: Build Debug APK with Gradle
         run: |
           cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace --no-daemon
+          gradle assembleDebug --stacktrace --no-daemon
 
       - name: Locate and Rename APK
         run: |
