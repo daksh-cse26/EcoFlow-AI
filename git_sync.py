@@ -74,7 +74,9 @@ def sync_and_push(commit_msg="update: EcoFlow AI platform enhancements"):
         run_git(["commit", "-m", commit_msg])
     code = run_git(["push", "origin", "main"])
     if code == 0:
-        print("✅ Repository synchronized with GitHub.")
+        print("✅ Repositories synchronized with GitHub:")
+        print("   🌐 https://github.com/daksh-singhi/EcoFlow_AI")
+        print("   🌐 https://github.com/daksh-cse26/EcoFlow-AI")
     return code
 
 if __name__ == "__main__":
