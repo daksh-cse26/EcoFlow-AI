@@ -118,15 +118,16 @@ function selectGatewayRole(role) {
     if (colIdField) colIdField.style.display = "none";
     if (passwordField) passwordField.style.display = "block";
     
-    // Set default value and placeholder for root owner, focus password field directly
+    // Do not prefill email; let user enter email to trigger recognition
     const emailInput = document.getElementById("gw-email");
     if (emailInput) {
-      if (!emailInput.value) emailInput.value = "dakssinghi@gmail.com";
-      emailInput.placeholder = "dakssinghi@gmail.com";
+      emailInput.placeholder = "e.g. officer@ecoflow.ai or dakssinghi@gmail.com";
+      setTimeout(() => emailInput.focus(), 80);
     }
-    const passwordInput = document.getElementById("gw-password");
-    if (passwordInput) {
-      setTimeout(() => passwordInput.focus(), 80);
+    const pwdLabelEl = document.getElementById("gw-password-label-text");
+    if (pwdLabelEl) {
+      pwdLabelEl.textContent = (typeof t === 'function' ? t('gw.password_label', "Password") : "Password");
+      pwdLabelEl.classList.remove("master-recognized-label");
     }
   } else if (role === 'collector') {
     if (nameField) nameField.style.display = "block";
@@ -188,10 +189,13 @@ function updateGatewayRoleTitle(role = activeGatewayRole) {
     coordinator: (typeof t === 'function' ? t('gw.role_coordinator_portal', "📋 Field Coordinator Portal") : "📋 Field Coordinator Portal"),
     collector: (typeof t === 'function' ? t('gw.role_collector_portal', "🚚 Field Collector Portal") : "🚚 Field Collector Portal"),
     hub: (typeof t === 'function' ? t('gw.role_hub_portal', "⚖️ Storage Hub (Authority) Station") : "⚖️ Storage Hub (Authority) Station"),
-    admin: (typeof t === 'function' ? t('gw.role_admin_portal', "🗺️ Command Center (Master Control)") : "🗺️ Command Center (Master Control)")
+    admin: (typeof t === 'function' ? t('gw.role_admin_portal', "🗺️ Command Center") : "🗺️ Command Center")
   };
   const titleEl = document.getElementById("gateway-role-title");
-  if (titleEl) titleEl.textContent = roleNames[role] || (role ? role.toUpperCase() : "");
+  if (titleEl) {
+    titleEl.textContent = roleNames[role] || (role ? role.toUpperCase() : "");
+    titleEl.classList.remove("master-recognized");
+  }
 }
 
 // List of well-known valid email domain TLDs and popular providers
@@ -288,7 +292,31 @@ function validateGatewayInputs() {
   let isValid = false;
 
   if (activeGatewayRole === 'admin') {
-    // Email is mandatory and Master Password is required directly
+    const titleEl = document.getElementById("gateway-role-title");
+    const pwdLabelEl = document.getElementById("gw-password-label-text");
+    const isMasterEmail = (email.toLowerCase() === 'dakssinghi@gmail.com');
+
+    if (isMasterEmail) {
+      if (titleEl) {
+        titleEl.textContent = (typeof t === 'function' ? t('gw.role_admin_portal_master', "🗺️ Command Center (Master Control)") : "🗺️ Command Center (Master Control)");
+        titleEl.classList.add("master-recognized");
+      }
+      if (pwdLabelEl) {
+        pwdLabelEl.textContent = (typeof t === 'function' ? t('gw.password_label_master', "Master Password") : "Master Password");
+        pwdLabelEl.classList.add("master-recognized-label");
+      }
+    } else {
+      if (titleEl) {
+        titleEl.textContent = (typeof t === 'function' ? t('gw.role_admin_portal', "🗺️ Command Center") : "🗺️ Command Center");
+        titleEl.classList.remove("master-recognized");
+      }
+      if (pwdLabelEl) {
+        pwdLabelEl.textContent = (typeof t === 'function' ? t('gw.password_label', "Password") : "Password");
+        pwdLabelEl.classList.remove("master-recognized-label");
+      }
+    }
+
+    // Email is mandatory and Password is required directly
     isValid = (email.length > 3 && isValidEmailDomain(email) && password.length >= 1);
   } else if (activeGatewayRole === 'collector') {
     // Either entering existing collector ID, OR registering new with Name and Address

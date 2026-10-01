@@ -5109,3 +5109,17 @@ body.light-mode .security-modal-box p {
 body.light-mode .security-modal-box .text-muted {
   color: #475569 !important;
 }
+
+/* Master Recognition Dynamic Switching Animations */
+.master-recognized {
+  color: var(--accent-adaptive, #38BDF8) !important;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+  transition: all 0.25s ease-in-out;
+}
+
+.master-recognized-label {
+  color: var(--accent-adaptive, #38BDF8) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.3px;
+  transition: all 0.25s ease-in-out;
+}
