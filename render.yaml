@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ecoflow-ai
+    env: python
+    buildCommand: "echo 'No build dependencies needed'"
+    startCommand: "python server.py"
+    plan: free
+    disk:
+      name: ecoflow-data
+      mountPath: /app/data
+      sizeGB: 1

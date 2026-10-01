@@ -5111,9 +5111,16 @@ body.light-mode .security-modal-box .text-muted {
 }
 
 /* Master Recognition Dynamic Switching Animations */
+@keyframes masterPulseGlow {
+  0% { transform: scale(0.98); opacity: 0.8; }
+  50% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 .master-recognized {
   color: var(--accent-adaptive, #38BDF8) !important;
-  text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+  text-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+  animation: masterPulseGlow 0.3s ease-out;
   transition: all 0.25s ease-in-out;
 }
 
@@ -5121,5 +5128,6 @@ body.light-mode .security-modal-box .text-muted {
   color: var(--accent-adaptive, #38BDF8) !important;
   font-weight: 800 !important;
   letter-spacing: 0.3px;
+  animation: masterPulseGlow 0.3s ease-out;
   transition: all 0.25s ease-in-out;
 }

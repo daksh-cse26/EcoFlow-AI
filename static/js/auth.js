@@ -118,16 +118,20 @@ function selectGatewayRole(role) {
     if (colIdField) colIdField.style.display = "none";
     if (passwordField) passwordField.style.display = "block";
     
-    // Do not prefill email; let user enter email to trigger recognition
+    // Do not prefill email; set clean officer placeholder
     const emailInput = document.getElementById("gw-email");
     if (emailInput) {
-      emailInput.placeholder = "e.g. officer@ecoflow.ai or dakssinghi@gmail.com";
+      emailInput.placeholder = (typeof t === 'function' ? t('gw.admin_email_placeholder', "e.g. officer@ecoflow.ai") : "e.g. officer@ecoflow.ai");
       setTimeout(() => emailInput.focus(), 80);
     }
     const pwdLabelEl = document.getElementById("gw-password-label-text");
     if (pwdLabelEl) {
       pwdLabelEl.textContent = (typeof t === 'function' ? t('gw.password_label', "Password") : "Password");
       pwdLabelEl.classList.remove("master-recognized-label");
+    }
+    const pwdInput = document.getElementById("gw-password");
+    if (pwdInput) {
+      pwdInput.placeholder = (typeof t === 'function' ? t('gw.password_placeholder', "Enter secure password") : "Enter secure password");
     }
   } else if (role === 'collector') {
     if (nameField) nameField.style.display = "block";
@@ -294,6 +298,9 @@ function validateGatewayInputs() {
   if (activeGatewayRole === 'admin') {
     const titleEl = document.getElementById("gateway-role-title");
     const pwdLabelEl = document.getElementById("gw-password-label-text");
+    const pwdInput = document.getElementById("gw-password");
+    const adminNoticeEl = document.getElementById("gf-admin-notice");
+    const adminCardDescEl = document.getElementById("role-admin-card-desc") || document.querySelector('.portal-role-card[data-role="admin"] .portal-card-desc');
     const isMasterEmail = (email.toLowerCase() === 'dakssinghi@gmail.com');
 
     if (isMasterEmail) {
@@ -305,6 +312,19 @@ function validateGatewayInputs() {
         pwdLabelEl.textContent = (typeof t === 'function' ? t('gw.password_label_master', "Master Password") : "Master Password");
         pwdLabelEl.classList.add("master-recognized-label");
       }
+      if (pwdInput) {
+        pwdInput.placeholder = (typeof t === 'function' ? t('gw.password_placeholder_master', "Enter Master Password") : "Enter Master Password");
+      }
+      if (adminCardDescEl) {
+        adminCardDescEl.textContent = (typeof t === 'function' ? t('gw.role_admin_desc_master', "Master executive GIS, neural models, encrypted registry & whitelist access.") : "Master executive GIS, neural models, encrypted registry & whitelist access.");
+        adminCardDescEl.classList.add("master-recognized-label");
+      }
+      if (adminNoticeEl) {
+        adminNoticeEl.innerHTML = (typeof t === 'function' ? t('gw.admin_notice_master', "👑 <strong>Root Sovereign Access Recognized:</strong> <code>dakssinghi@gmail.com</code> verified as Root Owner. Master Control protocols unlocked.") : "👑 <strong>Root Sovereign Access Recognized:</strong> <code>dakssinghi@gmail.com</code> verified as Root Owner. Master Control protocols unlocked.");
+        adminNoticeEl.style.background = "rgba(16, 185, 129, 0.18)";
+        adminNoticeEl.style.borderColor = "rgba(16, 185, 129, 0.5)";
+        adminNoticeEl.style.color = "#6EE7B7";
+      }
     } else {
       if (titleEl) {
         titleEl.textContent = (typeof t === 'function' ? t('gw.role_admin_portal', "🗺️ Command Center") : "🗺️ Command Center");
@@ -313,6 +333,19 @@ function validateGatewayInputs() {
       if (pwdLabelEl) {
         pwdLabelEl.textContent = (typeof t === 'function' ? t('gw.password_label', "Password") : "Password");
         pwdLabelEl.classList.remove("master-recognized-label");
+      }
+      if (pwdInput) {
+        pwdInput.placeholder = (typeof t === 'function' ? t('gw.password_placeholder', "Enter secure password") : "Enter secure password");
+      }
+      if (adminCardDescEl) {
+        adminCardDescEl.textContent = (typeof t === 'function' ? t('gw.role_admin_desc', "Executive GIS, neural models, encrypted registry & whitelist access.") : "Executive GIS, neural models, encrypted registry & whitelist access.");
+        adminCardDescEl.classList.remove("master-recognized-label");
+      }
+      if (adminNoticeEl) {
+        adminNoticeEl.innerHTML = (typeof t === 'function' ? t('gw.admin_notice', "🛡️ <strong>Restricted Executive Access:</strong> Only authorized administrative personnel on the encrypted whitelist have access to this portal. Phone number and address are not required.") : "🛡️ <strong>Restricted Executive Access:</strong> Only authorized administrative personnel on the encrypted whitelist have access to this portal. Phone number and address are not required.");
+        adminNoticeEl.style.background = "rgba(59, 130, 246, 0.15)";
+        adminNoticeEl.style.borderColor = "rgba(59, 130, 246, 0.35)";
+        adminNoticeEl.style.color = "#93C5FD";
       }
     }
 

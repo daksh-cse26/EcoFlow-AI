@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">EcoFlow AI</string>
+    <!-- Default server URL: can be changed to live Render URL or Cloudflare Tunnel -->
+    <string name="default_server_url">http://10.0.2.2:8088</string>
+</resources>

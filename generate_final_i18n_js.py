@@ -280,7 +280,7 @@ function applyTranslations() {
   const emailInput = document.getElementById("gw-email");
   if (emailInput && !emailInput.value) {
     if (typeof activeGatewayRole !== 'undefined' && activeGatewayRole === 'admin') {
-      emailInput.placeholder = "dakssinghi@gmail.com";
+      emailInput.placeholder = t("gw.admin_email_placeholder", "e.g. officer@ecoflow.ai");
     } else {
       emailInput.placeholder = t("gw.email_placeholder", "e.g. user@example.com");
     }

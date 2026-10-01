@@ -1,0 +1,68 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build EcoFlow AI APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant Execute Permission for Gradlew
+        run: |
+          cd android
+          chmod +x gradlew
+
+      - name: Build Debug APK
+        run: |
+          cd android
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Locate and Rename APK
+        run: |
+          mkdir -p build-output
+          cp android/app/build/outputs/apk/debug/app-debug.apk build-output/EcoFlow-AI.apk
+          echo "APK successfully built: $(ls -lh build-output/EcoFlow-AI.apk)"
+
+      - name: Upload APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EcoFlow-AI-APK
+          path: build-output/EcoFlow-AI.apk
+          retention-days: 30
+
+      - name: Create GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: v1.0.0-${{ github.run_number }}
+          name: "EcoFlow AI Android Release v1.0.0"
+          body: |
+            ## 📱 EcoFlow AI Android APK Build
+            
+            Installable APK for Android phones:
+            - **App Name**: EcoFlow AI
+            - **Target Android**: 7.0 (API 24) to Android 14+ (API 34)
+            - **Features**: Real-time sync, AI camera photo scanner, GPS geolocation, AES local vault session storage.
+            
+            Download `EcoFlow-AI.apk` below and install directly on your device.
+          files: build-output/EcoFlow-AI.apk
