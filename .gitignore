@@ -5,3 +5,4 @@ install_git.py
 test.db
 test.txt
 *.log
+cloudflared.exe

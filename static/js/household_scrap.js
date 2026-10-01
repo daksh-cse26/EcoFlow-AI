@@ -578,8 +578,22 @@ function recalculateCostFromTable() {
     }
     if (totalValEl) totalValEl.textContent = `₹${totalVal.toFixed(2)}`;
     if (co2El) co2El.textContent = `${totalCo2.toFixed(1)} kg CO₂ Offset`;
+
+    // Automatically enable Request Pickup button
+    const submitBtn = document.getElementById("btn-request-pickup-submit");
+    const sub = document.getElementById("pickup-btn-sub");
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.classList.add("btn-ready-pulse");
+      if (sub) sub.textContent = `Tap to dispatch ${totalWt.toFixed(1)} kg to collectors in 10 km`;
+    }
   } else {
     if (costCard) costCard.style.display = "none";
+    const submitBtn = document.getElementById("btn-request-pickup-submit");
+    const sub = document.getElementById("pickup-btn-sub");
+    if (submitBtn && !postScrapState.photoConfirmed) {
+      if (sub) sub.textContent = "Enter scrap weights or scan photo to unlock pickup";
+    }
   }
 }
 
@@ -588,7 +602,9 @@ function recalculateCostFromTable() {
 // ----------------------------------------------------
 async function submitScrapPickupFlow() {
   if (postScrapState.detectedMaterials.length === 0 || postScrapState.totalWeight <= 0) {
-    alert("Please enter weights or scan scrap photo to calculate material estimates.");
+    alert("ℹ️ Please enter estimated scrap weights in the table above or tap '📷 Capture / Upload Scrap Photo' to calculate pricing before requesting pickup.");
+    const table = document.getElementById("post-scrap-materials-table");
+    if (table) table.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
 

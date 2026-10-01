@@ -830,10 +830,10 @@
 
           <!-- Request Pickup Button -->
           <div class="post-scrap-submit-box">
-            <button type="button" class="btn-request-pickup-submit" id="btn-request-pickup-submit" onclick="submitScrapPickupFlow()" disabled>
+            <button type="button" class="btn-request-pickup-submit" id="btn-request-pickup-submit" onclick="submitScrapPickupFlow()">
               <span class="pickup-btn-icon">🚚</span>
               <span>Request pickup</span>
-              <span class="pickup-btn-sub" id="pickup-btn-sub">Confirm scrap photo to unlock pickup</span>
+              <span class="pickup-btn-sub" id="pickup-btn-sub">Enter scrap weights or scan photo to unlock pickup</span>
             </button>
           </div>
         </div>
@@ -2316,6 +2316,17 @@
         <input type="hidden" id="pickup-material-input" value="Copper Scrap" />
         <input type="hidden" id="pickup-weight-input" value="10" />
         <input type="hidden" id="pickup-rate-input" value="580" />
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Your Name:</label>
+            <input type="text" id="pickup-name" class="form-input" placeholder="Your Full Name" value="Rahul Sharma" required />
+          </div>
+          <div class="form-group">
+            <label>Contact Phone:</label>
+            <input type="tel" id="pickup-phone" class="form-input" placeholder="+91 98640 12345" value="+91 98640 12345" required />
+          </div>
+        </div>
 
         <div class="form-group">
           <label data-i18n="pickup.address">Address:</label>

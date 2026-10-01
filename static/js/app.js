@@ -903,8 +903,25 @@ function openPickupModal() {
   const modal = document.getElementById("pickup-modal");
   if (modal) {
     modal.classList.add("active");
+
+    // Populate user info from active session
+    const sessionStr = localStorage.getItem("ecoflow_user_session");
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr);
+        const nameInput = document.getElementById("pickup-name");
+        const phoneInput = document.getElementById("pickup-phone");
+        const addrInput = document.getElementById("pickup-address");
+        if (nameInput && session.name) nameInput.value = session.name;
+        if (phoneInput && session.phone) phoneInput.value = session.phone;
+        if (addrInput && session.address) addrInput.value = session.address;
+      } catch (e) {}
+    }
+
     setTimeout(() => {
-      if (appState.householdMap) appState.householdMap.resize();
+      if (appState.householdMap && typeof appState.householdMap.resize === "function") {
+        appState.householdMap.resize();
+      }
     }, 200);
   }
 }
@@ -917,20 +934,40 @@ function closePickupModal() {
 function submitPickupRequest(event) {
   if (event) event.preventDefault();
 
+  const sessionStr = localStorage.getItem("ecoflow_user_session");
+  let session = {};
+  try { session = JSON.parse(sessionStr) || {}; } catch (e) {}
+
+  const nameInput = document.getElementById("pickup-name");
+  const phoneInput = document.getElementById("pickup-phone");
+  const addrInput = document.getElementById("pickup-address");
+  const landmarkInput = document.getElementById("pickup-landmark");
+  const zoneInput = document.getElementById("pickup-zone");
+  const latInput = document.getElementById("pickup-lat");
+  const lngInput = document.getElementById("pickup-lng");
+  const dateInput = document.getElementById("pickup-date");
+  const slotInput = document.getElementById("pickup-slot");
+  const matInput = document.getElementById("pickup-material-input");
+  const wtInput = document.getElementById("pickup-weight-input");
+  const rateInput = document.getElementById("pickup-rate-input");
+  const notesInput = document.getElementById("pickup-notes");
+
+  const todayStr = new Date().toISOString().split("T")[0];
+
   const payload = {
-    household_name: document.getElementById("pickup-name").value || "Rahul Sharma",
-    household_phone: document.getElementById("pickup-phone").value || "+91 98640 12345",
-    address: document.getElementById("pickup-address").value || "House 14, Peace Enclave, Paltan Bazaar, Guwahati",
-    landmark: document.getElementById("pickup-landmark").value || "Opposite State Library",
-    service_zone: document.getElementById("pickup-zone").value || "ZONE B",
-    lat: parseFloat(document.getElementById("pickup-lat").value) || 26.1792,
-    lng: parseFloat(document.getElementById("pickup-lng").value) || 91.7695,
-    preferred_date: document.getElementById("pickup-date").value || "2026-09-28",
-    time_slot: document.getElementById("pickup-slot").value || "10:00 AM - 12:00 PM",
-    preliminary_material: document.getElementById("pickup-material-input").value || "Copper Wires & Circuit Boards",
-    user_estimated_weight: parseFloat(document.getElementById("pickup-weight-input").value) || 10.0,
-    indicative_rate: parseFloat(document.getElementById("pickup-rate-input").value) || 580.0,
-    notes: document.getElementById("pickup-notes").value || "Segregated cleanly in cardboard carton."
+    household_name: (nameInput && nameInput.value.trim()) || session.name || "Rahul Sharma",
+    household_phone: (phoneInput && phoneInput.value.trim()) || session.phone || "+91 98640 12345",
+    address: (addrInput && addrInput.value.trim()) || session.address || "House 14, Peace Enclave, Paltan Bazaar, Guwahati",
+    landmark: (landmarkInput && landmarkInput.value.trim()) || "Opposite State Library",
+    service_zone: (zoneInput && zoneInput.value) || "ZONE B",
+    lat: parseFloat(latInput?.value) || 26.1792,
+    lng: parseFloat(lngInput?.value) || 91.7695,
+    preferred_date: (dateInput && dateInput.value) || todayStr,
+    time_slot: (slotInput && slotInput.value) || "10:00 AM - 12:00 PM",
+    preliminary_material: (matInput && matInput.value) || "Copper Wires & Circuit Boards",
+    user_estimated_weight: parseFloat(wtInput?.value) || 10.0,
+    indicative_rate: parseFloat(rateInput?.value) || 580.0,
+    notes: (notesInput && notesInput.value.trim()) || "Segregated cleanly in cardboard carton."
   };
 
   apiFetch("/api/pickups/create", {

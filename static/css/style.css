@@ -4640,10 +4640,18 @@ body.light-mode .status-badge {
 }
 
 body.light-mode .modal-card,
-body.light-mode .modal-content {
-  background: rgba(255, 255, 255, 0.95) !important;
+body.light-mode .modal-content,
+body.light-mode .modal-dialog {
+  background: rgba(255, 255, 255, 0.98) !important;
   color: #065F46 !important;
-  border-color: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.light-mode .modal-dialog h3,
+body.light-mode .modal-dialog label,
+body.light-mode .modal-dialog strong {
+  color: #065F46 !important;
 }
 
 body.light-mode .active-session-badge {
