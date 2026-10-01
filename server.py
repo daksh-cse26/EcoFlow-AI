@@ -2599,19 +2599,52 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
 
         return chain
 
-def run_server(port=10000):
+def run_server(port=None):
     init_db()
     seed_demo_data()
-    server_address = ('0.0.0.0', port)
-    httpd = ThreadingHTTPServer(server_address, EcoFlowAPIHandler)
-    httpd.daemon_threads = True
-    print(f"--> EcoFlow AI Server listening on http://0.0.0.0:{port}", flush=True)
+
+    if port is None:
+        raw_port = os.environ.get("PORT")
+        if raw_port and raw_port.isdigit():
+            port = int(raw_port)
+        elif len(sys.argv) > 1 and sys.argv[1].isdigit():
+            port = int(sys.argv[1])
+        else:
+            port = 10000 if os.path.exists("/.dockerenv") or os.environ.get("RENDER") else 8088
+
+    candidate_ports = [port]
+    for p in [8088, 8080, 10000]:
+        if p not in candidate_ports:
+            candidate_ports.append(p)
+
+    active_servers = []
+    for p in candidate_ports:
+        try:
+            httpd = ThreadingHTTPServer(('0.0.0.0', p), EcoFlowAPIHandler)
+            httpd.daemon_threads = True
+            active_servers.append((p, httpd))
+            print(f"--> EcoFlow AI Server listening on http://localhost:{p} (http://0.0.0.0:{p})", flush=True)
+        except Exception:
+            pass
+
+    if not active_servers:
+        raise RuntimeError(f"Could not bind to any candidate port: {candidate_ports}")
+
+    for p, srv in active_servers[1:]:
+        t = threading.Thread(target=srv.serve_forever, daemon=True)
+        t.start()
+
+    primary_srv = active_servers[0][1]
     try:
-        httpd.serve_forever()
+        primary_srv.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
-        httpd.server_close()
+        for p, srv in active_servers:
+            try:
+                srv.server_close()
+            except Exception:
+                pass
         print("Server stopped.", flush=True)
 
 if __name__ == "__main__":
