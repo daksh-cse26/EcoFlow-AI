@@ -2628,9 +2628,9 @@ def run_server(port=10000):
 if __name__ == "__main__":
     try:
         raw_port = os.environ.get("PORT")
-        if raw_port:
+        if raw_port and raw_port.isdigit():
             port = int(raw_port)
-        elif len(sys.argv) > 1:
+        elif len(sys.argv) > 1 and sys.argv[1].isdigit():
             port = int(sys.argv[1])
         else:
             port = 10000 if os.path.exists("/.dockerenv") or os.environ.get("RENDER") else 8088
