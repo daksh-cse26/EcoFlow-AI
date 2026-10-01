@@ -1,0 +1,6 @@
+# Ensure gradlew and shell scripts always have LF line endings
+android/gradlew text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.jar binary
