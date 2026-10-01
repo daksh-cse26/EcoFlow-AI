@@ -15,7 +15,7 @@ DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ecoflow.db")
 def get_db():
     conn = sqlite3.connect(DB_PATH, timeout=30.0)
     try:
-        conn.execute("PRAGMA journal_mode = WAL;")
+        conn.execute("PRAGMA journal_mode = DELETE;")
         conn.execute("PRAGMA busy_timeout = 30000;")
     except Exception:
         pass
