@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ecoflow-ai
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerCommand: /bin/sh /app/entrypoint.sh
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: WEB_CONCURRENCY
+        value: "1"

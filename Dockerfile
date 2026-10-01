@@ -8,13 +8,16 @@ ENV PYTHONIOENCODING=utf-8
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV PORT=10000
+ENV WEB_CONCURRENCY=1
 
 # Copy application files
 COPY . /app
 
-# Ensure permissions
-RUN chmod +x /app/server.py && chmod -R 777 /app
+# Fix any CRLF line endings, ensure executable permissions, and open database write access
+RUN sed -i 's/\r$//' /app/entrypoint.sh /app/server.py && \
+    chmod +x /app/entrypoint.sh /app/server.py && \
+    chmod -R 777 /app
 
 EXPOSE 10000
 
-CMD ["python3", "-u", "/app/server.py"]
+ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
