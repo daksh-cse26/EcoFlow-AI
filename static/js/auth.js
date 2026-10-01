@@ -60,6 +60,34 @@ function selectGatewayRole(role) {
     card.classList.toggle("selected", card.dataset.role === role);
   });
 
+  // Toggle Cosmic Purple theme for admin/command center
+  if (role === 'admin') {
+    document.body.classList.add('cosmic-admin-theme');
+  } else {
+    document.body.classList.remove('cosmic-admin-theme');
+  }
+
+  // Voice Guide Bar (TTS) and Voice Assistant visibility:
+  // Strictly remove Voice Guide feature for Command Center (admin) and Field Coordinator (coordinator)
+  document.body.dataset.gatewayRole = role;
+  const ttsBar = document.getElementById("gateway-tts-bar");
+  const topVoiceBtn = document.querySelector(".voice-btn-top");
+  if (role === 'admin' || role === 'coordinator') {
+    if (ttsBar) ttsBar.style.display = "none";
+    if (topVoiceBtn) topVoiceBtn.style.display = "none";
+    if (typeof loginTTSNarrator !== 'undefined' && loginTTSNarrator) {
+      loginTTSNarrator.stopNarrator();
+      loginTTSNarrator.isEnabled = false;
+      loginTTSNarrator.updateToggleUI();
+    }
+  } else {
+    if (ttsBar) ttsBar.style.display = "flex";
+    if (topVoiceBtn) topVoiceBtn.style.display = (role === 'household') ? "inline-flex" : "none";
+    if (typeof loginTTSNarrator !== 'undefined' && loginTTSNarrator) {
+      loginTTSNarrator.updateToggleUI();
+    }
+  }
+
   // Role Metadata Titles
   updateGatewayRoleTitle(role);
 
@@ -166,6 +194,84 @@ function updateGatewayRoleTitle(role = activeGatewayRole) {
   if (titleEl) titleEl.textContent = roleNames[role] || (role ? role.toUpperCase() : "");
 }
 
+// List of well-known valid email domain TLDs and popular providers
+const VALID_EMAIL_TLDS = [
+  'com', 'org', 'net', 'edu', 'gov', 'mil', 'int', 'io', 'co', 'us', 'uk', 'ca', 'au', 'de', 'fr', 'jp',
+  'in', 'br', 'it', 'es', 'nl', 'se', 'no', 'fi', 'dk', 'pl', 'cz', 'sk', 'at', 'ch', 'be', 'pt', 'ie',
+  'nz', 'za', 'mx', 'ar', 'cl', 'co', 'kr', 'cn', 'tw', 'hk', 'sg', 'my', 'th', 'ph', 'id', 'vn',
+  'ru', 'ua', 'tr', 'il', 'ae', 'sa', 'eg', 'ng', 'ke', 'gh', 'tz', 'info', 'biz', 'name', 'pro',
+  'xyz', 'online', 'site', 'tech', 'store', 'app', 'dev', 'ai', 'me', 'tv', 'cc', 'ws', 'mobi',
+  'asia', 'tel', 'museum', 'aero', 'coop', 'jobs', 'travel', 'cat', 'post', 'ac', 'ad'
+];
+
+/**
+ * Validates if an email address has a valid domain name with a recognized TLD.
+ * @param {string} email - The email to validate
+ * @returns {boolean} - Whether the email domain is valid
+ */
+function isValidEmailDomain(email) {
+  if (!email || !email.includes('@')) return false;
+
+  // Basic email regex: local@domain.tld
+  const emailRegex = /^[a-zA-Z0-9._%+\-]+@([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) return false;
+
+  // Extract the domain part
+  const domain = email.split('@')[1].toLowerCase();
+  if (!domain || domain.length < 3) return false;
+
+  // Extract TLD from domain
+  const parts = domain.split('.');
+  if (parts.length < 2) return false;
+
+  const tld = parts[parts.length - 1];
+  // Check if TLD is in our known list OR has 2-6 characters (covers country codes and new gTLDs)
+  if (VALID_EMAIL_TLDS.includes(tld) || (tld.length >= 2 && tld.length <= 6 && /^[a-z]+$/.test(tld))) {
+    // Additional check: domain part before TLD should be at least 1 char
+    const domainName = parts.slice(0, -1).join('.');
+    return domainName.length >= 1 && !/^[\-.]|[\-.]$/.test(domainName);
+  }
+
+  return false;
+}
+
+/**
+ * Shows/hides the email validation error message and styles the input field.
+ * Called on every keystroke in the email field.
+ */
+function validateEmailDomain() {
+  const emailInput = document.getElementById('gw-email');
+  const errorEl = document.getElementById('email-domain-error');
+  if (!emailInput || !errorEl) return;
+
+  const email = emailInput.value.trim();
+
+  // Don't show error if field is empty or too short (user still typing)
+  if (email.length < 3 || !email.includes('@')) {
+    errorEl.classList.remove('visible');
+    emailInput.classList.remove('input-error', 'input-valid');
+    return;
+  }
+
+  // Check if the part after @ has started (user is typing domain)
+  const afterAt = email.split('@')[1] || '';
+  if (afterAt.length < 2) {
+    errorEl.classList.remove('visible');
+    emailInput.classList.remove('input-error', 'input-valid');
+    return;
+  }
+
+  if (isValidEmailDomain(email)) {
+    errorEl.classList.remove('visible');
+    emailInput.classList.remove('input-error');
+    emailInput.classList.add('input-valid');
+  } else {
+    errorEl.classList.add('visible');
+    emailInput.classList.add('input-error');
+    emailInput.classList.remove('input-valid');
+  }
+}
+
 // Live Validation: Reveal login button when all mandatory details are entered
 function validateGatewayInputs() {
   const name = (document.getElementById("gw-name")?.value || "").trim();
@@ -176,11 +282,14 @@ function validateGatewayInputs() {
   const password = (document.getElementById("gw-password")?.value || "").trim();
   const colId = (document.getElementById("gw-collector-id")?.value || "").trim();
 
+  // Email domain validation — block submission if invalid domain
+  const emailDomainOk = email.length === 0 || isValidEmailDomain(email);
+
   let isValid = false;
 
   if (activeGatewayRole === 'admin') {
     // Email is mandatory and Master Password is required directly
-    isValid = (email.length > 3 && email.includes('@') && password.length >= 1);
+    isValid = (email.length > 3 && isValidEmailDomain(email) && password.length >= 1);
   } else if (activeGatewayRole === 'collector') {
     // Either entering existing collector ID, OR registering new with Name and Address
     if (colId.length >= 4) {
@@ -190,10 +299,10 @@ function validateGatewayInputs() {
     }
   } else if (activeGatewayRole === 'coordinator') {
     // Name, phone, email, address, and employee_id are all mandatory
-    isValid = (name.length >= 2 && phone.length >= 7 && email.includes('@') && address.length >= 4 && empId.length >= 2);
+    isValid = (name.length >= 2 && phone.length >= 7 && isValidEmailDomain(email) && address.length >= 4 && empId.length >= 2);
   } else {
     // household, hub: Name, phone, email, address mandatory
-    isValid = (name.length >= 2 && phone.length >= 7 && email.includes('@') && address.length >= 4);
+    isValid = (name.length >= 2 && phone.length >= 7 && isValidEmailDomain(email) && address.length >= 4);
   }
 
   const submitContainer = document.getElementById("gateway-submit-container");
@@ -327,6 +436,19 @@ function applyActiveSession(session) {
 
   // Lock and activate chosen interface view
   switchPerspective(session.role);
+
+  // Set active role attribute and control Voice Guide / Assistant feature visibility
+  document.body.dataset.activeRole = session.role;
+  const topVoiceBtn = document.querySelector(".voice-btn-top");
+  if (session.role === 'admin' || session.role === 'coordinator') {
+    if (topVoiceBtn) topVoiceBtn.style.display = "none";
+    if (typeof loginTTSNarrator !== 'undefined' && loginTTSNarrator) {
+      loginTTSNarrator.stopNarrator();
+      loginTTSNarrator.isEnabled = false;
+    }
+  } else {
+    if (topVoiceBtn) topVoiceBtn.style.display = (session.role === 'household') ? "inline-flex" : "none";
+  }
 
   // Update dynamic user names across all headers and greetings
   if (typeof updateAllInterfaceUserNames === "function") {
@@ -469,7 +591,7 @@ async function requestPasswordResetCode() {
 
     const alertBox = document.getElementById("forgot-token-alert");
     if (alertBox) {
-      alertBox.innerHTML = `<strong>Verification Code Generated:</strong> <span style="font-family:monospace; color:#34D399; font-size:16px;">${result.token_preview}</span><br><small class="text-muted">A verification token has been simulated to your registered email (${email}). Enter it below to set your new password.</small>`;
+      alertBox.innerHTML = `<strong>Verification Code Generated:</strong> <span style="font-family:monospace; color: var(--accent-adaptive); font-size:16px;">${result.token_preview}</span><br><small class="text-muted">A verification token has been simulated to your registered email (${email}). Enter it below to set your new password.</small>`;
       alertBox.style.display = "block";
     }
 
@@ -567,10 +689,10 @@ function renderCategorizedRegistry(data = registryDataCache) {
     hhTbody.innerHTML = list.length ? list.map(u => `
       <tr>
         <td><code>${u.user_id}</code></td>
-        <td><strong style="color: #F8FAFC;">${showRawCipherMode ? u.raw_display : u.name}</strong></td>
+        <td><strong style="color: var(--text-main);">${showRawCipherMode ? u.raw_display : u.name}</strong></td>
         <td>${showRawCipherMode ? '<code>' + u.raw_display.substring(0, 14) + '...</code>' : u.phone}</td>
         <td>${showRawCipherMode ? '<code>' + u.raw_display.substring(0, 16) + '...</code>' : u.email}</td>
-        <td><small style="color: #CBD5E1;">${showRawCipherMode ? u.raw_ciphertext : u.address}</small></td>
+        <td><small style="color: var(--text-muted);">${showRawCipherMode ? u.raw_ciphertext : u.address}</small></td>
         <td><span class="badge-blue" style="font-size: 10px;">${u.custom_id}</span></td>
         <td><span class="registry-encrypted-pill" style="font-size: 10px; font-family: monospace; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 6px; border-radius: 4px; color: #7DD3FC;" title="${u.raw_ciphertext}">${u.raw_display}</span></td>
       </tr>
@@ -583,10 +705,10 @@ function renderCategorizedRegistry(data = registryDataCache) {
     coordTbody.innerHTML = list.length ? list.map(u => `
       <tr>
         <td><code>${u.user_id}</code></td>
-        <td><strong style="color: #34D399;">${showRawCipherMode ? u.raw_display : u.name}</strong></td>
+        <td><strong style="color: var(--accent-adaptive);">${showRawCipherMode ? u.raw_display : u.name}</strong></td>
         <td>${showRawCipherMode ? '<code>' + u.raw_display.substring(0, 14) + '...</code>' : u.phone}</td>
         <td>${showRawCipherMode ? '<code>' + u.raw_display.substring(0, 16) + '...</code>' : u.email}</td>
-        <td><small style="color: #CBD5E1;">${showRawCipherMode ? u.raw_ciphertext : u.address}</small></td>
+        <td><small style="color: var(--text-muted);">${showRawCipherMode ? u.raw_ciphertext : u.address}</small></td>
         <td><span class="badge-green" style="font-size: 10px;">${u.custom_id}</span></td>
         <td><span class="registry-encrypted-pill" style="font-size: 10px; font-family: monospace; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 6px; border-radius: 4px; color: #6EE7B7;" title="${u.raw_ciphertext}">${u.raw_display}</span></td>
       </tr>
@@ -607,7 +729,7 @@ function renderCategorizedRegistry(data = registryDataCache) {
           <td><strong style="color: #FBBF24;">${showRawCipherMode ? u.raw_display : u.name}</strong></td>
           <td>${modeBadge}</td>
           <td>${showRawCipherMode ? '<code>' + u.raw_display.substring(0, 14) + '...</code>' : u.phone}</td>
-          <td><small style="color: #CBD5E1;">${showRawCipherMode ? u.raw_ciphertext : u.address}</small></td>
+          <td><small style="color: var(--text-muted);">${showRawCipherMode ? u.raw_ciphertext : u.address}</small></td>
           <td><code style="color: #FDE68A;">${u.custom_id}</code></td>
           <td><span class="registry-encrypted-pill" style="font-size: 10px; font-family: monospace; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 2px 6px; border-radius: 4px; color: #FCD34D;" title="${u.raw_ciphertext}">${u.raw_display}</span></td>
         </tr>
@@ -624,7 +746,7 @@ function renderCategorizedRegistry(data = registryDataCache) {
         <td><strong style="color: #C084FC;">${showRawCipherMode ? u.raw_display : u.name}</strong></td>
         <td><span class="badge-purple" style="font-size: 10px;">${u.role.toUpperCase()}</span></td>
         <td>${showRawCipherMode ? '<code>' + u.raw_display.substring(0, 14) + '...</code>' : u.phone}</td>
-        <td><small style="color: #CBD5E1;">${showRawCipherMode ? u.raw_ciphertext : u.address}</small></td>
+        <td><small style="color: var(--text-muted);">${showRawCipherMode ? u.raw_ciphertext : u.address}</small></td>
         <td><code>${u.custom_id}</code></td>
         <td><span class="registry-encrypted-pill" style="font-size: 10px; font-family: monospace; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); padding: 2px 6px; border-radius: 4px; color: #D8B4FE;" title="${u.raw_ciphertext}">${u.raw_display}</span></td>
       </tr>
@@ -679,7 +801,7 @@ async function loadWhitelist() {
     tbody.innerHTML = data.whitelist.map(w => `
       <tr>
         <td>
-          <strong style="color: #F8FAFC;">${w.email}</strong>
+          <strong style="color: var(--text-main);">${w.email}</strong>
           ${w.is_root ? '<span class="status-badge status-verified" style="margin-left:6px; font-size:10px;">👑 ROOT OWNER</span>' : ''}
         </td>
         <td>${w.name}</td>
@@ -1091,12 +1213,12 @@ async function respondToSMSInvite(choice) {
         if (cardEl) {
           cardEl.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <strong style="color: #34D399;">${data.collector_id}</strong>
+              <strong style="color: var(--accent-adaptive);">${data.collector_id}</strong>
               <span class="status-pill status-verified" style="font-size: 9px;">ACTIVE</span>
             </div>
             <p class="small text-muted mb-1">Mode: <strong>Basic Phone (SMS Only)</strong></p>
-            <p class="small text-muted mb-1">Identity: <span style="color:#94A3B8; font-family: monospace;">[🔒 RECORD SEALED & ENCRYPTED]</span></p>
-            <p class="small text-muted mb-2">Personal Data: <span style="color:#94A3B8; font-family: monospace;">[ERASED FROM LOCAL STORAGE]</span></p>
+            <p class="small text-muted mb-1">Identity: <span style="color: var(--text-muted); font-family: monospace;">[🔒 RECORD SEALED & ENCRYPTED]</span></p>
+            <p class="small text-muted mb-2">Personal Data: <span style="color: var(--text-muted); font-family: monospace;">[ERASED FROM LOCAL STORAGE]</span></p>
             <span class="badge-green" style="font-size: 10px; width: 100%; display: block; text-align: center; padding: 4px;">
               🔒 Privacy Protocol Enforced
             </span>
@@ -1145,7 +1267,7 @@ async function loadCoordinatorFleet() {
             <strong>${escapeHtml(e.name)}</strong>
             <span class="${modeBadge}" style="font-size: 9.5px;">${e.availability || 'AVAILABLE'}</span>
           </div>
-          <p class="small text-muted mb-1">ID: <code style="color: #34D399; font-weight: 700;">${e.employee_id}</code></p>
+          <p class="small text-muted mb-1">ID: <code style="color: var(--accent-adaptive); font-weight: 700;">${e.employee_id}</code></p>
           <p class="small text-muted mb-1">Mode: <strong>${modeTitle}</strong></p>
           <p class="small text-muted mb-1">Contact: <span>${phoneDisplay}</span></p>
           <p class="small text-muted mb-2">Zone: <strong>${e.service_zone}</strong> • Hub: <strong>${e.assigned_hub || 'HUB-001'}</strong> • Workload: ${e.workload || 0}</p>
@@ -1307,7 +1429,7 @@ async function loadAdminCoordinators() {
 
     tbody.innerHTML = data.coordinators.map(c => `
       <tr>
-        <td><code style="color: #34D399; font-weight: 700; font-size: 13px;">${c.employee_id}</code></td>
+        <td><code style="color: var(--accent-adaptive); font-weight: 700; font-size: 13px;">${c.employee_id}</code></td>
         <td><strong>${escapeHtml(c.name)}</strong></td>
         <td><span class="category-tag tag-metal">${c.service_zone}</span></td>
         <td>${c.email || '—'}</td>

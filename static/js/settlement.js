@@ -254,9 +254,9 @@ class SettlementEngine {
 
     if (!settlement || !settlement.lot_id) {
       container.innerHTML = `
-        <div class="empty-state-notice" id="settlement-empty-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+        <div class="empty-state-notice" id="settlement-empty-notice" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
           <div class="empty-state-icon" style="font-size: 40px; margin-bottom: 10px;">🧾</div>
-          <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Settlement Receipts Yet</h4>
+          <h4 style="margin: 0 0 6px 0; color: var(--text-main);">No Settlement Receipts Yet</h4>
           <p class="small text-muted" style="margin: 0; max-width: 420px; margin-inline: auto;">
             Digital receipts and transparent weighment calculations will appear here automatically after your scrap is physically verified and paid at the hub.
           </p>

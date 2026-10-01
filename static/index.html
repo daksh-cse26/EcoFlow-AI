@@ -7,8 +7,14 @@
   <meta name="description" content="AI-assisted, digitally managed recycling platform organizing the complete recyclable-waste journey from household to verified storage hub to authorized recycler." />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/animations.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
+
+  <!-- Floating Particles Background -->
+  <div id="particles-canvas" aria-hidden="true"></div>
 
   <!-- ==================================================
        SECTION 53: 26-STEP COMPLETE JUDGE TOUR BAR (Hidden per user request)
@@ -91,6 +97,13 @@
       <button class="voice-btn-top" onclick="voiceAssistant.openVoiceModal('pickup-notes', 'pickup')" title="Multilingual Speech Recognition">
         🎙️ <span data-i18n="voice.tap_to_speak">Voice Assistant</span>
       </button>
+
+      <!-- Dark/Light Mode Toggle -->
+      <div class="theme-toggle-container" title="Toggle Light/Dark Mode">
+        <span class="theme-toggle-label">🌙</span>
+        <div class="theme-toggle-switch" id="theme-toggle" onclick="toggleThemeMode()"></div>
+        <span class="theme-toggle-label">☀️</span>
+      </div>
     </div>
   </header>
 
@@ -212,7 +225,7 @@
         🛡️ <strong>Restricted Executive Access:</strong> Only <code>dakssinghi@gmail.com</code> and authorized administrators on the whitelist have access to this portal. Phone number and address are not required.
       </div>
 
-      <div id="gf-collector-notice" data-i18n="gw.collector_notice" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #A7F3D0;">
+      <div id="gf-collector-notice" data-i18n="gw.collector_notice" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: var(--text-muted);">
         🚚 <strong>Automated Identity:</strong> Upon entering your details, an individual, unique Collector ID (e.g. <code>COL-2026-XXXXX</code>) will be permanently generated for you and encrypted on the database.
       </div>
 
@@ -241,7 +254,10 @@
             <span data-i18n="gw.email_label">Email Address</span>
             <span class="field-tag field-tag-req" data-i18n="gw.mandatory">* Mandatory</span>
           </label>
-          <input type="email" id="gw-email" class="form-input" placeholder="e.g. user@example.com" data-i18n-placeholder="gw.email_placeholder" oninput="validateGatewayInputs()" />
+          <input type="email" id="gw-email" class="form-input" placeholder="e.g. user@example.com" data-i18n-placeholder="gw.email_placeholder" oninput="validateGatewayInputs(); validateEmailDomain()" />
+          <div class="email-validation-error" id="email-domain-error">
+            ⚠️ <span>Invalid email — please enter a valid domain (e.g. gmail.com, yahoo.com, outlook.com)</span>
+          </div>
         </div>
 
         <!-- Employee ID (Coordinator only) -->
@@ -251,7 +267,7 @@
             <span class="field-tag field-tag-req" data-i18n="gw.mandatory">* Mandatory</span>
           </label>
           <input type="text" id="gw-emp-id" class="form-input" placeholder="e.g. EMP-2026-101" data-i18n-placeholder="gw.emp_id_placeholder" oninput="validateGatewayInputs()" />
-          <small style="display: block; font-size: 10.5px; color: #94A3B8; margin-top: 4px;" data-i18n="gw.coord_id_hint">
+          <small style="display: block; font-size: 10.5px; color: var(--text-muted); margin-top: 4px;" data-i18n="gw.coord_id_hint">
             🛡️ <em>Strictly verified against Command Center Directory (e.g. <code>EMP-2026-101</code>, <code>EMP-2026-102</code>, <code>EMP-2026-103</code>, <code>EMP-2026-104</code>, <code>EMP-2026-904</code>)</em>
           </small>
         </div>
@@ -260,10 +276,10 @@
         <div class="gateway-field" id="gf-collector-id-container" style="display: none;">
           <label for="gw-collector-id">
             <span>Collector ID (If previously registered)</span>
-            <span class="field-tag" style="background: rgba(16, 185, 129, 0.2); color: #34D399;">Auto-Restore</span>
+            <span class="field-tag" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-adaptive);">Auto-Restore</span>
           </label>
           <input type="text" id="gw-collector-id" class="form-input" placeholder="e.g. COL-00156 or COL-NP-0024" oninput="validateGatewayInputs()" />
-          <small style="display: block; font-size: 10.5px; color: #94A3B8; margin-top: 4px;">
+          <small style="display: block; font-size: 10.5px; color: var(--text-muted); margin-top: 4px;">
             🚚 <em>Entering your Collector ID will instantly restore all your past pickups, lots, and profile data directly into this device's local storage.</em>
           </small>
         </div>
@@ -315,7 +331,7 @@
         <!-- Top Household Bar -->
         <div class="household-app-bar">
         <div class="user-greeting-box">
-          <h2 id="hh-dynamic-greeting-title">Good Morning, <span class="editable-user-name" id="hh-user-display-name" onclick="promptChangeUserName()" title="Click to change name">User</span> 🌅</h2>
+          <h2 id="hh-dynamic-greeting-title" class="text-gradient-emerald">Good Morning, <span class="editable-user-name" id="hh-user-display-name" onclick="promptChangeUserName()" title="Click to change name">User</span> 🌅</h2>
           <p id="hh-dynamic-greeting-sub">AI-Assisted Scrap Recycling & Citizen Circular Economy Hub</p>
         </div>
       </div>
@@ -338,7 +354,7 @@
       </div>
 
       <!-- Real-Time 5-Step Lifecycle Progress Bar (Appears once pickup is accepted) -->
-      <div class="household-live-progress-card" id="household-live-progress-card" style="display: none;">
+      <div class="household-live-progress-card glass-panel" id="household-live-progress-card" style="display: none;">
         <div class="progress-card-top-row">
           <div class="progress-lot-badge">
             <span class="pulse-dot-green"></span>
@@ -411,7 +427,7 @@
       </div>
 
       <!-- Dynamic Environmental Impact Tagline -->
-      <div class="environment-tagline-card" id="environment-tagline-card">
+      <div class="environment-tagline-card glass-panel" id="environment-tagline-card">
         <div class="tagline-icon">🌿</div>
         <div class="tagline-content">
           <span class="tagline-badge">CIRCULAR ENVIRONMENT INSIGHT</span>
@@ -427,7 +443,7 @@
         <div class="tut-banner-content">
           <div class="tut-banner-icon">🎓</div>
           <div>
-            <h4 style="margin: 0; color: #FFFFFF;" data-i18n="tut.hh_banner_title">Household Quick Tutorial & Videos</h4>
+            <h4 style="margin: 0; color: var(--text-main);" data-i18n="tut.hh_banner_title">Household Quick Tutorial & Videos</h4>
             <p class="small text-muted mb-0" data-i18n="tut.hh_banner_desc">Step-by-step interactive walkthrough & animated video guides for each feature.</p>
           </div>
         </div>
@@ -435,7 +451,7 @@
           <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('household')" data-i18n="tut.start_tour">
             🧭 Start Step-by-Step Tour
           </button>
-          <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('hh_scanner')" data-i18n="tut.feature_videos">
+          <button type="button" class="btn btn-sm btn-outline" style="border-color: var(--accent-adaptive); color: var(--accent-adaptive);" onclick="openVideoModal('hh_scanner')" data-i18n="tut.feature_videos">
             🎥 Feature Video Demos
           </button>
         </div>
@@ -533,9 +549,9 @@
           </div>
         </div>
         <div id="household-pickups-list">
-          <div class="empty-state-notice" id="household-pickups-empty" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+          <div class="empty-state-notice" id="household-pickups-empty" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
             <div class="empty-state-icon" style="font-size: 36px; margin-bottom: 8px;">📦</div>
-            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Pickups Scheduled</h4>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-main);">No Pickups Scheduled</h4>
             <p class="small text-muted" style="margin: 0 0 16px 0;">You have no active or completed scrap pickups. Tap "+ New" or "Sell Scrap" to schedule your first eco-collection.</p>
             <button type="button" class="btn btn-sm btn-primary" onclick="openPickupModal()">+ Request Scrap Pickup</button>
           </div>
@@ -609,9 +625,9 @@
           <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('hh_settlement')">🎥 Video Demo</button>
         </div>
         <div id="settlement-receipt-view">
-          <div class="empty-state-notice" id="settlement-empty-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+          <div class="empty-state-notice" id="settlement-empty-notice" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
             <div class="empty-state-icon" style="font-size: 40px; margin-bottom: 10px;">🧾</div>
-            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Settlement Receipts Yet</h4>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-main);">No Settlement Receipts Yet</h4>
             <p class="small text-muted" style="margin: 0; max-width: 420px; margin-inline: auto;">
               Digital receipts and transparent weighment calculations will appear here automatically after your scrap is physically verified and paid at the hub.
             </p>
@@ -855,7 +871,7 @@
         <div class="impact-card" style="cursor: pointer;" onclick="openCollectorIdVerifyModal()" title="Register & Verify for basic phone / no phone collectors">
           <span class="impact-icon">🔍</span>
           <div>
-            <div class="impact-val" style="color: #34D399; font-size: 16px;">Verify ID</div>
+            <div class="impact-val" style="color: var(--accent-adaptive); font-size: 16px;">Verify ID</div>
             <div class="impact-lbl">Register & Verify Data ➔</div>
           </div>
         </div>
@@ -872,7 +888,7 @@
     <!-- Coordinator Fast Actions Bar -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-glass); border-radius: 8px; padding: 10px 14px;">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-weight: 600; color: #E2E8F0;">Active Coordinator: <strong id="coord-user-name" style="color: #38BDF8;">Priyanka Baruah</strong></span>
+        <span style="font-weight: 600; color: var(--text-main);">Active Coordinator: <strong id="coord-user-name" style="color: var(--accent-adaptive);">Priyanka Baruah</strong></span>
         <button type="button" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 2px 8px;" onclick="promptChangeUserName()" title="Edit Name">✏️ Edit Name</button>
       </div>
       <div style="display: flex; gap: 8px;">
@@ -915,7 +931,7 @@
             <button type="button" class="btn btn-primary" style="background: linear-gradient(135deg, #10B981, #059669); font-weight: 700;" onclick="openCollectorIdVerifyModal()">
               🔍 Register & Verify via Collector ID
             </button>
-            <button type="button" class="btn btn-outline" style="border-color: #34D399; color: #34D399; font-weight: 700;" onclick="openCoordinatorAddCollectorModal('no_phone')">
+            <button type="button" class="btn btn-outline" style="border-color: var(--accent-adaptive); color: var(--accent-adaptive); font-weight: 700;" onclick="openCoordinatorAddCollectorModal('no_phone')">
               📴 Add Phone-less Collector (COL-NP)
             </button>
             <button type="button" class="btn btn-primary" style="font-weight: 700;" onclick="openCoordinatorAddCollectorModal('smartphone')">
@@ -981,14 +997,14 @@
         <!-- Geofence Radar Info Banner -->
         <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
           <span style="font-size: 24px;">🌐</span>
-          <div style="font-size: 12px; color: #D1FAE5; line-height: 1.4;">
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
             <strong>Interactive 2-Choice SMS Gateway:</strong> Candidates receive an instant flash SMS with options <code>1</code> (Accept) and <code>2</code> (Decline). Upon replying <code>1</code>, their unique <code>COL-NS-</code> ID is issued and registered to the database.
             <br/><span style="color: #FCD34D;">🔒 <strong>Privacy Assurance:</strong> Upon registration completion, candidate data is 100% erased from coordinator local storage and never readable by coordinators.</span>
           </div>
         </div>
 
         <!-- Nearby Candidate Kabadiwalas within 10km -->
-        <h4 class="mb-2" style="font-size: 13px; color: #FFFFFF;">Detected Unregistered Informal Aggregators in 10 km Radius:</h4>
+        <h4 class="mb-2" style="font-size: 13px; color: var(--text-main);">Detected Unregistered Informal Aggregators in 10 km Radius:</h4>
         <div class="inspector-grid" style="grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px;" id="proximity-candidates-grid">
           <!-- Candidate 1 -->
           <div class="inspector-card" id="card-cand-shankar">
@@ -1061,7 +1077,7 @@
         <div class="privacy-sealed-banner" id="coord-privacy-banner" style="display: none;">
           <span class="privacy-sealed-icon">🔒</span>
           <div>
-            <strong style="color: #34D399; font-size: 13px;">Zero-Knowledge Privacy Guaranteed:</strong>
+            <strong style="color: var(--accent-adaptive); font-size: 13px;">Zero-Knowledge Privacy Guaranteed:</strong>
             <p class="small text-muted mb-0">Candidate registration complete. All local candidate entries have been completely cleared and purged from your device storage. The new collector is operating anonymously under tokenized ID with database-level AES-256 encryption.</p>
           </div>
         </div>
@@ -1083,7 +1099,7 @@
       <div class="tut-banner-content">
         <div class="tut-banner-icon">🚚</div>
         <div>
-          <h4 style="margin: 0; color: #FFFFFF;" data-i18n="tut.col_banner_title">Field Collector Operational Training</h4>
+          <h4 style="margin: 0; color: var(--text-main);" data-i18n="tut.col_banner_title">Field Collector Operational Training</h4>
           <p class="small text-muted mb-0" data-i18n="tut.col_banner_desc">Guided tour and short feature video tutorials on doorstep collection and lot sealing.</p>
         </div>
       </div>
@@ -1091,7 +1107,7 @@
         <button type="button" class="btn btn-sm btn-primary" onclick="openStepTutorial('collector')" data-i18n="tut.col_start_tour">
           🧭 Start Collector Tour
         </button>
-        <button type="button" class="btn btn-sm btn-outline" style="border-color: #38BDF8; color: #38BDF8;" onclick="openVideoModal('col_modes')" data-i18n="tut.col_feature_videos">
+        <button type="button" class="btn btn-sm btn-outline" style="border-color: var(--accent-adaptive); color: var(--accent-adaptive);" onclick="openVideoModal('col_modes')" data-i18n="tut.col_feature_videos">
           🎥 Collector Video Demos
         </button>
       </div>
@@ -1105,7 +1121,7 @@
             <h2 style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
               <span><span id="collector-user-name">Field Collector</span> (<span id="collector-id-badge-hdr">COL-00142</span>)</span>
               <div style="display: flex; gap: 6px; align-items: center;">
-                <button type="button" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 2px 8px; border-color: rgba(56, 189, 248, 0.5); color: #38BDF8;" onclick="openJoinSmartphoneModal()" title="Login with Collector ID to restore data">🔑 Login with Collector ID</button>
+                <button type="button" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 2px 8px; border-color: rgba(56, 189, 248, 0.5); color: var(--accent-adaptive);" onclick="openJoinSmartphoneModal()" title="Login with Collector ID to restore data">🔑 Login with Collector ID</button>
                 <button type="button" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 2px 8px; border-color: rgba(255,255,255,0.2);" onclick="promptChangeUserName()" title="Edit Name">✏️ Edit Name</button>
               </div>
             </h2>
@@ -1122,7 +1138,7 @@
           <!-- Empty State when Collector Has No Active Assignment (Initial First Login) -->
           <div id="collector-no-assignment-notice" style="display: block; background: rgba(30, 41, 59, 0.7); border: 1px dashed rgba(148, 163, 184, 0.3); border-radius: var(--radius-md); padding: 28px 20px; text-align: center; margin-bottom: 12px;">
             <span style="font-size: 32px; display: block; margin-bottom: 8px;">📭</span>
-            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Active Pickup Assignment</h4>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-main);">No Active Pickup Assignment</h4>
             <p class="small text-muted" style="margin: 0;">You have no active collection assignments. Once a field coordinator assigns a scrap pickup in your zone, collection details and navigation will appear here in real-time.</p>
           </div>
 
@@ -1131,7 +1147,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="status-pill status-active" style="font-size: 10px;">ACTIVE PICKUP ASSIGNMENT</span>
-                <span style="font-size: 11px; color: #94A3B8;" id="collector-active-pickup-id">—</span>
+                <span style="font-size: 11px; color: var(--text-muted);" id="collector-active-pickup-id">—</span>
               </div>
               <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('col_assignment')">🎥 Video Demo</button>
             </div>
@@ -1142,24 +1158,24 @@
                 <span style="font-size: 22px; line-height: 1;">📍</span>
                 <div style="flex: 1;">
                   <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
-                    <span style="font-size: 11px; font-weight: 700; color: #38BDF8; text-transform: uppercase; letter-spacing: 0.5px;">Household Destination & Doorstep Address</span>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--accent-adaptive); text-transform: uppercase; letter-spacing: 0.5px;">Household Destination & Doorstep Address</span>
                     <span class="badge-blue" id="collector-address-zone" style="font-size: 10px;">ZONE B</span>
                   </div>
-                  <h4 style="margin: 4px 0 2px 0; color: #F8FAFC; font-size: 15px; font-weight: 700;" id="collector-household-address">
+                  <h4 style="margin: 4px 0 2px 0; color: var(--text-main); font-size: 15px; font-weight: 700;" id="collector-household-address">
                     —
                   </h4>
-                  <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: #CBD5E1; margin-top: 4px;">
-                    <span>👤 Citizen: <strong id="collector-household-name" style="color: #FFFFFF;">—</strong></span>
-                    <span>📞 Phone: <strong id="collector-household-phone" style="color: #34D399;">—</strong></span>
-                    <span id="collector-household-landmark-wrap" style="color: #94A3B8;">🏛️ Landmark: <span id="collector-household-landmark" style="color: #CBD5E1;">—</span></span>
+                  <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                    <span>👤 Citizen: <strong id="collector-household-name" style="color: var(--text-main);">—</strong></span>
+                    <span>📞 Phone: <strong id="collector-household-phone" style="color: var(--accent-adaptive);">—</strong></span>
+                    <span id="collector-household-landmark-wrap" style="color: var(--text-muted);">🏛️ Landmark: <span id="collector-household-landmark" style="color: var(--text-muted);">—</span></span>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Scrap Details Summary -->
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #94A3B8; background: rgba(255, 255, 255, 0.03); padding: 8px 12px; border-radius: 6px;" id="collector-active-assignment-info">
-              <span>📦 Expected Scrap: <strong id="collector-scrap-material" style="color: #E2E8F0;">No active scrap</strong></span>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); background: rgba(255, 255, 255, 0.03); padding: 8px 12px; border-radius: 6px;" id="collector-active-assignment-info">
+              <span>📦 Expected Scrap: <strong id="collector-scrap-material" style="color: var(--text-main);">No active scrap</strong></span>
               <span>Est. Value: <strong id="collector-scrap-value" style="color: #FBBF24;">—</strong></span>
             </div>
           </div>
@@ -1174,7 +1190,7 @@
               <canvas id="collector-active-qr" width="150" height="150" style="border: 1px solid var(--border-glass); border-radius: 8px;"></canvas>
             </div>
             <p class="small text-muted mb-1">Bound to Household, Collector ID, and Pickup ID.</p>
-            <div id="collector-lot-lock-badge" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid #10B981; color: #34D399; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; margin-top: 6px;">
+            <div id="collector-lot-lock-badge" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid #10B981; color: var(--accent-adaptive); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; margin-top: 6px;">
               🔒 Cryptographically Sealed & Locked to Server • Immutable
             </div>
           </div>
@@ -1188,7 +1204,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="pulse-dot-green"></span>
-                <span style="font-size: 13px; font-weight: 700; color: #FFFFFF;">Collection Lifecycle Progress</span>
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-main);">Collection Lifecycle Progress</span>
               </div>
               <span class="status-pill status-active" id="col-lifecycle-status-tag" style="font-size: 10px;">PICKUP ACCEPTED</span>
             </div>
@@ -1226,9 +1242,9 @@
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 11px; flex-wrap: wrap; gap: 8px;">
-              <span id="col-step-action-desc" style="color: #94A3B8;">Doorstep collection in progress</span>
+              <span id="col-step-action-desc" style="color: var(--text-muted);">Doorstep collection in progress</span>
               <div style="display: flex; gap: 6px;">
-                <button type="button" class="btn btn-sm btn-outline" id="btn-col-mark-collected" onclick="advanceCollectorProgress(2)" style="font-size: 11px; padding: 3px 10px; border-color: #38BDF8; color: #38BDF8;">
+                <button type="button" class="btn btn-sm btn-outline" id="btn-col-mark-collected" onclick="advanceCollectorProgress(2)" style="font-size: 11px; padding: 3px 10px; border-color: var(--accent-adaptive); color: var(--accent-adaptive);">
                   ✓ Mark Pickup Completed
                 </button>
               </div>
@@ -1241,14 +1257,14 @@
           <!-- Grassroots Peer Onboarding (No Physical Phone) -->
           <div class="hub-card mt-2" style="background: rgba(16, 185, 129, 0.08); border: 1px dashed var(--primary-leaf); padding: 14px; border-radius: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <span style="font-weight: 700; color: #34D399; font-size: 13px;">📴 Grassroots Peer Registration</span>
+              <span style="font-weight: 700; color: var(--accent-adaptive); font-size: 13px;">📴 Grassroots Peer Registration</span>
               <div style="display: flex; gap: 6px; align-items: center;">
                 <button type="button" class="btn-feature-video-pill" onclick="openVideoModal('col_grassroots')">🎥 Video Demo</button>
                 <span class="badge-green" style="font-size: 10px;">COLLECTOR PERMISSION</span>
               </div>
             </div>
             <p class="small text-muted mb-2">Empower informal waste-pickers without phones. Register them to generate an official <strong>COL-NP-</strong> Collector ID with physical lot token.</p>
-            <button type="button" class="btn btn-outline btn-block" style="border-color: var(--primary-leaf); color: #34D399; font-weight: 700;" onclick="openPhonelessCollectorModal()">
+            <button type="button" class="btn btn-outline btn-block" style="border-color: var(--primary-leaf); color: var(--accent-adaptive); font-weight: 700;" onclick="openPhonelessCollectorModal()">
               ➕ Register Collector (No Physical Phone)
             </button>
           </div>
@@ -1386,7 +1402,7 @@
           <!-- BUILT-IN QR SCANNER STATION FOR STORAGE HUB -->
           <div class="hub-qr-scanner-card" id="hub-built-in-scanner">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <h4 style="margin: 0; color: #FFFFFF; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+              <h4 style="margin: 0; color: var(--text-main); font-size: 14px; display: flex; align-items: center; gap: 6px;">
                 <span>📷</span> Built-in Digital QR Scanner
               </h4>
               <span class="badge-green" style="font-size: 10px;">DIRECT HUB AUTHORITY</span>
@@ -1408,7 +1424,7 @@
               <button type="button" class="btn btn-sm btn-primary" id="btn-hub-toggle-camera" onclick="toggleHubCameraScanner()" style="font-size: 11px; padding: 4px 10px;">
                 📹 Start Camera Scan
               </button>
-              <button type="button" class="btn btn-sm btn-outline" id="btn-hub-quick-scan" onclick="quickScanActiveCollectorLot()" style="font-size: 11px; padding: 4px 10px; border-color: #38BDF8; color: #38BDF8; font-weight: 700;" title="Instantly scan the active field collector's sealed QR lot">
+              <button type="button" class="btn btn-sm btn-outline" id="btn-hub-quick-scan" onclick="quickScanActiveCollectorLot()" style="font-size: 11px; padding: 4px 10px; border-color: var(--accent-adaptive); color: var(--accent-adaptive); font-weight: 700;" title="Instantly scan the active field collector's sealed QR lot">
                 ⚡ Quick Scan Collector QR
               </button>
               <label class="btn btn-sm btn-outline" style="font-size: 11px; padding: 4px 10px; margin: 0; cursor: pointer;">
@@ -1502,13 +1518,13 @@
           <div class="hub-payment-settlement-box" id="hub-payment-settlement-box" style="display: none;">
             <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px;">
               <span class="pulse-dot-green"></span>
-              <strong style="color: #34D399; font-size: 14px;">Instant Settlement Payout Authorized</strong>
+              <strong style="color: var(--accent-adaptive); font-size: 14px;">Instant Settlement Payout Authorized</strong>
             </div>
             <p class="small text-muted mb-2">Physical weights and materials verified. Disburse verified funds directly to Collector & Household via UPI / Direct Transfer.</p>
             <button type="button" class="btn btn-primary btn-block" id="btn-hub-release-payment" onclick="processHubPaymentRelease()" style="background: linear-gradient(135deg, #10B981, #059669); font-weight: 800; font-size: 14px; padding: 12px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);">
               💳 Release & Settle Instant Payment
             </button>
-            <div id="hub-payment-disbursed-msg" style="display: none; margin-top: 8px; color: #A7F3D0; font-size: 12px; font-weight: 700;"></div>
+            <div id="hub-payment-disbursed-msg" style="display: none; margin-top: 8px; color: var(--text-muted); font-size: 12px; font-weight: 700;"></div>
           </div>
 
           <button class="btn btn-outline btn-block mt-2" onclick="switchPerspective('household'); switchHouseholdTab('settlement');">
@@ -1568,9 +1584,9 @@
           <span class="badge-green" style="font-size: 11px;">EPR Certified Aggregate</span>
         </div>
         <div class="inspector-grid" id="hub-inventory-batches-list" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-          <div class="empty-state-notice" style="grid-column: 1 / -1; text-align: center; padding: 36px 20px; color: #94A3B8;">
+          <div class="empty-state-notice" style="grid-column: 1 / -1; text-align: center; padding: 36px 20px; color: var(--text-muted);">
             <span style="font-size: 32px; display: block; margin-bottom: 8px;">📦</span>
-            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Aggregated Batches Yet</h4>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-main);">No Aggregated Batches Yet</h4>
             <p class="small text-muted" style="margin: 0;">Inventory batches will be generated as verified lots are aggregated at the hub.</p>
           </div>
         </div>
@@ -1591,8 +1607,8 @@
 
       <!-- Command Center Session Identity & Access Control Simulator -->
       <div id="admin-session-identity-box" style="display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.85); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.3);">
-        <span id="admin-logged-in-label" style="font-size: 12px; color: #34D399; font-weight: 700;">👑 Logged in as: Daksh Singhi (Owner - dakssinghi@gmail.com)</span>
-        <button type="button" id="btn-toggle-admin-session" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 3px 10px; border-color: rgba(56, 189, 248, 0.4); color: #38BDF8;" onclick="toggleAdminSessionIdentity()">
+        <span id="admin-logged-in-label" style="font-size: 12px; color: var(--accent-adaptive); font-weight: 700;">👑 Logged in as: Daksh Singhi (Owner - dakssinghi@gmail.com)</span>
+        <button type="button" id="btn-toggle-admin-session" class="btn btn-sm btn-outline" style="font-size: 11px; padding: 3px 10px; border-color: rgba(56, 189, 248, 0.4); color: var(--accent-adaptive);" onclick="toggleAdminSessionIdentity()">
           🔄 Simulate Other Officer Login
         </button>
       </div>
@@ -1607,11 +1623,11 @@
         <div>
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
             <span style="font-size: 18px;">🛡️</span>
-            <h3 style="margin: 0; font-size: 16px; color: #F8FAFC;">Command Center Whitelist & Root Access Control</h3>
+            <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Command Center Whitelist & Root Access Control</h3>
             <span class="badge-green" style="font-size: 10px;">ROOT OWNER ONLY</span>
           </div>
           <p class="text-muted small" style="margin: 0;">
-            Logged in Root Owner: <strong style="color: #34D399;">Daksh Singhi (dakssinghi@gmail.com)</strong>. Only the root owner has sovereign authority to authorize or revoke Command Center administrative access.
+            Logged in Root Owner: <strong style="color: var(--accent-adaptive);">Daksh Singhi (dakssinghi@gmail.com)</strong>. Only the root owner has sovereign authority to authorize or revoke Command Center administrative access.
           </p>
         </div>
         <button type="button" class="btn btn-sm btn-outline" onclick="toggleWhitelistCollapse()" id="btn-toggle-whitelist-collapse" style="font-size: 11px; padding: 3px 8px;">
@@ -1622,7 +1638,7 @@
       <div id="admin-whitelist-panel-body">
         <!-- Authorize New Administrator Form -->
         <div class="form-group mb-2" style="background: rgba(0, 0, 0, 0.35); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-glass);">
-          <label style="font-size: 12px; font-weight: 700; color: #E2E8F0; margin-bottom: 6px; display: block;">Authorize New Administrator for Command Center:</label>
+          <label style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; display: block;">Authorize New Administrator for Command Center:</label>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <input type="email" id="new-admin-email" class="form-input" placeholder="Officer Email (e.g. supervisor@ecoflow.ai)" style="flex: 2; min-width: 220px;" />
             <input type="text" id="new-admin-name" class="form-input" placeholder="Officer Designation (e.g. Zonal Operations Director)" style="flex: 2; min-width: 200px;" />
@@ -1762,10 +1778,10 @@
         <!-- Interactive AI Model Testing Modal / Output Console -->
         <div id="ai-test-console-modal" style="display: none; margin-top: 16px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 8px; padding: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <strong style="color: #38BDF8; font-size: 14px;" id="ai-console-title">🧪 Model Diagnostic Test Console</strong>
+            <strong style="color: var(--accent-adaptive); font-size: 14px;" id="ai-console-title">🧪 Model Diagnostic Test Console</strong>
             <button type="button" class="btn btn-sm btn-outline" onclick="closeAITestConsole()" style="font-size: 11px; padding: 2px 8px;">✕ Close</button>
           </div>
-          <pre id="ai-console-output" style="background: rgba(0, 0, 0, 0.5); padding: 12px; border-radius: 6px; color: #A7F3D0; font-size: 12px; max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: monospace;"></pre>
+          <pre id="ai-console-output" style="background: rgba(0, 0, 0, 0.5); padding: 12px; border-radius: 6px; color: var(--text-muted); font-size: 12px; max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: monospace;"></pre>
         </div>
       </div>
     </div>
@@ -1812,7 +1828,7 @@
         <!-- Query Form & Live Lot Quick Selector -->
         <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
-            <label style="font-size: 12px; font-weight: 700; color: #E2E8F0; margin: 0;">Query Digital Waste Lot Token or Pickup Reference:</label>
+            <label style="font-size: 12px; font-weight: 700; color: var(--text-main); margin: 0;">Query Digital Waste Lot Token or Pickup Reference:</label>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <input type="text" id="trace-input-id" class="form-input" value="" style="flex: 2; min-width: 200px;" placeholder="Enter active Lot ID or Pickup Reference (e.g. LOT-2026-...)" />
             <button class="btn btn-primary" onclick="loadTraceabilityChain(document.getElementById('trace-input-id').value)">
@@ -1825,9 +1841,9 @@
         </div>
 
         <div id="traceability-chain-view">
-          <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+          <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
             <span style="font-size: 32px; display: block; margin-bottom: 8px;">🔍</span>
-            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">Traceability Provenance Search</h4>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-main);">Traceability Provenance Search</h4>
             <p class="small text-muted" style="margin: 0;">Enter an active Lot ID or Pickup Reference above to inspect its verified 10-stage end-to-end cryptographic lifecycle.</p>
           </div>
         </div>
@@ -1848,7 +1864,7 @@
         <!-- Dynamic Regional Market Rate Adjustment Tool -->
         <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
-            <strong style="color: #38BDF8; font-size: 13px;">📊 Zonal Commodity Price Engine (Live Guwahati Mandi Adjuster)</strong>
+            <strong style="color: var(--accent-adaptive); font-size: 13px;">📊 Zonal Commodity Price Engine (Live Guwahati Mandi Adjuster)</strong>
             <span class="small text-muted">Simulate seasonal market fluctuation (+/- %) across all buying rates</span>
           </div>
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -1857,7 +1873,7 @@
             <button type="button" class="btn btn-sm btn-primary active" id="btn-rate-baseline" onclick="adjustRegionalRates(0)" style="font-size: 11px; padding: 4px 10px;">⚖️ Baseline Mandi Standard (0%)</button>
             <button type="button" class="btn btn-sm btn-outline" onclick="adjustRegionalRates(5)" style="font-size: 11px; padding: 4px 10px;">📈 +5% Peak Demand</button>
             <button type="button" class="btn btn-sm btn-outline" onclick="adjustRegionalRates(10)" style="font-size: 11px; padding: 4px 10px;">📈 +10% Copper/Metal Surge</button>
-            <span id="rate-adjustment-indicator" style="font-size: 11px; color: #34D399; font-weight: 700; margin-left: 6px;">Status: Current Official Mandi Benchmark Active</span>
+            <span id="rate-adjustment-indicator" style="font-size: 11px; color: var(--accent-adaptive); font-weight: 700; margin-left: 6px;">Status: Current Official Mandi Benchmark Active</span>
           </div>
         </div>
 
@@ -1883,19 +1899,19 @@
 
         <!-- Quality Grading Standards Matrix -->
         <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px;">
-          <h4 style="margin: 0 0 10px 0; color: #F8FAFC; font-size: 13px;">🏅 CPCB / BIS Quality Grading Matrix & Price Multipliers</h4>
+          <h4 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 13px;">🏅 CPCB / BIS Quality Grading Matrix & Price Multipliers</h4>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
             <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 10px;">
               <span class="badge-green" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">GRADE A (100% - 105% Value)</span>
-              <p style="font-size: 11px; color: #CBD5E1; margin: 4px 0 0 0;">Zero contamination, bare bright copper (>99% purity), clean dry rinsed PET bottles, crisp unsoiled newsprint.</p>
+              <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 0 0;">Zero contamination, bare bright copper (>99% purity), clean dry rinsed PET bottles, crisp unsoiled newsprint.</p>
             </div>
             <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 10px;">
               <span class="badge-blue" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">GRADE B (85% - 100% Value)</span>
-              <p style="font-size: 11px; color: #CBD5E1; margin: 4px 0 0 0;">Light oxidation, standard desktop motherboards, colored rinsed PET, minor label adhesives, clean packaging cartons.</p>
+              <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 0 0;">Light oxidation, standard desktop motherboards, colored rinsed PET, minor label adhesives, clean packaging cartons.</p>
             </div>
             <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 10px;">
               <span class="badge-gold" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">GRADE C (70% - 85% Value)</span>
-              <p style="font-size: 11px; color: #CBD5E1; margin: 4px 0 0 0;">Mixed offcuts with light solder residue, aged paper inserts, low-grade power supply boards, pressed mixed alloys.</p>
+              <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 0 0;">Mixed offcuts with light solder residue, aged paper inserts, low-grade power supply boards, pressed mixed alloys.</p>
             </div>
           </div>
         </div>
@@ -1957,7 +1973,7 @@
             <p class="text-muted small">All user data is stored encrypted in SQLite using military-grade PBKDF2/AES-256-HMAC keystreams, segregated into dedicated role categories.</p>
           </div>
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <button type="button" class="btn btn-sm btn-outline" id="btn-toggle-cipher-view" onclick="toggleRegistryCipherDisplay()" style="font-size: 11px; padding: 4px 10px; border-color: #38BDF8; color: #38BDF8;">
+            <button type="button" class="btn btn-sm btn-outline" id="btn-toggle-cipher-view" onclick="toggleRegistryCipherDisplay()" style="font-size: 11px; padding: 4px 10px; border-color: var(--accent-adaptive); color: var(--accent-adaptive);">
               👁️ Toggle Raw Ciphertext / Decrypted
             </button>
             <span class="status-badge status-verified" id="registry-count-badge">Encrypted Database Storage</span>
@@ -1988,7 +2004,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="font-size: 18px;">🏠</span>
-              <h4 style="margin: 0; color: #38BDF8; font-size: 14px;">Household Citizens Encrypted Registry</h4>
+              <h4 style="margin: 0; color: var(--accent-adaptive); font-size: 14px;">Household Citizens Encrypted Registry</h4>
               <span class="badge-blue" id="cat-badge-hh" style="font-size: 10px;">Citizens</span>
             </div>
             <span class="small text-muted">Doorstep scrap generators • Zero-knowledge address tokens</span>
@@ -2018,7 +2034,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="font-size: 18px;">📋</span>
-              <h4 style="margin: 0; color: #34D399; font-size: 14px;">Field Coordinators Encrypted Registry</h4>
+              <h4 style="margin: 0; color: var(--accent-adaptive); font-size: 14px;">Field Coordinators Encrypted Registry</h4>
               <span class="badge-green" id="cat-badge-coord" style="font-size: 10px;">Supervisory Officers</span>
             </div>
             <span class="small text-muted">Zonal dispatch supervisors • Municipal command cleared</span>
@@ -2121,11 +2137,11 @@
         <div class="inspector-grid mb-2" style="grid-template-columns: repeat(4, 1fr); gap: 10px;">
           <div class="inspector-card" style="padding: 10px; text-align: center;">
             <div class="small text-muted">Total Authorized Emails</div>
-            <div style="font-size: 20px; font-weight: 800; color: #38BDF8;" id="metric-access-total">7</div>
+            <div style="font-size: 20px; font-weight: 800; color: var(--accent-adaptive);" id="metric-access-total">7</div>
           </div>
           <div class="inspector-card" style="padding: 10px; text-align: center;">
             <div class="small text-muted">Root Sovereign Owner</div>
-            <div style="font-size: 13px; font-weight: 700; color: #34D399;">Daksh Singhi</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--accent-adaptive);">Daksh Singhi</div>
           </div>
           <div class="inspector-card" style="padding: 10px; text-align: center;">
             <div class="small text-muted">Security Encryption</div>
@@ -2175,8 +2191,8 @@
           <div style="display: flex; align-items: flex-start; gap: 10px;">
             <span style="font-size: 20px;">💡</span>
             <div>
-              <strong style="color: #38BDF8; font-size: 13px; display: block; margin-bottom: 4px;">Architectural Distinction: Traffic Crowding vs. NVD Vulnerabilities</strong>
-              <p style="font-size: 12px; color: #CBD5E1; margin: 0; line-height: 1.5;">
+              <strong style="color: var(--accent-adaptive); font-size: 13px; display: block; margin-bottom: 4px;">Architectural Distinction: Traffic Crowding vs. NVD Vulnerabilities</strong>
+              <p style="font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.5;">
                 <strong>Why NVD does not directly handle traffic crowding:</strong> The National Vulnerability Database (NVD), maintained by NIST, is an external repository of software security vulnerabilities (CVEs), not a real-time load balancer or queue. Querying NVD during a high-traffic rush would create external latency bottlenecks and hit NIST API rate limits (5 req / 30s).<br/>
                 <strong>How the App Prevents Server Breakdown:</strong> Our integrated <strong>TrafficShield Engine</strong> prevents traffic crowding crashes via <em>in-memory RAM micro-caching (0.1ms responses)</em>, <em>adaptive concurrency limits (100-thread ceiling)</em>, and <em>circuit breakers</em>. Meanwhile, the <strong>NVD Vulnerability Guard</strong> protects against <em>software-level Denial of Service (DoS) exploits (CWE-400 / CWE-770)</em> by auditing all runtime components against NIST advisories.
               </p>
@@ -2189,7 +2205,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="font-size: 18px;">⚡</span>
-              <h4 style="margin: 0; color: #38BDF8; font-size: 14px;">Live Anti-Breakdown Traffic Shield Telemetry</h4>
+              <h4 style="margin: 0; color: var(--accent-adaptive); font-size: 14px;">Live Anti-Breakdown Traffic Shield Telemetry</h4>
               <span class="badge-blue" style="font-size: 10px;">Live In-Memory Guard</span>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
@@ -2206,33 +2222,33 @@
           <div class="inspector-grid mb-2" style="grid-template-columns: repeat(4, 1fr); gap: 10px;">
             <div class="inspector-card" style="padding: 12px; text-align: center; background: rgba(0,0,0,0.35);">
               <div class="small text-muted">Active Concurrent Requests</div>
-              <div style="font-size: 20px; font-weight: 800; color: #34D399;" id="metric-active-concurrency">0 / 100</div>
-              <small style="color: #94A3B8; font-size: 10px;">Adaptive Ceiling Active</small>
+              <div style="font-size: 20px; font-weight: 800; color: var(--accent-adaptive);" id="metric-active-concurrency">0 / 100</div>
+              <small style="color: var(--text-muted); font-size: 10px;">Adaptive Ceiling Active</small>
             </div>
             <div class="inspector-card" style="padding: 12px; text-align: center; background: rgba(0,0,0,0.35);">
               <div class="small text-muted">RAM Micro-Cache Hit Ratio</div>
-              <div style="font-size: 20px; font-weight: 800; color: #38BDF8;" id="metric-cache-hit-ratio">99.2%</div>
-              <small style="color: #94A3B8; font-size: 10px;">Bypasses SQLite Under Load</small>
+              <div style="font-size: 20px; font-weight: 800; color: var(--accent-adaptive);" id="metric-cache-hit-ratio">99.2%</div>
+              <small style="color: var(--text-muted); font-size: 10px;">Bypasses SQLite Under Load</small>
             </div>
             <div class="inspector-card" style="padding: 12px; text-align: center; background: rgba(0,0,0,0.35);">
               <div class="small text-muted">Overload Requests Shielded</div>
               <div style="font-size: 20px; font-weight: 800; color: #FBBF24;" id="metric-throttled-requests">0</div>
-              <small style="color: #94A3B8; font-size: 10px;">Rate-Limiter Protected</small>
+              <small style="color: var(--text-muted); font-size: 10px;">Rate-Limiter Protected</small>
             </div>
             <div class="inspector-card" style="padding: 12px; text-align: center; background: rgba(0,0,0,0.35);">
               <div class="small text-muted">Circuit Breaker State</div>
-              <div style="font-size: 16px; font-weight: 800; color: #34D399; margin-top: 3px;" id="metric-circuit-breaker">🟢 CLOSED (HEALTHY)</div>
-              <small style="color: #94A3B8; font-size: 10px;">Zero Cascading Failures</small>
+              <div style="font-size: 16px; font-weight: 800; color: var(--accent-adaptive); margin-top: 3px;" id="metric-circuit-breaker">🟢 CLOSED (HEALTHY)</div>
+              <small style="color: var(--text-muted); font-size: 10px;">Zero Cascading Failures</small>
             </div>
           </div>
 
           <!-- Dynamic Surge Test Output Box -->
           <div id="surge-simulation-result" style="display: none; margin-top: 12px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 6px; padding: 12px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <strong style="color: #34D399; font-size: 13px;" id="surge-result-title">⚡ 500-Request Stress Test Completed</strong>
+              <strong style="color: var(--accent-adaptive); font-size: 13px;" id="surge-result-title">⚡ 500-Request Stress Test Completed</strong>
               <span class="badge-green" style="font-size: 10px;">Zero Downtime</span>
             </div>
-            <p style="font-size: 12px; color: #E2E8F0; margin: 0;" id="surge-result-details"></p>
+            <p style="font-size: 12px; color: var(--text-main); margin: 0;" id="surge-result-details"></p>
           </div>
         </div>
 
@@ -2241,7 +2257,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="font-size: 18px;">🔒</span>
-              <h4 style="margin: 0; color: #34D399; font-size: 14px;">NIST NVD & CVE Denial-of-Service (DoS) Audit Matrix</h4>
+              <h4 style="margin: 0; color: var(--accent-adaptive); font-size: 14px;">NIST NVD & CVE Denial-of-Service (DoS) Audit Matrix</h4>
               <span class="badge-green" style="font-size: 10px;">NIST NVD API 2.0 Audited</span>
             </div>
             <button type="button" class="btn btn-sm btn-outline" onclick="loadNVDAudit()" style="font-size: 11px; padding: 3px 10px;">
@@ -2376,18 +2392,18 @@
       <!-- Live Environmental Impact Achievements -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
         <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 8px; border-radius: var(--radius-sm);">
-          <span class="small" style="color: #A7F3D0;">🌍 Net CO₂ Offset:</span>
-          <div style="font-weight: 800; font-size: 15px; color: #FFFFFF;" id="match-co2-saved">24.5 kg CO₂</div>
+          <span class="small" style="color: var(--text-muted);">🌍 Net CO₂ Offset:</span>
+          <div style="font-weight: 800; font-size: 15px; color: var(--text-main);" id="match-co2-saved">24.5 kg CO₂</div>
         </div>
         <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 8px; border-radius: var(--radius-sm);">
           <span class="small" style="color: #FDE68A;">⭐ Citizen Rewards:</span>
-          <div style="font-weight: 800; font-size: 15px; color: #FFFFFF;" id="match-eco-points">+100 pts</div>
+          <div style="font-weight: 800; font-size: 15px; color: var(--text-main);" id="match-eco-points">+100 pts</div>
         </div>
       </div>
 
       <div class="disclaimer-note mb-2">
         <small id="match-tolerance-used">±5.0% tolerance match</small><br />
-        <small style="color: #94A3B8;"><em>💡 Click or tap anywhere to burst fresh leaves & sparkles!</em></small>
+        <small style="color: var(--text-muted);"><em>💡 Click or tap anywhere to burst fresh leaves & sparkles!</em></small>
       </div>
 
       <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -2464,8 +2480,8 @@
   <div class="security-modal-overlay" id="collector-celebration-modal" role="dialog" aria-modal="true">
     <div class="security-modal-box">
       <div style="font-size: 42px; margin-bottom: 8px;">🎉</div>
-      <h3 style="color: #FFFFFF; font-size: 20px; font-weight: 800; margin-bottom: 6px;">Field Collector Onboarded!</h3>
-      <p class="text-muted small">Welcome, <strong id="modal-collector-name" style="color: #34D399;">Field Collector</strong>. Your unique digital identity token has been created:</p>
+      <h3 style="color: var(--text-main); font-size: 20px; font-weight: 800; margin-bottom: 6px;">Field Collector Onboarded!</h3>
+      <p class="text-muted small">Welcome, <strong id="modal-collector-name" style="color: var(--accent-adaptive);">Field Collector</strong>. Your unique digital identity token has been created:</p>
       <div class="collector-id-badge-large" id="modal-collector-id">COL-2026-00000</div>
       <p class="small text-muted mb-2">This ID has been saved to your device and securely encrypted in the master database. All collections, digital QR lots, and daily tasks will be automatically stamped with this ID.</p>
       <button class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: 700;" onclick="closeCollectorCelebrationModal()">
@@ -2477,8 +2493,8 @@
   <!-- Command Center First-Time Password Setup Modal -->
   <div class="security-modal-overlay" id="admin-setup-password-modal" role="dialog" aria-modal="true">
     <div class="security-modal-box text-left">
-      <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800; margin-bottom: 4px;">🔐 Configure Master Security Password</h3>
-      <p class="small text-muted mb-2">First-time access detected for <strong id="admin-setup-email-display" style="color: #34D399;">dakssinghi@gmail.com</strong>. Create your secure master password to lock the Command Center and encrypted registry.</p>
+      <h3 style="color: var(--text-main); font-size: 18px; font-weight: 800; margin-bottom: 4px;">🔐 Configure Master Security Password</h3>
+      <p class="small text-muted mb-2">First-time access detected for <strong id="admin-setup-email-display" style="color: var(--accent-adaptive);">dakssinghi@gmail.com</strong>. Create your secure master password to lock the Command Center and encrypted registry.</p>
       <div class="form-group mb-2">
         <label>Master Password (min 6 characters):</label>
         <input type="password" id="admin-new-password" class="form-input" placeholder="Create strong password" />
@@ -2500,7 +2516,7 @@
   <!-- Command Center Forgot Password Modal -->
   <div class="security-modal-overlay" id="admin-forgot-password-modal" role="dialog" aria-modal="true">
     <div class="security-modal-box text-left">
-      <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800; margin-bottom: 4px;">🔑 Reset Master Security Password</h3>
+      <h3 style="color: var(--text-main); font-size: 18px; font-weight: 800; margin-bottom: 4px;">🔑 Reset Master Security Password</h3>
       <p class="small text-muted mb-2">Enter your registered administrator email to verify your identity and reset your encrypted password.</p>
       <div class="form-group mb-2">
         <label>Administrator Email:</label>
@@ -2531,7 +2547,7 @@
   <div class="security-modal-overlay" id="phoneless-collector-modal" role="dialog" aria-modal="true" style="display: none;">
     <div class="security-modal-box text-left" style="max-width: 520px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800;">📴 Register Collector (No Physical Phone)</h3>
+        <h3 style="color: var(--text-main); font-size: 18px; font-weight: 800;">📴 Register Collector (No Physical Phone)</h3>
         <button class="btn btn-sm btn-outline" onclick="closePhonelessCollectorModal()">✕</button>
       </div>
       <p class="small text-muted mb-2">Field Collector Grassroots Authority: Issue an official encrypted identity to a peer waste picker or kabadiwala who has <strong>no physical phone</strong>. The platform assigns an ID featuring the permanent <code>NP</code> special code.</p>
@@ -2573,12 +2589,12 @@
       <!-- Result Card with Printable Token Pass -->
       <div id="phoneless-pass-result" style="display: none;">
         <div class="offline-token-pass">
-          <div style="font-size: 11px; text-transform: uppercase; color: #94A3B8; font-weight: 700;">EcoFlow AI • Grassroots Collector Identity Pass</div>
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">EcoFlow AI • Grassroots Collector Identity Pass</div>
           <div class="offline-token-id" id="np-result-id">COL-NP-2026-00000</div>
-          <div style="display: inline-block; background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; color: #34D399; font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px;">
+          <div style="display: inline-block; background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; color: var(--accent-adaptive); font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px;">
             📴 SPECIAL CODE 'NP': NO PHYSICAL PHONE VERIFIED
           </div>
-          <p class="small text-muted" style="margin-bottom: 10px;">Name: <strong id="np-result-name" style="color: #FFFFFF;">—</strong> • Hub: <strong id="np-result-hub" style="color: #FFFFFF;">HUB-001</strong></p>
+          <p class="small text-muted" style="margin-bottom: 10px;">Name: <strong id="np-result-name" style="color: var(--text-main);">—</strong> • Hub: <strong id="np-result-hub" style="color: var(--text-main);">HUB-001</strong></p>
           <div style="display: flex; justify-content: center; margin: 12px 0;">
             <canvas id="np-pass-qr" width="140" height="140" style="border: 1px solid var(--border-glass); border-radius: 8px; background: #FFFFFF; padding: 4px;"></canvas>
           </div>
@@ -2599,7 +2615,7 @@
       <!-- Retro Feature Phone Simulator Body -->
       <div class="feature-phone-wrapper">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <div style="font-size: 11px; font-weight: 800; color: #94A3B8; letter-spacing: 1px;">KABADIWALA 2G GSM RECEIVER (10KM ZONE)</div>
+          <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px;">KABADIWALA 2G GSM RECEIVER (10KM ZONE)</div>
           <button type="button" class="btn btn-sm btn-outline" style="color: #F87171; border-color: rgba(239,68,68,0.4);" onclick="closeSMSInviteModal()">✕</button>
         </div>
 
@@ -2638,13 +2654,13 @@ Press 2 to DECLINE
 
           <!-- Onboarding Accepted Screen -->
           <div id="phone-screen-accepted" style="display: none;">
-            <div class="feature-phone-msg-body" style="color: #34D399;">
+            <div class="feature-phone-msg-body" style="color: var(--accent-adaptive);">
 [INCOMING SMS]
 From: +91 80000 32635
 
 ✅ REGISTRATION CONFIRMED!
 Your Official Collector ID:
-<strong id="phone-registered-id" style="font-size: 14px; color: #FFFFFF; background: rgba(16,185,129,0.3); padding: 2px 6px; border-radius: 4px;">COL-NS-2026-00000</strong>
+<strong id="phone-registered-id" style="font-size: 14px; color: var(--text-main); background: rgba(16,185,129,0.3); padding: 2px 6px; border-radius: 4px;">COL-NS-2026-00000</strong>
 
 Special Code 'NS': Basic Phone (No Smartphone) Verified.
 
@@ -2666,7 +2682,7 @@ Invitation declined. You will not receive further alerts today.
 
         <!-- Interactive Numeric Keypad -->
         <div class="feature-phone-keypad">
-          <button type="button" class="phone-key-btn" onclick="respondToSMSInvite('1')">1 <span style="font-size: 9px; display: block; color: #34D399;">ACCEPT</span></button>
+          <button type="button" class="phone-key-btn" onclick="respondToSMSInvite('1')">1 <span style="font-size: 9px; display: block; color: var(--accent-adaptive);">ACCEPT</span></button>
           <button type="button" class="phone-key-btn" onclick="respondToSMSInvite('2')">2 <span style="font-size: 9px; display: block; color: #F87171;">DECLINE</span></button>
           <button type="button" class="phone-key-btn">3 <span style="font-size: 9px; display: block; color: #64748B;">DEF</span></button>
           <button type="button" class="phone-key-btn">4 <span style="font-size: 9px; display: block; color: #64748B;">GHI</span></button>
@@ -2691,7 +2707,7 @@ Invitation declined. You will not receive further alerts today.
   <div class="security-modal-overlay" id="coord-add-collector-modal" role="dialog" aria-modal="true" style="display: none;">
     <div class="security-modal-box text-left" style="max-width: 520px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800;">🚚 Onboard Field Collector (Coordinator Direct)</h3>
+        <h3 style="color: var(--text-main); font-size: 18px; font-weight: 800;">🚚 Onboard Field Collector (Coordinator Direct)</h3>
         <button class="btn btn-sm btn-outline" onclick="closeCoordinatorAddCollectorModal()">✕</button>
       </div>
       <p class="small text-muted mb-2">Field Coordinator Authority: Register a new municipal waste collector directly into the fleet across Smartphone, Basic 2G SMS, or Grassroots No-Phone modes.</p>
@@ -2758,12 +2774,12 @@ Invitation declined. You will not receive further alerts today.
       <!-- Result for Phone-less Collector (Printable Pass) -->
       <div id="coord-collector-pass-result" style="display: none;">
         <div class="offline-token-pass">
-          <div style="font-size: 11px; text-transform: uppercase; color: #94A3B8; font-weight: 700;">EcoFlow AI • Official Collector Identity Token</div>
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">EcoFlow AI • Official Collector Identity Token</div>
           <div class="offline-token-id" id="coord-col-result-id">COL-NP-2026-00000</div>
-          <div id="coord-col-result-badge" style="display: inline-block; background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; color: #34D399; font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px;">
+          <div id="coord-col-result-badge" style="display: inline-block; background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; color: var(--accent-adaptive); font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px;">
             📴 SPECIAL CODE 'NP': NO PHYSICAL PHONE VERIFIED
           </div>
-          <p class="small text-muted" style="margin-bottom: 10px;">Name: <strong id="coord-col-result-name" style="color: #FFFFFF;">—</strong> • Zone: <strong id="coord-col-result-zone" style="color: #FFFFFF;">ZONE B</strong></p>
+          <p class="small text-muted" style="margin-bottom: 10px;">Name: <strong id="coord-col-result-name" style="color: var(--text-main);">—</strong> • Zone: <strong id="coord-col-result-zone" style="color: var(--text-main);">ZONE B</strong></p>
           <div style="display: flex; justify-content: center; margin: 12px 0;">
             <canvas id="coord-col-pass-qr" width="140" height="140" style="border: 1px solid var(--border-glass); border-radius: 8px; background: #FFFFFF; padding: 4px;"></canvas>
           </div>
@@ -2782,7 +2798,7 @@ Invitation declined. You will not receive further alerts today.
   <div class="security-modal-overlay" id="collector-id-verify-modal" role="dialog" aria-modal="true" style="display: none;">
     <div class="security-modal-box text-left" style="max-width: 640px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800;">🔍 Register & Verify Data via Collector ID</h3>
+        <h3 style="color: var(--text-main); font-size: 18px; font-weight: 800;">🔍 Register & Verify Data via Collector ID</h3>
         <button class="btn btn-sm btn-outline" onclick="closeCollectorIdVerifyModal()">✕</button>
       </div>
       <p class="small text-muted mb-2">For field collectors operating basic keypad phones (SMS) or without a smartphone who have not yet logged into a smartphone. Displays <strong>strictly only</strong> collector's name and past successful pickups.</p>
@@ -2804,7 +2820,7 @@ Invitation declined. You will not receive further alerts today.
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
             <div>
               <span class="small text-muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Collector Name</span>
-              <h4 id="coord-min-name" style="margin: 2px 0 0 0; color: #34D399; font-size: 17px;">-</h4>
+              <h4 id="coord-min-name" style="margin: 2px 0 0 0; color: var(--accent-adaptive); font-size: 17px;">-</h4>
             </div>
             <div style="text-align: right;">
               <span class="small text-muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Past Successful Pickups</span>
@@ -2813,12 +2829,12 @@ Invitation declined. You will not receive further alerts today.
           </div>
 
           <!-- Strict Privacy Notice -->
-          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; color: #A7F3D0; line-height: 1.4;">
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; color: var(--text-muted); line-height: 1.4;">
             🔒 <strong>Strict Privacy Guard:</strong> Only the collector's name and past successful pickups are accessible. All other personal data (phone number, home address, earnings, personal notes) are withheld and encrypted on the server.
           </div>
 
           <!-- Table of Past Successful Pickups -->
-          <h5 style="color: #E2E8F0; font-size: 12px; margin: 0 0 6px 0;">Past Successful Pickups Record:</h5>
+          <h5 style="color: var(--text-main); font-size: 12px; margin: 0 0 6px 0;">Past Successful Pickups Record:</h5>
           <div style="max-height: 140px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.06); border-radius: 6px;">
             <table class="data-table" style="font-size: 11px; margin: 0;">
               <thead>
@@ -2839,7 +2855,7 @@ Invitation declined. You will not receive further alerts today.
 
         <!-- Step C: Register & Verify New Scrap Data for this Collector -->
         <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px;">
-          <h4 style="font-size: 13px; color: #FFFFFF; margin: 0 0 10px 0;">⚖️ Register & Verify Data for this Collector</h4>
+          <h4 style="font-size: 13px; color: var(--text-main); margin: 0 0 10px 0;">⚖️ Register & Verify Data for this Collector</h4>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
               <label class="small text-muted" style="display: block; margin-bottom: 4px;">Material Category:</label>
@@ -2879,7 +2895,7 @@ Invitation declined. You will not receive further alerts today.
   <div class="security-modal-overlay" id="collector-restore-modal" role="dialog" aria-modal="true" style="display: none;">
     <div class="security-modal-box text-left" style="max-width: 500px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h3 style="color: #FFFFFF; font-size: 18px; font-weight: 800;">📱 Restore Work via Collector ID</h3>
+        <h3 style="color: var(--text-main); font-size: 18px; font-weight: 800;">📱 Restore Work via Collector ID</h3>
         <button class="btn btn-sm btn-outline" onclick="closeJoinSmartphoneModal()">✕</button>
       </div>
       <p class="small text-muted mb-2">If you previously collected using a basic feature phone (SMS) or physical coordinator vouchers and now have logged in using a smartphone, enter your Collector ID below to restore all your assignments, completed pickups, and digital lot history.</p>
@@ -2904,10 +2920,10 @@ Invitation declined. You will not receive further alerts today.
   <div class="voice-lang-modal" id="voice-lang-modal">
     <div class="voice-lang-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <span style="font-size: 11px; font-weight: 800; color: #38BDF8; letter-spacing: 1px; text-transform: uppercase;">🌐 Language Selection & Voice Recognition</span>
-        <button type="button" class="modal-close-btn" onclick="closeLanguageVoiceModal()" style="background: none; border: none; color: #94A3B8; font-size: 20px; cursor: pointer;">✕</button>
+        <span style="font-size: 11px; font-weight: 800; color: var(--accent-adaptive); letter-spacing: 1px; text-transform: uppercase;">🌐 Language Selection & Voice Recognition</span>
+        <button type="button" class="modal-close-btn" onclick="closeLanguageVoiceModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
       </div>
-      <h3 style="margin-bottom: 4px; color: #FFFFFF;" data-i18n="voice.modal_title">Speak or Choose Your Language</h3>
+      <h3 style="margin-bottom: 4px; color: var(--text-main);" data-i18n="voice.modal_title">Speak or Choose Your Language</h3>
       <p class="small text-muted" style="margin-bottom: 12px;" data-i18n="voice.modal_desc">Tap the microphone and say your language (e.g. "Marathi", "Gujarati", "Marwari", "Tamil", "Telugu", "Kannada", "Malayalam", "Punjabi", "Bengali", "English", "Hindi"...), or tap any language card below.</p>
 
       <div class="voice-mic-circle" id="lang-voice-mic-circle" onclick="voiceLangDetector.startListening()" title="Click to speak">
@@ -2923,7 +2939,7 @@ Invitation declined. You will not receive further alerts today.
         <div class="voice-wave-bar"></div>
       </div>
 
-      <div id="lang-voice-status" style="font-size: 13px; font-weight: 700; color: #38BDF8; margin-bottom: 6px;">
+      <div id="lang-voice-status" style="font-size: 13px; font-weight: 700; color: var(--accent-adaptive); margin-bottom: 6px;">
         Tap the microphone and say your language
       </div>
 
@@ -2931,7 +2947,7 @@ Invitation declined. You will not receive further alerts today.
         "Say: 'Marathi', 'Gujarati', 'Marwari', 'Tamil', 'Telugu', 'English', 'Hindi'..."
       </div>
 
-      <div id="lang-voice-result" style="margin: 8px 0; font-size: 13px; color: #34D399; font-weight: 700;"></div>
+      <div id="lang-voice-result" style="margin: 8px 0; font-size: 13px; color: var(--accent-adaptive); font-weight: 700;"></div>
 
       <div style="margin-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px;">
         <span class="small text-muted" style="display: block; margin-bottom: 6px;">Or tap any language card for instant audio setup:</span>
@@ -2969,9 +2985,9 @@ Invitation declined. You will not receive further alerts today.
     <div class="tut-guide-header">
       <span class="tut-guide-badge" id="tut-guide-badge">🏠 Household Recycling Guide</span>
       <div class="tut-guide-dots" id="tut-guide-dots"></div>
-      <button type="button" onclick="closeStepTutorial()" style="background: none; border: none; color: #94A3B8; font-size: 18px; cursor: pointer;">✕</button>
+      <button type="button" onclick="closeStepTutorial()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
     </div>
-    <h4 id="tut-guide-title" style="margin: 8px 0 6px 0; color: #FFFFFF;">1. Title</h4>
+    <h4 id="tut-guide-title" style="margin: 8px 0 6px 0; color: var(--text-main);">1. Title</h4>
     <p id="tut-guide-desc" class="small text-muted" style="line-height: 1.5; min-height: 60px; margin-bottom: 8px;">Description text</p>
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <span class="small text-muted" id="tut-guide-counter">Step 1 of 5</span>
@@ -2979,7 +2995,7 @@ Invitation declined. You will not receive further alerts today.
         <button type="button" class="btn btn-sm btn-outline" id="tut-guide-btn-speak" onclick="tutorialController.speakCurrentStep()" title="Read Step Aloud in your language">
           🔊 Speak
         </button>
-        <button type="button" class="btn btn-sm btn-outline" id="tut-guide-btn-video" style="border-color: #38BDF8; color: #38BDF8;" title="Watch Short Feature Video">
+        <button type="button" class="btn btn-sm btn-outline" id="tut-guide-btn-video" style="border-color: var(--accent-adaptive); color: var(--accent-adaptive);" title="Watch Short Feature Video">
           🎥 Watch Video
         </button>
       </div>
@@ -2996,12 +3012,12 @@ Invitation declined. You will not receive further alerts today.
       <div class="tut-video-header">
         <div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 11px; background: rgba(56, 189, 248, 0.2); color: #38BDF8; font-weight: 800; padding: 2px 8px; border-radius: 10px;">FEATURE VIDEO TUTORIAL</span>
-            <h3 id="tut-video-title" style="margin: 0; color: #FFFFFF; font-size: 16px;">Feature Title</h3>
+            <span style="font-size: 11px; background: rgba(56, 189, 248, 0.2); color: var(--accent-adaptive); font-weight: 800; padding: 2px 8px; border-radius: 10px;">FEATURE VIDEO TUTORIAL</span>
+            <h3 id="tut-video-title" style="margin: 0; color: var(--text-main); font-size: 16px;">Feature Title</h3>
           </div>
           <p class="small text-muted mb-0" id="tut-video-sub" style="margin-top: 2px;">Feature subtitle and workflow context</p>
         </div>
-        <button type="button" onclick="closeVideoModal()" style="background: none; border: none; color: #94A3B8; font-size: 22px; cursor: pointer;">✕</button>
+        <button type="button" onclick="closeVideoModal()" style="background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer;">✕</button>
       </div>
 
       <div class="tut-video-body">
@@ -3022,7 +3038,7 @@ Invitation declined. You will not receive further alerts today.
                 <button type="button" class="tut-icon-btn" id="tut-video-play-btn" onclick="tutorialController.toggleVideoPlay()">❚❚</button>
                 <button type="button" class="tut-icon-btn" id="tut-video-restart-btn" onclick="tutorialController.restartVideo()" title="Restart">↺</button>
                 <button type="button" class="tut-icon-btn active" id="tut-video-voice-btn" onclick="tutorialController.toggleVoiceover()" title="Voiceover Audio Narration">🔊</button>
-                <span class="small" id="tut-video-time-display" style="font-family: monospace; color: #94A3B8; margin-left: 6px;">0:00 / 0:20</span>
+                <span class="small" id="tut-video-time-display" style="font-family: monospace; color: var(--text-muted); margin-left: 6px;">0:00 / 0:20</span>
               </div>
               <div class="tut-ctrl-right">
                 <span class="small text-muted" style="font-size: 10px;">Speed:</span>
@@ -3118,6 +3134,7 @@ Invitation declined. You will not receive further alerts today.
   <script src="js/qr_engine.js"></script>
   <script src="js/settlement.js"></script>
   <script src="js/tour.js"></script>
+  <script src="js/effects.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/household_scrap.js"></script>

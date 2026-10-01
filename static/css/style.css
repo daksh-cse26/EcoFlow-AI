@@ -4,33 +4,48 @@
  */
 
 :root {
-  --primary-emerald: #0D5C3A;
+  /* Nature Forest Theme (default for all interfaces) */
+  --primary-emerald: #065F46;
   --primary-leaf: #10B981;
   --primary-mint: #34D399;
-  --primary-light: #E6F7F0;
+  --primary-light: #ECFDF5;
   --accent-amber: #F59E0B;
+  --accent-amber-light: #FCD34D;
+  --accent-amber-glow: rgba(245, 158, 11, 0.35);
   --accent-blue: #3B82F6;
   --accent-purple: #8B5CF6;
   --accent-red: #EF4444;
-  --bg-slate: #0B1512;
-  --bg-dark: #0F172A;
-  --bg-card: #1E293B;
-  --bg-card-subtle: rgba(30, 41, 59, 0.7);
-  --bg-glass: rgba(15, 23, 42, 0.75);
-  --border-glass: rgba(255, 255, 255, 0.12);
-  --border-focus: rgba(16, 185, 129, 0.5);
-  --text-main: #F8FAFC;
-  --text-muted: #94A3B8;
-  --text-dim: #64748B;
-  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
+  --bg-slate: #071A12;
+  --bg-dark: #0A1F14;
+  --bg-card: #122A1E;
+  --bg-card-subtle: rgba(18, 42, 30, 0.75);
+  --bg-glass: rgba(10, 31, 20, 0.78);
+  --border-glass: rgba(52, 211, 153, 0.12);
+  --border-focus: rgba(245, 158, 11, 0.55);
+  --text-main: #F0FDF4;
+  --text-muted: #86EFAC;
+  --text-dim: #6EE7B7;
+  --accent-adaptive: #34D399;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
   --radius-full: 9999px;
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.25);
+  /* Neumorphism Shadows */
+  --shadow-sm: 4px 4px 8px rgba(0, 0, 0, 0.4), -2px -2px 6px rgba(52, 211, 153, 0.06);
+  --shadow-md: 6px 6px 16px rgba(0, 0, 0, 0.45), -3px -3px 10px rgba(52, 211, 153, 0.08);
+  --shadow-lg: 10px 10px 30px rgba(0, 0, 0, 0.55), -5px -5px 15px rgba(52, 211, 153, 0.07);
+  --shadow-glow: 0 0 24px rgba(245, 158, 11, 0.3);
+  --shadow-neu-inset: inset 3px 3px 6px rgba(0, 0, 0, 0.35), inset -2px -2px 5px rgba(52, 211, 153, 0.05);
+  /* Cosmic Purple (Command Center / Admin only) */
+  --cosmic-bg: #0F0A1E;
+  --cosmic-card: #1A1035;
+  --cosmic-accent: #A78BFA;
+  --cosmic-neon: #C084FC;
+  --cosmic-neon-glow: rgba(192, 132, 252, 0.45);
+  --cosmic-border: rgba(139, 92, 246, 0.3);
+  --cosmic-gradient: linear-gradient(135deg, #312E81, #4C1D95, #581C87);
+  --cosmic-btn-gradient: linear-gradient(135deg, #7C3AED, #A855F7, #C084FC);
 }
 
 * {
@@ -41,11 +56,86 @@
 
 body {
   font-family: var(--font-family);
-  background-color: var(--bg-slate);
+  background: linear-gradient(160deg, #071A12 0%, #0A2418 30%, #0D2E1F 60%, #071A12 100%);
+  background-attachment: fixed;
   color: var(--text-main);
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  position: relative;
+  transition: background 0.5s ease;
+}
+
+/* Floating Particles Container */
+#particles-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(100vh) scale(0.3);
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10vh) scale(1);
+  }
+}
+
+/* Email Validation Error Message */
+.email-validation-error {
+  color: #EF4444;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  animation: shakeError 0.4s ease;
+}
+
+.email-validation-error.visible {
+  display: flex;
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+}
+
+.form-input.input-error {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2), inset 0 0 8px rgba(239, 68, 68, 0.1) !important;
+}
+
+.form-input.input-valid {
+  border-color: var(--accent-amber) !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15) !important;
 }
 
 /* ----------------------------------------------------
@@ -108,14 +198,17 @@ body {
    HEADER & ROLE PERSPECTIVE SWITCHER
 ---------------------------------------------------- */
 .app-header {
-  background: var(--bg-dark);
-  border-bottom: 1px solid var(--border-glass);
-  padding: 12px 24px;
+  background: linear-gradient(135deg, #0A1F14 0%, #0D2E1F 50%, #0A1F14 100%);
+  border-bottom: 1px solid rgba(52, 211, 153, 0.15);
+  padding: 14px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 10;
 }
 
 .brand-section {
@@ -141,13 +234,15 @@ body {
   font-size: 18px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  color: #FFFFFF;
+  color: var(--text-main);
+  transition: color 0.3s ease;
 }
 
 .brand-tagline {
   font-size: 11px;
-  color: var(--primary-mint);
+  color: var(--accent-adaptive);
   font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 .role-switcher-bar {
@@ -180,9 +275,9 @@ body {
 }
 
 .role-btn.active {
-  background: var(--primary-leaf);
-  color: #064E3B;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #451A03;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.45);
 }
 
 /* ----------------------------------------------------
@@ -295,6 +390,7 @@ body {
   width: 100%;
   letter-spacing: 0.3px;
   text-overflow: ellipsis;
+  transition: color 0.25s ease;
 }
 
 .lang-dropdown-select optgroup {
@@ -325,7 +421,7 @@ body {
   font-size: 9px;
   color: var(--primary-mint);
   pointer-events: none;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, color 0.25s ease;
 }
 
 .lang-selector-box:focus-within .lang-select-arrow {
@@ -1500,17 +1596,21 @@ body {
 
 .form-input {
   width: 100%;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--border-glass);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(52, 211, 153, 0.15);
   color: #FFFFFF;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: var(--radius-sm);
   font-size: 13px;
+  font-family: var(--font-family);
   outline: none;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-neu-inset);
 }
 
 .form-input:focus {
-  border-color: var(--primary-leaf);
+  border-color: var(--accent-amber);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2), 0 0 16px rgba(245, 158, 11, 0.15), var(--shadow-neu-inset);
 }
 
 /* Buttons */
@@ -1529,12 +1629,15 @@ body {
 }
 
 .btn-primary {
-  background: var(--primary-leaf);
-  color: #064E3B;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #451A03;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
 }
 
 .btn-primary:hover {
-  background: var(--primary-mint);
+  background: linear-gradient(135deg, #FBBF24, #F59E0B);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
@@ -1673,16 +1776,17 @@ body {
 }
 
 .portal-role-card {
-  background: rgba(30, 41, 59, 0.7);
-  border: 2px solid var(--border-glass);
+  background: rgba(18, 42, 30, 0.8);
+  border: 2px solid rgba(52, 211, 153, 0.12);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 18px;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   backdrop-filter: blur(14px);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-shadow: var(--shadow-sm);
 }
 
 .portal-role-card:hover {
@@ -1692,9 +1796,9 @@ body {
 }
 
 .portal-role-card.selected {
-  background: rgba(13, 92, 58, 0.28);
-  border-color: var(--primary-leaf);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+  background: rgba(6, 95, 70, 0.35);
+  border-color: var(--accent-amber);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.25), var(--shadow-md);
 }
 
 .portal-card-header {
@@ -1728,9 +1832,9 @@ body {
 }
 
 .portal-role-card.selected .portal-selected-indicator {
-  background: var(--primary-leaf);
-  border-color: var(--primary-leaf);
-  color: #064E3B;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  border-color: var(--accent-amber);
+  color: #451A03;
   font-weight: 900;
 }
 
@@ -1747,12 +1851,12 @@ body {
 }
 
 .gateway-form-box {
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid var(--border-glass);
+  background: rgba(10, 31, 20, 0.92);
+  border: 1px solid rgba(52, 211, 153, 0.15);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 28px;
   backdrop-filter: blur(20px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   max-width: 660px;
   margin: 0 auto;
 }
@@ -1821,27 +1925,35 @@ body {
 
 .btn-gateway-submit {
   width: 100%;
-  padding: 13px 20px;
-  background: linear-gradient(135deg, #10B981 0%, #0D5C3A 100%);
-  color: #FFFFFF;
-  border: 1px solid var(--primary-mint);
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #F59E0B 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+  color: #451A03;
+  border: 1px solid var(--accent-amber-light);
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 24px rgba(245, 158, 11, 0.45);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 }
 
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .btn-gateway-submit:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 26px rgba(16, 185, 129, 0.6);
-  filter: brightness(1.1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.65);
+  filter: brightness(1.15);
 }
 
 .btn-gateway-submit:active {
@@ -2082,7 +2194,7 @@ body {
 .btn-lang-voice-detect {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(6, 182, 212, 0.18));
   border: 1px solid rgba(52, 211, 153, 0.45);
-  color: #FFFFFF;
+  color: var(--text-main);
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 12.5px;
@@ -2091,7 +2203,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   letter-spacing: 0.3px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
@@ -2737,6 +2849,21 @@ body {
 /* ==================================================
    GATEWAY SEQUENTIAL VOICE GUIDE (TTS)
    ================================================== */
+/* Strictly hide Voice Guide and Voice Assistant for Command Center and Field Coordinator */
+body[data-gateway-role="admin"] #gateway-tts-bar,
+body[data-gateway-role="coordinator"] #gateway-tts-bar,
+body.cosmic-admin-theme #gateway-tts-bar,
+body[data-active-role="admin"] #gateway-tts-bar,
+body[data-active-role="coordinator"] #gateway-tts-bar,
+body[data-active-role="admin"] .voice-btn-top,
+body[data-active-role="coordinator"] .voice-btn-top,
+body[data-gateway-role="admin"] .voice-btn-top,
+body[data-gateway-role="coordinator"] .voice-btn-top,
+#view-admin .voice-btn-top,
+#view-coordinator .voice-btn-top {
+  display: none !important;
+}
+
 .gateway-tts-bar {
   display: flex;
   align-items: center;
@@ -4234,3 +4361,726 @@ body {
   color: #FCD34D;
 }
 
+/* ==================================================
+   COSMIC PURPLE THEME — Command Center / Admin Interface
+   Applied dynamically via body.cosmic-admin-theme class
+   ================================================== */
+body.cosmic-admin-theme {
+  background: linear-gradient(160deg, #0F0A1E 0%, #1A1035 30%, #231545 60%, #0F0A1E 100%) !important;
+  background-attachment: fixed !important;
+}
+
+body.cosmic-admin-theme .app-header {
+  background: linear-gradient(135deg, #0F0A1E 0%, #1A1035 50%, #0F0A1E 100%) !important;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.25) !important;
+  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.15) !important;
+}
+
+body.cosmic-admin-theme .gateway-form-box,
+body.cosmic-admin-theme .portal-role-card {
+  background: rgba(26, 16, 53, 0.85) !important;
+  border-color: var(--cosmic-border) !important;
+  box-shadow: 6px 6px 16px rgba(0, 0, 0, 0.5), -3px -3px 10px rgba(139, 92, 246, 0.06) !important;
+}
+
+body.cosmic-admin-theme .portal-role-card.selected {
+  border-color: var(--cosmic-neon) !important;
+  box-shadow: 0 0 28px var(--cosmic-neon-glow), 6px 6px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.cosmic-admin-theme .portal-role-card.selected .portal-selected-indicator {
+  background: var(--cosmic-btn-gradient) !important;
+  border-color: var(--cosmic-neon) !important;
+}
+
+body.cosmic-admin-theme .btn-gateway-submit {
+  background: var(--cosmic-btn-gradient) !important;
+  background-size: 200% 200% !important;
+  border: 1px solid var(--cosmic-neon) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 28px var(--cosmic-neon-glow) !important;
+}
+
+body.cosmic-admin-theme .btn-gateway-submit:hover {
+  box-shadow: 0 8px 40px rgba(192, 132, 252, 0.7) !important;
+}
+
+body.cosmic-admin-theme .form-input {
+  border-color: rgba(139, 92, 246, 0.2) !important;
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.4), inset -2px -2px 5px rgba(139, 92, 246, 0.04) !important;
+}
+
+body.cosmic-admin-theme .form-input:focus {
+  border-color: var(--cosmic-neon) !important;
+  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2), 0 0 18px rgba(192, 132, 252, 0.15), inset 3px 3px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.cosmic-admin-theme .gateway-badge {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border-color: var(--cosmic-accent) !important;
+  color: var(--cosmic-accent) !important;
+}
+
+body.cosmic-admin-theme .gateway-form-title {
+  color: var(--cosmic-accent) !important;
+}
+
+body.cosmic-admin-theme .btn-primary {
+  background: var(--cosmic-btn-gradient) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 14px var(--cosmic-neon-glow) !important;
+  border: 1px solid var(--cosmic-neon) !important;
+}
+
+body.cosmic-admin-theme .btn-primary:hover {
+  box-shadow: 0 4px 20px rgba(192, 132, 252, 0.65) !important;
+}
+
+body.cosmic-admin-theme .role-btn.active {
+  background: var(--cosmic-btn-gradient) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 14px var(--cosmic-neon-glow) !important;
+}
+
+body.cosmic-admin-theme .particle-orb {
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.6), rgba(139, 92, 246, 0.15)) !important;
+}
+
+body.cosmic-admin-theme .portal-subnav-btn.active {
+  background: var(--cosmic-btn-gradient) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 10px var(--cosmic-neon-glow) !important;
+}
+
+body.cosmic-admin-theme .hub-card,
+body.cosmic-admin-theme .assessment-card,
+body.cosmic-admin-theme .impact-card {
+  background: rgba(26, 16, 53, 0.6) !important;
+  border-color: var(--cosmic-border) !important;
+}
+
+/* ==================================================
+   DARK/LIGHT MODE TOGGLE SWITCH
+   ================================================== */
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-toggle-switch {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-neu-inset);
+}
+
+.theme-toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #34D399, #10B981);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.theme-toggle-switch.light::after {
+  left: 24px;
+  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+}
+
+.theme-toggle-switch.light {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.theme-toggle-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Light Mode Overrides */
+body.light-mode {
+  --text-main: #065F46;
+  --text-muted: #047857;
+  --text-dim: #059669;
+  --accent-adaptive: #047857;
+  background: linear-gradient(160deg, #ECFDF5 0%, #D1FAE5 30%, #F0FDF4 60%, #ECFDF5 100%) !important;
+  color: var(--text-main) !important;
+}
+
+body.light-mode .app-header {
+  background: linear-gradient(135deg, #FFFFFF 0%, #ECFDF5 50%, #FFFFFF 100%) !important;
+  border-bottom-color: rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.light-mode .form-input {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #065F46 !important;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.06), inset -1px -1px 3px rgba(255, 255, 255, 0.7) !important;
+}
+
+body.light-mode .gateway-form-box {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+  box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.08), -4px -4px 12px rgba(255, 255, 255, 0.8) !important;
+}
+
+body.light-mode .portal-role-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.06), -2px -2px 6px rgba(255, 255, 255, 0.6) !important;
+}
+
+body.light-mode .portal-card-title,
+body.light-mode .gateway-hero h2 {
+  color: #065F46 !important;
+}
+
+body.light-mode .portal-card-desc,
+body.light-mode .gateway-hero p,
+body.light-mode .text-muted {
+  color: #047857 !important;
+}
+
+/* Light Mode: Post-Login Interface Coverage */
+body.light-mode .perspective-view,
+body.light-mode main {
+  color: #065F46 !important;
+}
+
+body.light-mode .impact-card,
+body.light-mode .hub-card,
+body.light-mode .assessment-card,
+body.light-mode .chain-step-node,
+body.light-mode .locked-reward-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.06), -2px -2px 8px rgba(255, 255, 255, 0.7) !important;
+  color: #065F46 !important;
+}
+
+body.light-mode .impact-card h4,
+body.light-mode .impact-card .impact-value,
+body.light-mode .hub-card h4,
+body.light-mode .assessment-card h4 {
+  color: #065F46 !important;
+}
+
+body.light-mode .household-container,
+body.light-mode .coordinator-container,
+body.light-mode .collector-container,
+body.light-mode .hub-container,
+body.light-mode .admin-container {
+  background: transparent !important;
+}
+
+body.light-mode .household-tab-btn,
+body.light-mode .portal-subnav-btn {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #065F46 !important;
+}
+
+body.light-mode .household-tab-btn.active,
+body.light-mode .portal-subnav-btn.active {
+  background: linear-gradient(135deg, #10B981, #059669) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+}
+
+body.light-mode table {
+  color: #065F46 !important;
+}
+
+body.light-mode table thead th {
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #065F46 !important;
+  border-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+body.light-mode table tbody tr {
+  border-color: rgba(16, 185, 129, 0.08) !important;
+}
+
+body.light-mode table tbody tr:hover {
+  background: rgba(16, 185, 129, 0.05) !important;
+}
+
+body.light-mode .btn-primary {
+  background: linear-gradient(135deg, #059669, #10B981) !important;
+  color: #FFFFFF !important;
+}
+
+body.light-mode .btn-outline {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  color: #059669 !important;
+}
+
+body.light-mode .btn-outline:hover {
+  background: rgba(16, 185, 129, 0.1) !important;
+}
+
+body.light-mode .status-badge {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #059669 !important;
+}
+
+body.light-mode .modal-card,
+body.light-mode .modal-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #065F46 !important;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+body.light-mode .active-session-badge {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #065F46 !important;
+}
+
+body.light-mode .active-session-badge .session-role-pill {
+  color: #059669 !important;
+}
+
+body.light-mode .active-session-badge .session-user-name {
+  color: #065F46 !important;
+}
+
+body.light-mode .btn-switch-portal {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+  color: #065F46 !important;
+}
+
+body.light-mode .btn-switch-portal:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #DC2626 !important;
+}
+
+/* Light Mode: Header Brand Text */
+body.light-mode .brand-text h1 {
+  color: #065F46 !important;
+}
+
+body.light-mode .brand-tagline {
+  color: #047857 !important;
+}
+
+body.light-mode .brand-logo-icon {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Light Mode: Language Selector Box & Dropdown */
+body.light-mode .lang-selector-box {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.light-mode .lang-selector-box:hover,
+body.light-mode .lang-selector-box:focus-within {
+  background: #FFFFFF !important;
+  border-color: #10B981 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25) !important;
+}
+
+body.light-mode .lang-dropdown-select {
+  color: #065F46 !important;
+}
+
+body.light-mode .lang-select-arrow {
+  color: #065F46 !important;
+}
+
+body.light-mode .lang-dropdown-select optgroup {
+  background-color: #ECFDF5 !important;
+  color: #047857 !important;
+}
+
+body.light-mode .lang-dropdown-select option {
+  background-color: #FFFFFF !important;
+  color: #065F46 !important;
+}
+
+body.light-mode .lang-dropdown-select option:checked {
+  background-color: #10B981 !important;
+  color: #FFFFFF !important;
+}
+
+/* Light Mode: Language Recognition / Voice Detect Button */
+body.light-mode .btn-lang-voice-detect {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+  color: #065F46 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.light-mode .btn-lang-voice-detect:hover {
+  background: #FFFFFF !important;
+  border-color: #10B981 !important;
+  color: #047857 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25) !important;
+  transform: translateY(-1px);
+}
+
+body.light-mode #btn-lang-text {
+  color: inherit !important;
+}
+
+/* Light Mode: Top Multilingual Voice Assistant Button */
+body.light-mode .voice-btn-top {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+  color: #065F46 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.light-mode .voice-btn-top:hover {
+  background: #FFFFFF !important;
+  border-color: #10B981 !important;
+  color: #047857 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25) !important;
+  transform: translateY(-1px);
+}
+
+body.light-mode .voice-btn-top span {
+  color: inherit !important;
+}
+
+/* Light Mode: Language Auto-Detection Modal */
+body.light-mode .voice-lang-modal {
+  background: rgba(15, 23, 42, 0.6) !important;
+}
+
+body.light-mode .voice-lang-card {
+  background: linear-gradient(165deg, #FFFFFF 0%, #F0FDF4 100%) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), 0 0 35px rgba(16, 185, 129, 0.12) !important;
+  color: #065F46 !important;
+}
+
+body.light-mode .voice-lang-card h3 {
+  color: #065F46 !important;
+}
+
+body.light-mode .voice-lang-card p,
+body.light-mode .voice-lang-card .text-muted {
+  color: #047857 !important;
+}
+
+body.light-mode .voice-transcript-box {
+  background: #FFFFFF !important;
+  border: 1px dashed rgba(16, 185, 129, 0.4) !important;
+  color: #065F46 !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.light-mode .voice-lang-chip {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+  color: #065F46 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .voice-lang-chip:hover {
+  background: #10B981 !important;
+  border-color: #059669 !important;
+  color: #FFFFFF !important;
+}
+
+body.light-mode #lang-voice-status {
+  color: #047857 !important;
+}
+
+body.light-mode #lang-voice-result {
+  color: #059669 !important;
+}
+
+body.light-mode h1, body.light-mode h2, body.light-mode h3, body.light-mode h4,
+body.light-mode .section-title, body.light-mode strong {
+  color: var(--text-main) !important;
+}
+
+body.light-mode code {
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #059669 !important;
+}
+
+/* Light Mode: Collector Interface */
+body.light-mode .collector-task-card,
+body.light-mode .collector-lot-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+  color: #065F46 !important;
+}
+
+/* Light Mode: Storage Hub */
+body.light-mode .hub-verification-card,
+body.light-mode .hub-lot-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+  color: #065F46 !important;
+}
+
+/* Light Mode: Admin / Command Center — override cosmic purple */
+body.light-mode.cosmic-admin-theme {
+  background: linear-gradient(160deg, #F5F3FF 0%, #EDE9FE 30%, #F5F3FF 60%, #F5F3FF 100%) !important;
+}
+
+body.light-mode.cosmic-admin-theme .app-header {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5F3FF 50%, #FFFFFF 100%) !important;
+}
+
+body.light-mode.cosmic-admin-theme .hub-card,
+body.light-mode.cosmic-admin-theme .assessment-card,
+body.light-mode.cosmic-admin-theme .impact-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(139, 92, 246, 0.15) !important;
+}
+
+body.light-mode.cosmic-admin-theme .brand-text h1 {
+  color: #1E1B4B !important;
+}
+
+body.light-mode.cosmic-admin-theme .brand-tagline {
+  color: #6D28D9 !important;
+}
+
+body.light-mode.cosmic-admin-theme .lang-selector-box {
+  border-color: rgba(139, 92, 246, 0.35) !important;
+}
+
+body.light-mode.cosmic-admin-theme .lang-selector-box:hover,
+body.light-mode.cosmic-admin-theme .lang-selector-box:focus-within {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 14px rgba(139, 92, 246, 0.25) !important;
+}
+
+body.light-mode.cosmic-admin-theme .lang-dropdown-select,
+body.light-mode.cosmic-admin-theme .lang-select-arrow {
+  color: #4C1D95 !important;
+}
+
+body.light-mode.cosmic-admin-theme .lang-dropdown-select optgroup {
+  background-color: #F5F3FF !important;
+  color: #6D28D9 !important;
+}
+
+body.light-mode.cosmic-admin-theme .lang-dropdown-select option {
+  background-color: #FFFFFF !important;
+  color: #4C1D95 !important;
+}
+
+body.light-mode.cosmic-admin-theme .lang-dropdown-select option:checked {
+  background-color: #8B5CF6 !important;
+  color: #FFFFFF !important;
+}
+
+body.light-mode.cosmic-admin-theme .btn-lang-voice-detect {
+  border-color: rgba(139, 92, 246, 0.35) !important;
+  color: #4C1D95 !important;
+}
+
+body.light-mode.cosmic-admin-theme .btn-lang-voice-detect:hover {
+  border-color: #8B5CF6 !important;
+  color: #6D28D9 !important;
+  box-shadow: 0 0 14px rgba(139, 92, 246, 0.25) !important;
+}
+
+body.light-mode .gateway-tts-bar {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(16, 185, 129, 0.18) !important;
+}
+
+body.light-mode .particle-orb {
+  opacity: 0.25 !important;
+}
+
+/* ==================================================
+   BUTTON RIPPLE EFFECT
+   ================================================== */
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: rippleAnim 0.55s ease-out forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes rippleAnim {
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* ==================================================
+   SHIMMER / SKELETON LOADERS
+   ================================================== */
+.shimmer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.shimmer-line {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.1) 40%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerSlide 1.5s infinite ease-in-out;
+}
+
+body.light-mode .shimmer-line {
+  background: linear-gradient(90deg,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.08) 40%,
+    rgba(0, 0, 0, 0.04) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes shimmerSlide {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ==================================================
+   MICRO-ANIMATIONS & SMOOTH TRANSITIONS
+   ================================================== */
+.perspective-view,
+.portal-subpane,
+.admin-tab-pane,
+.household-tab-pane {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+/* Hover lift effect for cards */
+.impact-card,
+.hub-card,
+.assessment-card,
+.chain-step-node,
+.locked-reward-card {
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.impact-card:hover,
+.hub-card:hover,
+.assessment-card:hover,
+.chain-step-node:hover,
+.locked-reward-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Subtle scale on focus for buttons */
+.btn:active,
+.action-card-btn:active {
+  transform: scale(0.97);
+}
+
+/* Glowing borders micro-animation for focused inputs */
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15); }
+  50% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.25), 0 0 12px rgba(245, 158, 11, 0.1); }
+  100% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15); }
+}
+
+.form-input:focus {
+  animation: glowPulse 2s infinite ease-in-out;
+}
+
+/* Neumorphic card base styling */
+.hub-card,
+.assessment-card,
+.impact-card,
+.collector-assignment-card {
+  box-shadow: var(--shadow-sm);
+  border-color: rgba(52, 211, 153, 0.1);
+  background: var(--bg-card-subtle);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ==================================================
+   PREMIUM GLASSMORPHISM & GRADIENTS
+   ================================================== */
+
+.glass-panel {
+  background: rgba(18, 42, 30, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(52, 211, 153, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border-radius: var(--radius-md);
+}
+
+body.light-mode .glass-panel {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}
+
+.text-gradient-emerald {
+  background: linear-gradient(135deg, #34D399, #10B981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-amber {
+  background: linear-gradient(135deg, #FCD34D, #F59E0B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.6);
+}
+body.light-mode ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.4);
+}
+body.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.7);
+}

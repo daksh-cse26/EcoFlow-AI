@@ -22,9 +22,16 @@ class LoginTTSNarrator {
     const roleCards = document.querySelectorAll(".portal-role-card");
     roleCards.forEach(card => {
       card.addEventListener("click", () => {
+        const role = card.dataset.role;
+        if (role === 'admin' || role === 'coordinator') {
+          this.stopNarrator();
+          this.isEnabled = false;
+          this.updateToggleUI();
+          return;
+        }
         if (this.isEnabled) {
           setTimeout(() => {
-            this.handleRoleChange(card.dataset.role);
+            this.handleRoleChange(role);
           }, 250);
         }
       });
@@ -47,6 +54,13 @@ class LoginTTSNarrator {
   }
 
   toggle() {
+    const role = (typeof activeGatewayRole !== 'undefined') ? activeGatewayRole : 'household';
+    if (role === 'admin' || role === 'coordinator') {
+      this.isEnabled = false;
+      this.stopNarrator();
+      this.updateToggleUI();
+      return;
+    }
     this.isEnabled = !this.isEnabled;
     this.updateToggleUI();
 
@@ -172,6 +186,17 @@ class LoginTTSNarrator {
       repeatText.textContent = repeatLabels[lang] || repeatLabels.en;
     }
 
+    const activeRole = (typeof activeGatewayRole !== 'undefined') ? activeGatewayRole : 'household';
+    if (activeRole === 'admin' || activeRole === 'coordinator') {
+      if (bar) bar.style.display = "none";
+      if (btn) btn.classList.remove("active");
+      if (repeatBtn) repeatBtn.style.display = "none";
+      this.clearAllHighlights();
+      return;
+    } else {
+      if (bar) bar.style.display = "flex";
+    }
+
     if (this.isEnabled) {
       if (btn) btn.classList.add("active");
       if (label) label.textContent = onLabels[lang] || onLabels.en;
@@ -189,12 +214,8 @@ class LoginTTSNarrator {
   }
 
   getFieldsForRole(role) {
-    if (role === 'admin') {
-      return [
-        { id: "gw-email", container: "gf-email-container", label: "Email Address", step: 1, req: true },
-        { id: "gw-password", container: "gf-password-container", label: "Master Password", step: 2, req: true },
-        { id: "btn-gateway-submit", container: "gateway-submit-container", label: "Submit Button", step: 3, isSubmit: true }
-      ];
+    if (role === 'admin' || role === 'coordinator') {
+      return [];
     } else if (role === 'collector') {
       return [
         { id: "gw-name", container: "gf-name-container", label: "Full Name", step: 1, req: true },
@@ -202,15 +223,6 @@ class LoginTTSNarrator {
         { id: "gw-email", container: "gf-email-container", label: "Email Address", step: 3, req: false },
         { id: "gw-address", container: "gf-address-container", label: "Operating Address", step: 4, req: true },
         { id: "btn-gateway-submit", container: "gateway-submit-container", label: "Submit Button", step: 5, isSubmit: true }
-      ];
-    } else if (role === 'coordinator') {
-      return [
-        { id: "gw-name", container: "gf-name-container", label: "Full Name", step: 1, req: true },
-        { id: "gw-phone", container: "gf-phone-container", label: "Mobile Number", step: 2, req: true },
-        { id: "gw-email", container: "gf-email-container", label: "Email Address", step: 3, req: true },
-        { id: "gw-emp-id", container: "gf-employee-id-container", label: "Employee ID", step: 4, req: true },
-        { id: "gw-address", container: "gf-address-container", label: "Physical Address", step: 5, req: true },
-        { id: "btn-gateway-submit", container: "gateway-submit-container", label: "Submit Button", step: 6, isSubmit: true }
       ];
     } else {
       // household, hub, recycler
@@ -226,6 +238,12 @@ class LoginTTSNarrator {
 
   startNarrator() {
     this.activeRole = (typeof activeGatewayRole !== 'undefined') ? activeGatewayRole : 'household';
+    if (this.activeRole === 'admin' || this.activeRole === 'coordinator') {
+      this.isEnabled = false;
+      this.stopNarrator();
+      this.updateToggleUI();
+      return;
+    }
     this.fieldsSequence = this.getFieldsForRole(this.activeRole);
     this.currentStepIndex = 0;
 
@@ -271,6 +289,12 @@ class LoginTTSNarrator {
   }
 
   handleRoleChange(role) {
+    if (role === 'admin' || role === 'coordinator') {
+      this.isEnabled = false;
+      this.stopNarrator();
+      this.updateToggleUI();
+      return;
+    }
     if (!this.isEnabled) return;
     this.activeRole = role;
     this.fieldsSequence = this.getFieldsForRole(role);
@@ -576,6 +600,8 @@ class LoginTTSNarrator {
   }
 
   replayCurrentField() {
+    const role = (typeof activeGatewayRole !== 'undefined') ? activeGatewayRole : this.activeRole;
+    if (role === 'admin' || role === 'coordinator') return;
     if (!this.isEnabled) return;
     this.narrateCurrentStep();
   }
@@ -615,6 +641,10 @@ class LoginTTSNarrator {
 const loginTTSNarrator = new LoginTTSNarrator();
 
 function toggleLoginTTS() {
+  const activeRole = (typeof activeGatewayRole !== 'undefined') ? activeGatewayRole : 'household';
+  if (activeRole === 'admin' || activeRole === 'coordinator') {
+    return;
+  }
   loginTTSNarrator.toggle();
 }
 

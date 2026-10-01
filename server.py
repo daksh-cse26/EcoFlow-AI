@@ -2546,7 +2546,7 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
 
         return chain
 
-def run_server(port=8080):
+def run_server(port=8088):
     init_db()
     seed_demo_data()
     server_address = ('0.0.0.0', port)
@@ -2562,7 +2562,7 @@ def run_server(port=8080):
         print("Server stopped.", flush=True)
 
 if __name__ == "__main__":
-    port = 8080
+    port = 8088
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     run_server(port)

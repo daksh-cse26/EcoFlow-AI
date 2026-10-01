@@ -260,6 +260,19 @@ function switchPerspective(role) {
     view.classList.toggle("active", view.id === `view-${role}`);
   });
 
+  // Set active role on body and control voice assistant button visibility
+  document.body.dataset.activeRole = role;
+  const topVoiceBtn = document.querySelector(".voice-btn-top");
+  if (topVoiceBtn) {
+    if (role === 'admin' || role === 'coordinator') {
+      topVoiceBtn.style.display = "none";
+    } else if (role === 'household') {
+      topVoiceBtn.style.display = "inline-flex";
+    } else {
+      topVoiceBtn.style.display = "none";
+    }
+  }
+
   // Role-specific refreshes
   if (role === "admin") {
     setTimeout(() => {
@@ -555,9 +568,9 @@ function loadHouseholdPickups() {
       const pickups = data.pickups || [];
       if (pickups.length === 0) {
         container.innerHTML = `
-          <div class="empty-state-notice" id="household-pickups-empty" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+          <div class="empty-state-notice" id="household-pickups-empty" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
             <div class="empty-state-icon" style="font-size: 36px; margin-bottom: 8px;">📦</div>
-            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Pickups Scheduled</h4>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-main);">No Pickups Scheduled</h4>
             <p class="small text-muted" style="margin: 0 0 16px 0;">You have no active or completed scrap pickups. Tap "+ New" or "Sell Scrap" to schedule your first eco-collection.</p>
             <button type="button" class="btn btn-sm btn-primary" onclick="openPickupModal()">+ Request Scrap Pickup</button>
           </div>
@@ -568,14 +581,14 @@ function loadHouseholdPickups() {
       container.innerHTML = pickups.map(p => `
         <div class="queue-item-card" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-glass); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
           <div class="queue-item-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="queue-id" style="font-size: 13px; font-weight: 700; color: #38BDF8;">${p.pickup_id}</span>
+            <span class="queue-id" style="font-size: 13px; font-weight: 700; color: var(--accent-adaptive);">${p.pickup_id}</span>
             <span class="status-pill status-${(p.status || 'PENDING').toLowerCase()}">${p.status || 'PENDING'}</span>
           </div>
           <p class="small text-muted" style="margin: 4px 0 8px 0;">
             ${p.user_estimated_weight || 0} kg ${p.preliminary_material || 'Scrap'} • ${p.address || ''}
           </p>
           ${p.lot_id ? `
-            <div style="font-size: 11px; color: #94A3B8; margin-bottom: 8px;">
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
               Digital Lot: <strong style="color: #7DD3FC;">${p.lot_id}</strong>
               ${p.assigned_collector_name ? ` • Collector: <strong>${p.assigned_collector_name}</strong>` : ''}
             </div>
@@ -613,9 +626,9 @@ function loadHouseholdSettlement() {
       const settlements = data.settlements || [];
       if (settlements.length === 0) {
         container.innerHTML = `
-          <div class="empty-state-notice" id="settlement-empty-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+          <div class="empty-state-notice" id="settlement-empty-notice" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
             <div class="empty-state-icon" style="font-size: 40px; margin-bottom: 10px;">🧾</div>
-            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Settlement Receipts Yet</h4>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-main);">No Settlement Receipts Yet</h4>
             <p class="small text-muted" style="margin: 0; max-width: 420px; margin-inline: auto;">
               Digital receipts and transparent weighment calculations will appear here automatically after your scrap is physically verified and paid at the hub.
             </p>
@@ -631,9 +644,9 @@ function loadHouseholdSettlement() {
     })
     .catch(() => {
       container.innerHTML = `
-        <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+        <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
           <div class="empty-state-icon" style="font-size: 40px; margin-bottom: 10px;">🧾</div>
-          <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Settlement Receipts Yet</h4>
+          <h4 style="margin: 0 0 6px 0; color: var(--text-main);">No Settlement Receipts Yet</h4>
           <p class="small text-muted" style="margin: 0;">Digital receipts will appear here after physical scale verification.</p>
         </div>
       `;
@@ -680,9 +693,9 @@ function loadHubInventoryBatches() {
       const batches = data.batches || [];
       if (batches.length === 0) {
         container.innerHTML = `
-          <div class="empty-state-notice" style="grid-column: 1 / -1; text-align: center; padding: 36px 20px; color: #94A3B8;">
+          <div class="empty-state-notice" style="grid-column: 1 / -1; text-align: center; padding: 36px 20px; color: var(--text-muted);">
             <span style="font-size: 32px; display: block; margin-bottom: 8px;">📦</span>
-            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">No Aggregated Batches Yet</h4>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-main);">No Aggregated Batches Yet</h4>
             <p class="small text-muted" style="margin: 0;">Inventory batches will be generated as verified lots are aggregated at the hub.</p>
           </div>
         `;
@@ -981,7 +994,7 @@ function loadCoordinatorQueue(isSilent = false) {
       const pickups = data.pickups || [];
       if (pickups.length === 0) {
         queueContainer.innerHTML = `
-          <div style="text-align: center; padding: 30px; color: #94A3B8;">
+          <div style="text-align: center; padding: 30px; color: var(--text-muted);">
             <span style="font-size: 32px; display: block; margin-bottom: 8px;">📭</span>
             <p>No pickup requests currently pending in the municipal queue.</p>
           </div>
@@ -993,7 +1006,7 @@ function loadCoordinatorQueue(isSilent = false) {
         <div class="queue-item-card" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-glass); border-radius: 10px; padding: 16px; margin-bottom: 12px; transition: transform 0.15s ease;">
           <div class="queue-item-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-              <span class="queue-id" style="font-size: 14px; font-weight: 700; color: #38BDF8;">${p.pickup_id}</span>
+              <span class="queue-id" style="font-size: 14px; font-weight: 700; color: var(--accent-adaptive);">${p.pickup_id}</span>
               ${p.lot_id ? `<span style="font-size: 11px; background: rgba(56, 189, 248, 0.15); color: #7DD3FC; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3); font-weight: 600;">Lot: ${p.lot_id}</span>` : ''}
               <span class="badge-blue" style="font-size: 10px;">${p.service_zone || 'ZONE B'}</span>
             </div>
@@ -1005,22 +1018,22 @@ function loadCoordinatorQueue(isSilent = false) {
             <div style="display: flex; align-items: flex-start; gap: 10px;">
               <span style="font-size: 20px; line-height: 1;">📍</span>
               <div style="flex: 1;">
-                <div style="font-size: 10px; font-weight: 700; color: #38BDF8; text-transform: uppercase; letter-spacing: 0.5px;">Household Destination & Collection Address</div>
-                <div style="font-size: 14px; font-weight: 700; color: #F8FAFC; margin: 2px 0 3px 0;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--accent-adaptive); text-transform: uppercase; letter-spacing: 0.5px;">Household Destination & Collection Address</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin: 2px 0 3px 0;">
                   ${p.address || "House 14, Peace Enclave, Paltan Bazaar, Guwahati"}
                 </div>
-                <div style="font-size: 11px; color: #94A3B8;">
-                  ${p.landmark ? `🏛️ Landmark: <span style="color: #CBD5E1;">${p.landmark}</span> • ` : ''}Zone: <strong style="color: #CBD5E1;">${p.service_zone || 'ZONE B'}</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">
+                  ${p.landmark ? `🏛️ Landmark: <span style="color: var(--text-muted);">${p.landmark}</span> • ` : ''}Zone: <strong style="color: var(--text-muted);">${p.service_zone || 'ZONE B'}</strong>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Citizen Contact & Scrap Details -->
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 12px; margin-bottom: 10px; color: #CBD5E1;">
-            <span>👤 Citizen: <strong style="color: #FFFFFF;">${p.household_name}</strong> (${p.household_phone || '+91 98640 12345'})</span>
-            <span>📦 Scrap: <strong style="color: #FFFFFF;">${p.preliminary_material || 'Mixed Scrap'}</strong> (~${p.user_estimated_weight || 0} kg)</span>
-            ${p.assigned_collector_name ? `<span style="color: #34D399;">🚚 Assigned: <strong>${p.assigned_collector_name}</strong> (${p.assigned_collector})</span>` : '<span style="color: #F59E0B;">⏳ Awaiting Collector Assignment</span>'}
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 12px; margin-bottom: 10px; color: var(--text-muted);">
+            <span>👤 Citizen: <strong style="color: var(--text-main);">${p.household_name}</strong> (${p.household_phone || '+91 98640 12345'})</span>
+            <span>📦 Scrap: <strong style="color: var(--text-main);">${p.preliminary_material || 'Mixed Scrap'}</strong> (~${p.user_estimated_weight || 0} kg)</span>
+            ${p.assigned_collector_name ? `<span style="color: var(--accent-adaptive);">🚚 Assigned: <strong>${p.assigned_collector_name}</strong> (${p.assigned_collector})</span>` : '<span style="color: #F59E0B;">⏳ Awaiting Collector Assignment</span>'}
           </div>
 
           <div class="queue-actions-row mt-2" style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -1119,7 +1132,7 @@ async function syncCollectorActiveAssignment() {
         if (scrapValEl) scrapValEl.textContent = data.indicative_value ? `₹${data.indicative_value}` : "Spot Market Value";
 
         if (infoEl) {
-          infoEl.innerHTML = `<span>📦 Expected Scrap: <strong style="color: #E2E8F0;">${data.weight || 0} kg ${data.material || 'Scrap'}</strong></span><span>Est. Value: <strong style="color: #FBBF24;">${data.indicative_value ? '₹' + data.indicative_value : 'Spot Rate'}</strong></span>`;
+          infoEl.innerHTML = `<span>📦 Expected Scrap: <strong style="color: var(--text-main);">${data.weight || 0} kg ${data.material || 'Scrap'}</strong></span><span>Est. Value: <strong style="color: #FBBF24;">${data.indicative_value ? '₹' + data.indicative_value : 'Spot Rate'}</strong></span>`;
         }
 
         // Check if lot is already sealed or completed
@@ -1218,7 +1231,7 @@ async function syncCollectorActiveAssignment() {
     if (scrapValEl && fallbackVal) scrapValEl.textContent = `₹${fallbackVal}`;
 
     if (infoEl && fallbackPickupId) {
-      infoEl.innerHTML = `<span>📦 Expected Scrap: <strong style="color: #E2E8F0;">${fallbackWeight || 0} kg ${fallbackMat || 'Scrap'}</strong></span><span>Est. Value: <strong style="color: #FBBF24;">₹${fallbackVal || 0}</strong></span>`;
+      infoEl.innerHTML = `<span>📦 Expected Scrap: <strong style="color: var(--text-main);">${fallbackWeight || 0} kg ${fallbackMat || 'Scrap'}</strong></span><span>Est. Value: <strong style="color: #FBBF24;">₹${fallbackVal || 0}</strong></span>`;
     }
     if (sealBtn && !appState.collectorLotLocked) {
       sealBtn.disabled = false;
@@ -2253,10 +2266,10 @@ function loadAIModels() {
           <div class="model-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <h4 style="margin: 0; color: #F8FAFC; font-size: 15px;">${m.version_name}</h4>
+                <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${m.version_name}</h4>
                 <span class="badge-blue" style="font-size: 10px;">${m.model_id}</span>
               </div>
-              <small class="text-muted">${m.category} • Architecture: <code style="color: #A7F3D0;">${m.architecture}</code></small>
+              <small class="text-muted">${m.category} • Architecture: <code style="color: var(--text-muted);">${m.architecture}</code></small>
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
               <span class="status-pill status-${m.status.toLowerCase()}">${m.status}</span>
@@ -2265,31 +2278,31 @@ function loadAIModels() {
           </div>
 
           <div class="model-metrics-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 6px;">
-            <div><span class="lbl" style="font-size: 11px; color: #94A3B8;">Validation Acc:</span> <strong style="color: #34D399;">${(m.accuracy * 100).toFixed(1)}%</strong></div>
-            <div><span class="lbl" style="font-size: 11px; color: #94A3B8;">F1 Score:</span> <strong style="color: #38BDF8;">${m.f1_score.toFixed(3)}</strong></div>
-            <div><span class="lbl" style="font-size: 11px; color: #94A3B8;">Latency:</span> <strong style="color: #FBBF24;">${m.latency_ms} ms</strong></div>
-            <div><span class="lbl" style="font-size: 11px; color: #94A3B8;">Target Classes:</span> <strong style="color: #E2E8F0;">${m.categories_count}</strong></div>
+            <div><span class="lbl" style="font-size: 11px; color: var(--text-muted);">Validation Acc:</span> <strong style="color: var(--accent-adaptive);">${(m.accuracy * 100).toFixed(1)}%</strong></div>
+            <div><span class="lbl" style="font-size: 11px; color: var(--text-muted);">F1 Score:</span> <strong style="color: var(--accent-adaptive);">${m.f1_score.toFixed(3)}</strong></div>
+            <div><span class="lbl" style="font-size: 11px; color: var(--text-muted);">Latency:</span> <strong style="color: #FBBF24;">${m.latency_ms} ms</strong></div>
+            <div><span class="lbl" style="font-size: 11px; color: var(--text-muted);">Target Classes:</span> <strong style="color: var(--text-main);">${m.categories_count}</strong></div>
           </div>
 
           <!-- WHERE USED IN THE APP -->
           <div style="margin-top: 12px; background: rgba(56, 189, 248, 0.08); border-left: 3px solid #38BDF8; padding: 8px 12px; border-radius: 4px;">
-            <strong style="color: #38BDF8; font-size: 12px; display: block; margin-bottom: 2px;">📍 Where Used in App:</strong>
-            <span style="font-size: 12px; color: #E2E8F0; line-height: 1.4;">${m.where_used}</span>
+            <strong style="color: var(--accent-adaptive); font-size: 12px; display: block; margin-bottom: 2px;">📍 Where Used in App:</strong>
+            <span style="font-size: 12px; color: var(--text-main); line-height: 1.4;">${m.where_used}</span>
           </div>
 
           <!-- HOW USED & OPERATIONAL ROLE -->
           <div style="margin-top: 8px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10B981; padding: 8px 12px; border-radius: 4px;">
-            <strong style="color: #34D399; font-size: 12px; display: block; margin-bottom: 2px;">⚙️ How Used & Operational Pipeline:</strong>
-            <p style="font-size: 12px; color: #CBD5E1; margin: 0; line-height: 1.5;">${m.how_used}</p>
+            <strong style="color: var(--accent-adaptive); font-size: 12px; display: block; margin-bottom: 2px;">⚙️ How Used & Operational Pipeline:</strong>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.5;">${m.how_used}</p>
           </div>
 
           <!-- INPUT & OUTPUT SPECS -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; font-size: 11px;">
             <div style="background: rgba(255, 255, 255, 0.03); padding: 6px 10px; border-radius: 4px;">
-              <span style="color: #94A3B8;">Input Spec:</span> <code style="color: #93C5FD;">${m.input_spec}</code>
+              <span style="color: var(--text-muted);">Input Spec:</span> <code style="color: #93C5FD;">${m.input_spec}</code>
             </div>
             <div style="background: rgba(255, 255, 255, 0.03); padding: 6px 10px; border-radius: 4px;">
-              <span style="color: #94A3B8;">Output Spec:</span> <code style="color: #A7F3D0;">${m.output_spec}</code>
+              <span style="color: var(--text-muted);">Output Spec:</span> <code style="color: var(--text-muted);">${m.output_spec}</code>
             </div>
           </div>
 
@@ -2328,7 +2341,7 @@ function runModelDiagnosticTest(modelId, versionId) {
   .then(r => r.json())
   .then(res => {
     const t = res.test_result || {};
-    if (title) title.innerHTML = `🧪 Diagnostic Test Result: <span style="color:#34D399;">${t.model_name || modelId}</span>`;
+    if (title) title.innerHTML = `🧪 Diagnostic Test Result: <span style="color: var(--accent-adaptive);">${t.model_name || modelId}</span>`;
     if (output) {
       output.textContent = JSON.stringify(t, null, 2);
     }
@@ -2405,10 +2418,10 @@ function loadAdminCoordinators() {
       tbody.innerHTML = list.map(item => `
         <tr>
           <td>
-            <strong style="color: #F8FAFC;">${escapeHtml(item.email)}</strong>
+            <strong style="color: var(--text-main);">${escapeHtml(item.email)}</strong>
             ${item.is_root ? '<span class="status-badge status-verified" style="margin-left: 6px; font-size: 10px;">👑 ROOT OWNER</span>' : ''}
           </td>
-          <td><strong style="color: #E2E8F0;">${escapeHtml(item.name || 'Officer')}</strong></td>
+          <td><strong style="color: var(--text-main);">${escapeHtml(item.name || 'Officer')}</strong></td>
           <td>
             <span class="badge-${item.is_root ? 'green' : (item.access_level.includes('COORDINATOR') ? 'blue' : 'purple')}" style="font-size: 10px;">
               ${escapeHtml(item.access_level)}
@@ -2417,7 +2430,7 @@ function loadAdminCoordinators() {
           <td>
             <span class="text-success" style="font-size: 11px;">🔒 ${escapeHtml(item.credential_status || 'Verified Encrypted Token')}</span>
           </td>
-          <td><span style="font-size: 12px; color: #CBD5E1;">${escapeHtml(item.service_zone || 'All Zones')}</span></td>
+          <td><span style="font-size: 12px; color: var(--text-muted);">${escapeHtml(item.service_zone || 'All Zones')}</span></td>
           <td><small class="text-muted">${escapeHtml(item.last_active || 'Active Now')}</small></td>
           <td>
             <span class="badge-outline" style="font-size: 10px; border: 1px solid rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">
@@ -2442,9 +2455,9 @@ function loadTraceabilityChain(queryId = "") {
   if (!queryId) {
     if (container) {
       container.innerHTML = `
-        <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+        <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
           <span style="font-size: 32px; display: block; margin-bottom: 8px;">🔍</span>
-          <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">Traceability Provenance Search</h4>
+          <h4 style="margin: 0 0 6px 0; color: var(--text-main);">Traceability Provenance Search</h4>
           <p class="small text-muted" style="margin: 0;">Enter an active Lot ID or Pickup Reference above to inspect its verified 10-stage end-to-end cryptographic lifecycle.</p>
         </div>
       `;
@@ -2458,9 +2471,9 @@ function loadTraceabilityChain(queryId = "") {
       if (!chain || chain.error || (!chain.lot && !chain.pickup)) {
         if (container) {
           container.innerHTML = `
-            <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+            <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
               <span style="font-size: 32px; display: block; margin-bottom: 8px;">⚠️</span>
-              <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">Record Not Found</h4>
+              <h4 style="margin: 0 0 6px 0; color: var(--text-main);">Record Not Found</h4>
               <p class="small text-muted" style="margin: 0;">No active provenance record found matching "<code>${queryId}</code>". Please verify the Lot ID or Pickup Reference.</p>
             </div>
           `;
@@ -2474,9 +2487,9 @@ function loadTraceabilityChain(queryId = "") {
       console.warn("Failed to load traceability chain:", err);
       if (container) {
         container.innerHTML = `
-          <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: #94A3B8;">
+          <div class="empty-state-notice" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
             <span style="font-size: 32px; display: block; margin-bottom: 8px;">⚠️</span>
-            <h4 style="margin: 0 0 6px 0; color: #F8FAFC;">Trace Search Error</h4>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-main);">Trace Search Error</h4>
             <p class="small text-muted" style="margin: 0;">Could not retrieve provenance record. Please try again.</p>
           </div>
         `;
@@ -2516,12 +2529,12 @@ function renderTraceabilityVisualizer(chain) {
     <div class="trace-chain-container" style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px;">
       <div class="trace-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
         <div>
-          <h4 style="margin: 0; color: #38BDF8; font-size: 16px;">🔗 Digital Provenance Chain: <code style="color: #34D399;">${chain.query_id || lotId}</code></h4>
+          <h4 style="margin: 0; color: var(--accent-adaptive); font-size: 16px;">🔗 Digital Provenance Chain: <code style="color: var(--accent-adaptive);">${chain.query_id || lotId}</code></h4>
           <p class="text-muted small" style="margin: 4px 0 0 0;">Zero-knowledge cryptographic custody proof covering 10 sequential stages from citizen doorstep to certified circular off-taker.</p>
         </div>
         <div style="text-align: right;">
           <span class="badge-green" style="font-size: 11px;">✅ 10/10 Proof Stages Validated</span>
-          <div style="font-size: 10px; color: #94A3B8; margin-top: 2px;">Merkle Root: <code>0x7d94e...6b15</code></div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Merkle Root: <code>0x7d94e...6b15</code></div>
         </div>
       </div>
 
@@ -2531,15 +2544,15 @@ function renderTraceabilityVisualizer(chain) {
             <div class="node-icon" style="font-size: 24px; min-width: 36px; text-align: center;">${s.icon}</div>
             <div class="node-content" style="flex: 1;">
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
-                <h5 style="margin: 0; color: #F8FAFC; font-size: 13px;">${s.title}</h5>
+                <h5 style="margin: 0; color: var(--text-main); font-size: 13px;">${s.title}</h5>
                 <span class="badge-blue" style="font-size: 10px;">${s.tag}</span>
               </div>
-              <div class="node-id" style="margin: 3px 0;"><code style="color: #38BDF8; font-size: 11px;">${s.id}</code></div>
-              <p class="node-desc" style="margin: 0; font-size: 11px; color: #CBD5E1;">${s.detail}</p>
+              <div class="node-id" style="margin: 3px 0;"><code style="color: var(--accent-adaptive); font-size: 11px;">${s.id}</code></div>
+              <p class="node-desc" style="margin: 0; font-size: 11px; color: var(--text-muted);">${s.detail}</p>
             </div>
-            <div style="color: #34D399; font-weight: 700; font-size: 18px;">✓</div>
+            <div style="color: var(--accent-adaptive); font-weight: 700; font-size: 18px;">✓</div>
           </div>
-          ${idx < steps.length - 1 ? '<div style="text-align: center; color: #38BDF8; font-size: 12px; margin: -4px 0;">↓</div>' : ''}
+          ${idx < steps.length - 1 ? '<div style="text-align: center; color: var(--accent-adaptive); font-size: 12px; margin: -4px 0;">↓</div>' : ''}
         `).join("")}
       </div>
     </div>
@@ -2649,10 +2662,10 @@ function renderAuditLogsFiltered() {
       <tr>
         <td><span class="${catBadge}" style="font-size: 11px;">${l.event_name}</span></td>
         <td><small class="text-muted">${l.previous_value || 'None'}</small></td>
-        <td><strong style="color: #F8FAFC;">${l.new_value}</strong></td>
-        <td><strong style="color: #38BDF8;">${l.user_name}</strong> <small class="text-muted">(${l.role})</small></td>
-        <td><small style="color: #CBD5E1;">${l.reason || '-'}</small></td>
-        <td><small style="font-family: monospace; color: #94A3B8;">${l.timestamp}</small></td>
+        <td><strong style="color: var(--text-main);">${l.new_value}</strong></td>
+        <td><strong style="color: var(--accent-adaptive);">${l.user_name}</strong> <small class="text-muted">(${l.role})</small></td>
+        <td><small style="color: var(--text-muted);">${l.reason || '-'}</small></td>
+        <td><small style="font-family: monospace; color: var(--text-muted);">${l.timestamp}</small></td>
       </tr>
     `;
   }).join("");
@@ -2744,11 +2757,11 @@ function renderTaxonomyRows() {
         <td><strong>${m.subcategory}</strong></td>
         <td><code>${m.material_code}</code></td>
         <td>
-          <strong style="color: #34D399; font-size: 14px;">₹${adjRate}</strong> / ${m.unit}
+          <strong style="color: var(--accent-adaptive); font-size: 14px;">₹${adjRate}</strong> / ${m.unit}
           ${currentRateDeltaPct !== 0 ? `<small style="margin-left: 4px; color: ${currentRateDeltaPct > 0 ? '#34D399' : '#F87171'};">(${currentRateDeltaPct > 0 ? '+' : ''}${currentRateDeltaPct}%)</small>` : ''}
         </td>
         <td><span class="badge-green" style="font-size: 10px;">${m.carbon_offset_per_kg || 1.5} kg CO₂ / ${m.unit}</span></td>
-        <td><small style="color: #CBD5E1;">${m.segregation_guidelines || 'Segregated clean recyclables only.'}</small></td>
+        <td><small style="color: var(--text-muted);">${m.segregation_guidelines || 'Segregated clean recyclables only.'}</small></td>
         <td><small style="color: #93C5FD; font-weight: 600;">🏭 ${offTaker}</small></td>
       </tr>
     `;
@@ -3204,16 +3217,16 @@ function loadNVDAudit() {
       const components = data.components || [];
       tbody.innerHTML = components.map(c => `
         <tr>
-          <td><strong style="color: #F8FAFC;">${c.component_name}</strong></td>
+          <td><strong style="color: var(--text-main);">${c.component_name}</strong></td>
           <td><code style="font-size: 11px; color: #93C5FD;">${c.cpe}</code></td>
           <td><span class="badge-blue" style="font-size: 10px;">${c.active_version}</span></td>
-          <td><small style="color: #CBD5E1;">${c.nist_cve_checked.join(", ")}</small></td>
+          <td><small style="color: var(--text-muted);">${c.nist_cve_checked.join(", ")}</small></td>
           <td><span class="badge-gold" style="font-size: 10px;">${c.dos_vulnerability_cwe}</span></td>
-          <td><strong style="color: #34D399;">${c.cvss_score.toFixed(1)} (None)</strong></td>
+          <td><strong style="color: var(--accent-adaptive);">${c.cvss_score.toFixed(1)} (None)</strong></td>
           <td>
             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
               <span class="badge-green" style="font-size: 10px;">${c.status}</span>
-              <small style="color: #94A3B8;">${c.immunity_details}</small>
+              <small style="color: var(--text-muted);">${c.immunity_details}</small>
             </div>
           </td>
         </tr>
@@ -3238,15 +3251,15 @@ function simulateCrowdingSurge(burstCount = 500) {
   })
     .then(r => r.json())
     .then(res => {
-      if (titleEl) titleEl.innerHTML = `⚡ ${burstCount} Concurrent Requests Absorbed: <span style="color:#34D399;">Server Breakdown Prevented</span>`;
+      if (titleEl) titleEl.innerHTML = `⚡ ${burstCount} Concurrent Requests Absorbed: <span style="color: var(--accent-adaptive);">Server Breakdown Prevented</span>`;
       if (detailsEl) {
         detailsEl.innerHTML = `
           <strong>Surge Resilience Report:</strong><br/>
-          • Processed Successfully: <span style="color: #34D399; font-weight: 700;">${res.processed_successfully} / ${res.burst_size}</span><br/>
-          • Served from RAM Micro-Cache: <span style="color: #38BDF8; font-weight: 700;">${res.served_from_ram_cache} requests (0.00ms SQLite latency)</span><br/>
+          • Processed Successfully: <span style="color: var(--accent-adaptive); font-weight: 700;">${res.processed_successfully} / ${res.burst_size}</span><br/>
+          • Served from RAM Micro-Cache: <span style="color: var(--accent-adaptive); font-weight: 700;">${res.served_from_ram_cache} requests (0.00ms SQLite latency)</span><br/>
           • Requests Shed to Protect Memory/Threads: <span style="color: #FBBF24;">${res.requests_shed_to_prevent_breakdown}</span><br/>
           • Total Execution Time: <strong>${res.total_execution_time_ms} ms</strong> (Avg: ${res.avg_latency_per_request_ms} ms/req)<br/>
-          • Verdict: <span style="color: #34D399;">${res.resilience_verdict}</span>
+          • Verdict: <span style="color: var(--accent-adaptive);">${res.resilience_verdict}</span>
         `;
       }
       loadTrafficShieldStats();
