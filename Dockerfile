@@ -13,9 +13,11 @@ ENV PORT=10000
 # Copy application files
 COPY . /app
 
-# Expose Render standard port and local port
+# Ensure full read/write permissions for SQLite database operations
+RUN chmod -R 777 /app
+
+# Expose Render standard port
 EXPOSE 10000
-EXPOSE 8088
 
 # Run server with unbuffered output
 CMD ["python", "-u", "server.py"]

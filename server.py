@@ -2595,13 +2595,24 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
 
         return chain
 
-def run_server(port=8088):
+def run_server(port=10000):
     init_db()
     seed_demo_data()
     server_address = ('0.0.0.0', port)
     httpd = ThreadingHTTPServer(server_address, EcoFlowAPIHandler)
     httpd.daemon_threads = True
-    print(f"EcoFlow AI Server listening on http://127.0.0.1:{port}", flush=True)
+    print(f"EcoFlow AI Server listening on http://0.0.0.0:{port}", flush=True)
+
+    # Secondary port fallback listener for Render port autodetection resilience
+    alt_port = 8088 if port != 8088 else 10000
+    try:
+        httpd_alt = ThreadingHTTPServer(('0.0.0.0', alt_port), EcoFlowAPIHandler)
+        httpd_alt.daemon_threads = True
+        threading.Thread(target=httpd_alt.serve_forever, daemon=True).start()
+        print(f"EcoFlow AI Secondary Listener active on http://0.0.0.0:{alt_port}", flush=True)
+    except Exception as alt_err:
+        print(f"Secondary listener on port {alt_port} skipped: {alt_err}", flush=True)
+
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

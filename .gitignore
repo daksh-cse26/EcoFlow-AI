@@ -7,3 +7,4 @@ test.txt
 *.log
 cloudflared.exe
 check_actions.py
+render_screenshot.png
