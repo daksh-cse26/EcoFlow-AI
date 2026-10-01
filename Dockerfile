@@ -8,12 +8,13 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONIOENCODING=utf-8
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
-ENV PORT=8088
+ENV PORT=10000
 
 # Copy application files
 COPY . /app
 
-# Expose port
+# Expose Render standard port and local port
+EXPOSE 10000
 EXPOSE 8088
 
 # Run server with unbuffered output

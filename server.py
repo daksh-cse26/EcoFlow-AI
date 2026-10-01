@@ -2612,8 +2612,13 @@ def run_server(port=8088):
 
 if __name__ == "__main__":
     try:
-        raw_port = os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else "8088")
-        port = int(raw_port)
+        raw_port = os.environ.get("PORT")
+        if raw_port:
+            port = int(raw_port)
+        elif len(sys.argv) > 1:
+            port = int(sys.argv[1])
+        else:
+            port = 10000 if os.path.exists("/.dockerenv") or os.environ.get("RENDER") else 8088
         print(f"--> Initializing EcoFlow AI Server on 0.0.0.0:{port}...", flush=True)
         run_server(port)
     except Exception as e:
