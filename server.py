@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+import sys
+print("--> Python runtime successfully initialized server.py!", flush=True)
+
 """
 EcoFlow AI - Production Backend Server
 REST API & Static Web Server
