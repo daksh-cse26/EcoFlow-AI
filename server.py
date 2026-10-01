@@ -2611,5 +2611,13 @@ def run_server(port=8088):
         print("Server stopped.", flush=True)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else 8088))
-    run_server(port)
+    try:
+        raw_port = os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else "8088")
+        port = int(raw_port)
+        print(f"--> Initializing EcoFlow AI Server on 0.0.0.0:{port}...", flush=True)
+        run_server(port)
+    except Exception as e:
+        import traceback
+        print(f"FATAL SERVER STARTUP ERROR: {e}", flush=True)
+        traceback.print_exc()
+        sys.exit(1)
