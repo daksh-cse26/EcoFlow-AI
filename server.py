@@ -256,6 +256,24 @@ class NVDVulnerabilityGuard:
 traffic_shield = TrafficShield()
 nvd_guard = NVDVulnerabilityGuard()
 
+def verify_master_credential(cursor, password):
+    """Verifies the master password for the Root Administrator (dakssinghi@gmail.com)."""
+    if not password:
+        return False, "Master security password is required."
+    cursor.execute("SELECT * FROM admin_whitelist WHERE LOWER(email) = 'dakssinghi@gmail.com' OR is_root = 1 LIMIT 1")
+    root = cursor.fetchone()
+    if not root:
+        return False, "Root administrator account not found in whitelist."
+    p_hash = root["password_hash"]
+    p_salt = root["password_salt"]
+    if not p_hash or not p_salt:
+        p_hash = "61cbbcac3af141579ed8b833e2b177807a54a863e92c02a5b1bc5d15585e4b3c"
+        p_salt = "1430c54781a1e7a767311188f1c1932666993c54ae63415e419f60d28e8d444f"
+        cursor.execute("UPDATE admin_whitelist SET password_hash = ?, password_salt = ? WHERE LOWER(email) = LOWER(?)", (p_hash, p_salt, root["email"]))
+    if not verify_password(password, p_hash, p_salt):
+        return False, "Incorrect Master Password. Access Denied."
+    return True, "OK"
+
 class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=STATIC_DIR, **kwargs)
@@ -1452,8 +1470,24 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
                 conn.close()
                 return self._send_json({"success": True, "message": "Master password reset successfully. Please login with your new credentials."})
 
+            # Verify Master Password Endpoint
+            elif path == '/api/auth/verify-master':
+                password = body.get('password', '').strip()
+                ok, err = verify_master_credential(cursor, password)
+                if not ok:
+                    conn.close()
+                    return self._send_json({"success": False, "error": err}, status=401)
+                conn.close()
+                return self._send_json({"success": True, "message": "Master Password Verified"})
+
             # Whitelist Management Endpoint
             elif path == '/api/auth/whitelist':
+                master_password = body.get('master_password', '').strip()
+                ok, err = verify_master_credential(cursor, master_password)
+                if not ok:
+                    conn.close()
+                    return self._send_json({"success": False, "error": f"Authorization Failed: {err}"}, status=401)
+
                 caller_email = body.get('caller_email', '').strip().lower()
                 if caller_email != 'dakssinghi@gmail.com':
                     conn.close()
@@ -1490,6 +1524,12 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
 
             # Command Center: Manage Authorized Coordinators Directory
             elif path == '/api/admin/coordinators':
+                master_password = body.get('master_password', '').strip()
+                ok, err = verify_master_credential(cursor, master_password)
+                if not ok:
+                    conn.close()
+                    return self._send_json({"success": False, "error": f"Authorization Failed: {err}"}, status=401)
+
                 emp_id = body.get('employee_id', '').strip()
                 name = body.get('name', '').strip()
                 zone = body.get('service_zone', 'ZONE B').strip()
@@ -1585,6 +1625,12 @@ class EcoFlowAPIHandler(SimpleHTTPRequestHandler):
 
             # 2. Switch Active AI Model Version
             elif path == '/api/ai/models/switch':
+                master_password = body.get('master_password', '').strip()
+                ok, err = verify_master_credential(cursor, master_password)
+                if not ok:
+                    conn.close()
+                    return self._send_json({"success": False, "error": f"Authorization Failed: {err}"}, status=401)
+
                 version_id = body.get('version_id')
                 cursor.execute("UPDATE ai_model_versions SET status = 'INACTIVE' WHERE status = 'ACTIVE'")
                 cursor.execute("UPDATE ai_model_versions SET status = 'ACTIVE' WHERE version_id = ?", (version_id,))

@@ -241,6 +241,25 @@ document.addEventListener("DOMContentLoaded", () => {
 // Role & Perspective Switcher
 function switchPerspective(role) {
   if (role === 'recycler') role = 'household';
+
+  // Guard Command Center entrance: Require master password if not in admin session
+  if (role === 'admin') {
+    const sessionStr = localStorage.getItem("ecoflow_user_session");
+    const session = sessionStr ? JSON.parse(sessionStr) : {};
+    if (session.role !== 'admin') {
+      if (typeof promptMasterPassword === "function") {
+        promptMasterPassword("Enter Command Center Master View", () => {
+          if (typeof executeBypassSwitchRole === "function") {
+            executeBypassSwitchRole('admin');
+          } else {
+            switchPerspective('admin');
+          }
+        });
+        return;
+      }
+    }
+  }
+
   appState.currentRole = role;
 
   // Smoothly scroll window to top
@@ -2394,16 +2413,31 @@ function closeAITestConsole() {
 }
 
 function switchAIModelVersion(versionId) {
+  if (typeof promptMasterPassword === "function") {
+    promptMasterPassword(`Activate AI Model: EcoFlow-Waste-${versionId}`, (masterPwd) => {
+      executeSwitchAIModelVersion(versionId, masterPwd);
+    });
+  } else {
+    executeSwitchAIModelVersion(versionId);
+  }
+}
+
+function executeSwitchAIModelVersion(versionId, masterPwd) {
   apiFetch("/api/ai/models/switch", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ version_id: versionId })
+    body: JSON.stringify({ version_id: versionId, master_password: masterPwd })
   })
   .then(r => r.json())
   .then(res => {
+    if (!res.success) {
+      alert("Error: " + (res.error || "Failed to switch model."));
+      return;
+    }
     alert(`AI Deployment Updated!\nActive Model: ${res.active_model}\nAudit log recorded.`);
     loadAIModels();
-  });
+  })
+  .catch(err => alert("Network error: " + err.message));
 }
 
 function testAIModelVersion(versionId) {

@@ -385,9 +385,155 @@ async function submitGatewayLogin() {
   }
 }
 
+// ====================================================
+// MASTER PASSWORD VERIFICATION CONTROLLER
+// Strict Security: Prompt master password for all administrative changes
+// ====================================================
+let pendingMasterAction = null;
+
+function promptMasterPassword(actionTitle, onAuthorizedCallback) {
+  const modal = document.getElementById("admin-master-password-modal");
+  const descEl = document.getElementById("master-auth-action-desc");
+  const pwdInput = document.getElementById("master-auth-password");
+  const errEl = document.getElementById("master-auth-error");
+  const submitBtn = document.getElementById("btn-submit-master-auth");
+
+  if (!modal) {
+    const entered = window.prompt(`[EcoFlow Master Authorization]\n${actionTitle}\nEnter Master Password:`);
+    if (entered) onAuthorizedCallback(entered);
+    return;
+  }
+
+  pendingMasterAction = {
+    actionTitle: actionTitle,
+    callback: onAuthorizedCallback
+  };
+
+  if (descEl) {
+    descEl.innerHTML = `<strong>Action:</strong> <span style="color: var(--accent-adaptive);">${actionTitle}</span><br>Enter your master security password to authorize this administrative change.`;
+  }
+  if (pwdInput) {
+    pwdInput.value = "";
+    pwdInput.type = "password";
+  }
+  const eyeBtn = document.getElementById("btn-toggle-master-auth-pwd");
+  if (eyeBtn) eyeBtn.textContent = "👁️";
+
+  if (errEl) {
+    errEl.style.display = "none";
+    errEl.textContent = "";
+  }
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `🔒 Authorize & Proceed`;
+  }
+
+  modal.style.display = "flex";
+  modal.classList.add("open");
+
+  setTimeout(() => {
+    if (pwdInput) pwdInput.focus();
+  }, 100);
+}
+
+function closeMasterPasswordModal() {
+  const modal = document.getElementById("admin-master-password-modal");
+  if (modal) {
+    modal.style.display = "none";
+    modal.classList.remove("open");
+  }
+  pendingMasterAction = null;
+}
+
+function toggleMasterAuthPwdVisibility() {
+  const pwdInput = document.getElementById("master-auth-password");
+  const eyeBtn = document.getElementById("btn-toggle-master-auth-pwd");
+  if (!pwdInput) return;
+  if (pwdInput.type === "password") {
+    pwdInput.type = "text";
+    if (eyeBtn) eyeBtn.textContent = "🙈";
+  } else {
+    pwdInput.type = "password";
+    if (eyeBtn) eyeBtn.textContent = "👁️";
+  }
+}
+
+async function submitMasterPasswordChallenge() {
+  if (!pendingMasterAction) return;
+  const pwdInput = document.getElementById("master-auth-password");
+  const errEl = document.getElementById("master-auth-error");
+  const submitBtn = document.getElementById("btn-submit-master-auth");
+  const enteredPassword = (pwdInput?.value || "").trim();
+
+  if (!enteredPassword) {
+    if (errEl) {
+      errEl.textContent = "Master password cannot be empty.";
+      errEl.style.display = "block";
+    }
+    if (pwdInput) pwdInput.focus();
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner-inline"></span> Verifying...`;
+  }
+
+  try {
+    const res = await fetch("/api/auth/verify-master", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: enteredPassword })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      if (errEl) {
+        errEl.textContent = data.error || "Incorrect Master Password. Access Denied.";
+        errEl.style.display = "block";
+      }
+      if (pwdInput) {
+        pwdInput.select();
+        pwdInput.focus();
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `🔒 Authorize & Proceed`;
+      }
+      return;
+    }
+
+    // Success: Execute callback with verified password
+    const cb = pendingMasterAction.callback;
+    closeMasterPasswordModal();
+    if (typeof cb === "function") {
+      cb(enteredPassword);
+    }
+  } catch (err) {
+    if (errEl) {
+      errEl.textContent = "Network Error: " + err.message;
+      errEl.style.display = "block";
+    }
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `🔒 Authorize & Proceed`;
+    }
+  }
+}
+
 // Helper role switcher for internal components
 function bypassSwitchRole(role) {
   if (role === 'recycler') role = 'household';
+  if (role === 'admin') {
+    promptMasterPassword("Enter Command Center Master View", () => {
+      executeBypassSwitchRole(role);
+    });
+    return;
+  }
+  executeBypassSwitchRole(role);
+}
+
+function executeBypassSwitchRole(role) {
   const customName = (typeof getActiveUserName === "function") ? getActiveUserName("") : (localStorage.getItem("ecoflow_custom_user_name") || "");
   const storedColId = localStorage.getItem("ecoflow_collector_id");
   const storedColName = localStorage.getItem("ecoflow_collector_name");
@@ -896,19 +1042,22 @@ function toggleAdminSessionIdentity() {
       is_root: false
     };
     localStorage.setItem("ecoflow_user_session", JSON.stringify(otherUser));
+    renderAdminAccessControl();
+    if (typeof updateAllInterfaceUserNames === "function") updateAllInterfaceUserNames();
   } else {
-    // Switch back to Root Owner ('me')
-    const rootUser = {
-      role: "admin",
-      name: "Daksh Singhi (Owner)",
-      email: "dakssinghi@gmail.com",
-      is_root: true
-    };
-    localStorage.setItem("ecoflow_user_session", JSON.stringify(rootUser));
+    // Switching back to Root Owner ('me') requires Master Password
+    promptMasterPassword("Switch to Root Owner Account (Daksh Singhi)", () => {
+      const rootUser = {
+        role: "admin",
+        name: "Daksh Singhi (Owner)",
+        email: "dakssinghi@gmail.com",
+        is_root: true
+      };
+      localStorage.setItem("ecoflow_user_session", JSON.stringify(rootUser));
+      renderAdminAccessControl();
+      if (typeof updateAllInterfaceUserNames === "function") updateAllInterfaceUserNames();
+    });
   }
-
-  renderAdminAccessControl();
-  if (typeof updateAllInterfaceUserNames === "function") updateAllInterfaceUserNames();
 }
 
 // Add Administrator to Whitelist
@@ -929,30 +1078,33 @@ async function addWhitelistEmail() {
     return;
   }
 
-  try {
-    const res = await fetch("/api/auth/whitelist", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        caller_email: session.email,
-        action: "add",
-        target_email: targetEmail,
-        target_name: targetName
-      })
-    });
-    const result = await res.json();
-    if (!res.ok || !result.success) {
-      alert("Error: " + (result.error || "Failed to add email."));
-      return;
-    }
+  promptMasterPassword(`Authorize New Administrator: ${targetEmail}`, async (masterPwd) => {
+    try {
+      const res = await fetch("/api/auth/whitelist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          caller_email: session.email,
+          action: "add",
+          target_email: targetEmail,
+          target_name: targetName,
+          master_password: masterPwd
+        })
+      });
+      const result = await res.json();
+      if (!res.ok || !result.success) {
+        alert("Error: " + (result.error || "Failed to add email."));
+        return;
+      }
 
-    alert(`Successfully authorized ${targetEmail} for Command Center access.`);
-    const emailInput = document.getElementById("new-admin-email");
-    if (emailInput) emailInput.value = "";
-    loadWhitelist();
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
+      alert(`Successfully authorized ${targetEmail} for Command Center access.`);
+      const emailInput = document.getElementById("new-admin-email");
+      if (emailInput) emailInput.value = "";
+      loadWhitelist();
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  });
 }
 
 // Revoke Administrator Email
@@ -967,27 +1119,30 @@ async function deleteWhitelistEmail(targetEmail) {
 
   if (!confirm(`Are you sure you want to revoke Command Center access for ${targetEmail}?`)) return;
 
-  try {
-    const res = await fetch("/api/auth/whitelist", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        caller_email: session.email,
-        action: "delete",
-        target_email: targetEmail
-      })
-    });
-    const result = await res.json();
-    if (!res.ok || !result.success) {
-      alert("Error: " + (result.error || "Failed to revoke access."));
-      return;
-    }
+  promptMasterPassword(`Revoke Command Center Access: ${targetEmail}`, async (masterPwd) => {
+    try {
+      const res = await fetch("/api/auth/whitelist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          caller_email: session.email,
+          action: "delete",
+          target_email: targetEmail,
+          master_password: masterPwd
+        })
+      });
+      const result = await res.json();
+      if (!res.ok || !result.success) {
+        alert("Error: " + (result.error || "Failed to revoke access."));
+        return;
+      }
 
-    alert(`Access revoked for ${targetEmail}.`);
-    loadWhitelist();
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
+      alert(`Access revoked for ${targetEmail}.`);
+      loadWhitelist();
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  });
 }
 
 // ====================================================
@@ -1460,38 +1615,51 @@ async function adminAuthorizeCoordinator() {
     return;
   }
 
-  try {
-    const res = await fetch("/api/admin/coordinators", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        employee_id: empId,
-        name: name,
-        service_zone: zone,
-        email: email
-      })
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      alert("Authorization Error: " + (data.error || "Failed to authorize coordinator."));
-      return;
+  promptMasterPassword(`Authorize Coordinator: ${name} (${empId})`, async (masterPwd) => {
+    try {
+      const res = await fetch("/api/admin/coordinators", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employee_id: empId,
+          name: name,
+          service_zone: zone,
+          email: email,
+          master_password: masterPwd
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        alert("Authorization Error: " + (data.error || "Failed to authorize coordinator."));
+        return;
+      }
+
+      alert(`✅ Employee ID ${empId} successfully authorized in Command Center Directory for ${name} (${zone}).`);
+      const idInput = document.getElementById("new-coord-empid");
+      const nameInput = document.getElementById("new-coord-name");
+      const emailInput = document.getElementById("new-coord-email");
+      if (idInput) idInput.value = "";
+      if (nameInput) nameInput.value = "";
+      if (emailInput) emailInput.value = "";
+
+      loadAdminCoordinators();
+    } catch (err) {
+      alert("Network Error: " + err.message);
     }
-
-    alert(`✅ Employee ID ${empId} successfully authorized in Command Center Directory for ${name} (${zone}).`);
-    const idInput = document.getElementById("new-coord-empid");
-    const nameInput = document.getElementById("new-coord-name");
-    const emailInput = document.getElementById("new-coord-email");
-    if (idInput) idInput.value = "";
-    if (nameInput) nameInput.value = "";
-    if (emailInput) emailInput.value = "";
-
-    loadAdminCoordinators();
-  } catch (err) {
-    alert("Network Error: " + err.message);
-  }
+  });
 }
 
 // Initialize on DOM Ready
 document.addEventListener("DOMContentLoaded", () => {
   initAuth();
+
+  const masterPwdInput = document.getElementById("master-auth-password");
+  if (masterPwdInput) {
+    masterPwdInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitMasterPasswordChallenge();
+      }
+    });
+  }
 });

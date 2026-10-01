@@ -2524,6 +2524,36 @@
     </div>
   </div>
 
+  <!-- Command Center Master Password Challenge Modal -->
+  <div class="security-modal-overlay" id="admin-master-password-modal" role="dialog" aria-modal="true" style="display: none; z-index: 100000;">
+    <div class="security-modal-box text-left" style="max-width: 460px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+        <h3 style="color: var(--text-main); font-size: 17px; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <span>🛡️</span> Master Password Required
+        </h3>
+        <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.35); font-size: 11px; font-weight: 700;">Restricted Action</span>
+      </div>
+      <p class="small text-muted mb-2" id="master-auth-action-desc" style="line-height: 1.4;">
+        Authentication is required before performing this Command Center operation.
+      </p>
+
+      <div class="form-group mb-2">
+        <label style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: block;">Master Security Password (dakssinghi@gmail.com):</label>
+        <div style="position: relative;">
+          <input type="password" id="master-auth-password" class="form-input" placeholder="Enter master security password..." autocomplete="current-password" style="padding-right: 42px; width: 100%; font-size: 14px;" />
+          <button type="button" id="btn-toggle-master-auth-pwd" class="btn-icon" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 4px;" onclick="toggleMasterAuthPwdVisibility()" aria-label="Toggle password visibility">👁️</button>
+        </div>
+      </div>
+
+      <div id="master-auth-error" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #EF4444; color: #FCA5A5; font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; font-weight: 600;"></div>
+
+      <div style="display: flex; gap: 10px; margin-top: 14px;">
+        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeMasterPasswordModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-submit-master-auth" style="flex: 2;" onclick="submitMasterPasswordChallenge()">🔒 Authorize & Proceed</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Command Center Forgot Password Modal -->
   <div class="security-modal-overlay" id="admin-forgot-password-modal" role="dialog" aria-modal="true">
     <div class="security-modal-box text-left">
